@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>entry-review 관리 시스템</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f0efec;color:#1a1a18;font-size:13px}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ── Sidebar Nav ── */
+.sb{width:220px;min-width:220px;background:#fff;border-right:.5px solid rgba(0,0,0,.1);display:flex;flex-direction:column;overflow:hidden;transition:width .2s}
+.sb-hd{padding:16px 18px 12px;border-bottom:.5px solid rgba(0,0,0,.07)}
+.sb-brand{font-size:10px;font-weight:700;letter-spacing:.12em;color:#aaa;text-transform:uppercase}
+.sb-title{font-size:13px;font-weight:700;color:#1a1a18;line-height:1.3;margin-top:2px}
+.sb-pill{display:inline-block;margin-top:6px;font-size:10px;font-weight:700;background:#378ADD;color:#fff;border-radius:4px;padding:2px 8px}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 0 20px}
+.sb-nav::-webkit-scrollbar{width:3px}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1)}
+.nav-sec{padding:10px 16px 4px;font-size:10px;font-weight:700;color:#c0bfb8;letter-spacing:.08em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:#888;font-size:12px;font-weight:500;border-left:2px solid transparent;transition:all .15s}
+.nav-item:hover{color:#1a1a18;background:#f8f8f5}
+.nav-item.active{color:#1a1a18;background:#f3f2ef;border-left:2px solid #1a1a18;font-weight:700}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.nav-badge{margin-left:auto;background:#378ADD;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700}
+.sb-ft{padding:12px 16px;border-top:.5px solid rgba(0,0,0,.07);font-size:10px;color:#ccc}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:48px;background:#fff;border-bottom:.5px solid rgba(0,0,0,.1);padding:0 22px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.tb-title{font-size:14px;font-weight:700}
+.tb-sub{font-size:11px;color:#bbb}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.bdg{font-size:10px;border-radius:4px;padding:2px 8px;font-weight:700}
+.bdg-bl{background:#e8f0fb;color:#1a56c4}.bdg-gn{background:#e6f4ed;color:#1a7f4a}
+.bdg-rd{background:#fde8e8;color:#c0392b}.bdg-am{background:#fdf3e3;color:#9a6d00}
+.bdg-gy{background:#f0efea;color:#888}
+.panels{flex:1;overflow-y:auto;padding:20px 22px 32px}
+.panels::-webkit-scrollbar{width:4px}
+.panels::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:2px}
+.panel{display:none}.panel.active{display:block}
+
+/* ── Components ── */
+.sec-hd{display:flex;align-items:baseline;gap:8px;margin-bottom:14px}
+.sec-hd h2{font-size:14px;font-weight:700;color:#1a1a18}
+.sec-hd p{font-size:11px;color:#bbb}
+.krow{display:grid;gap:10px;margin-bottom:16px}
+.k4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.k3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kpi{background:#fff;border-radius:10px;padding:14px 16px;border:.5px solid rgba(0,0,0,.07)}
+.kpi-l{font-size:10px;color:#aaa;margin-bottom:5px;font-weight:600;letter-spacing:.02em}
+.kpi-v{font-size:22px;font-weight:800;color:#1a1a18;line-height:1}
+.kpi-s{font-size:11px;margin-top:5px;color:#aaa}
+.up{color:#1a7f4a}.dn{color:#c0392b}.neu{color:#888}.blu{color:#378ADD}
+.card{background:#fff;border:.5px solid rgba(0,0,0,.07);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.card-hd{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
+.ct{font-size:12px;font-weight:700;color:#1a1a18}
+.cs{font-size:10px;color:#bbb;margin-bottom:12px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#aaa;border-bottom:.5px solid rgba(0,0,0,.08);white-space:nowrap}
+td{padding:7px 10px;color:#1a1a18;border-bottom:.5px solid rgba(0,0,0,.05);white-space:nowrap;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+.tr{text-align:right;font-variant-numeric:tabular-nums}
+.tag{font-size:10px;border-radius:3px;padding:2px 7px;font-weight:700}
+.tbl{background:#e8f0fb;color:#1a56c4}.tgn{background:#e6f4ed;color:#1a7f4a}
+.trd{background:#fde8e8;color:#c0392b}.tgy{background:#f0efea;color:#888}.tam{background:#fdf3e3;color:#9a6d00}
+.btn{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 14px;border-radius:7px;border:.5px solid rgba(0,0,0,.13);background:#fff;font-size:11px;font-weight:600;cursor:pointer;color:#1a1a18;transition:all .15s;white-space:nowrap}
+.btn:hover{background:#f5f5f2}
+.btn-pri{background:#1a1a18;color:#fff;border-color:#1a1a18}.btn-pri:hover{opacity:.82}
+.btn-bl{background:#378ADD;color:#fff;border-color:#378ADD}.btn-bl:hover{opacity:.85}
+.btn-gn{background:#1a7f4a;color:#fff;border-color:#1a7f4a}.btn-gn:hover{opacity:.85}
+.btn-sm{height:26px;padding:0 10px;font-size:10px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.score-bar-wrap{display:flex;align-items:center;gap:8px}
+.score-bar{flex:1;height:6px;background:#f0efec;border-radius:3px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:11px;color:#888;margin-bottom:4px;font-weight:600}
+.fld input[type=text],.fld input[type=number],.fld select,.fld textarea{width:100%;height:32px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;color:#1a1a18;background:#fafaf8;outline:none;font-family:inherit}
+.fld textarea{height:80px;padding:8px 10px;resize:vertical}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:#378ADD;background:#fff}
+.uw{position:relative}.uw input{padding-right:28px}
+.uw span{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:10px;color:#bbb;pointer-events:none}
+.slfld{margin-bottom:10px}
+.slfld label{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:4px;font-weight:600}
+.slfld label em{font-style:normal;font-weight:800;color:#378ADD}
+.slfld input[type=range]{width:100%;accent-color:#378ADD;cursor:pointer}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+/* ── Tabs (detail) ── */
+.dtabs{display:flex;border-bottom:.5px solid rgba(0,0,0,.08);margin-bottom:14px;gap:0}
+.dtab{font-size:11px;padding:8px 14px;cursor:pointer;color:#aaa;border:none;background:none;border-bottom:2px solid transparent;font-weight:500;transition:all .15s;white-space:nowrap}
+.dtab:hover{color:#555}
+.dtab.active{color:#1a1a18;border-bottom:2px solid #378ADD;font-weight:700}
+.dpanel{display:none}.dpanel.active{display:block}
+
+/* ── Timeline ── */
+.timeline{position:relative;padding-left:20px}
+.timeline::before{content:'';position:absolute;left:6px;top:4px;bottom:4px;width:1px;background:rgba(0,0,0,.08)}
+.tl-item{position:relative;margin-bottom:14px}
+.tl-dot{position:absolute;left:-20px;top:3px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.tl-dot-skill{background:#378ADD}.tl-dot-site{background:#1a7f4a}.tl-dot-report{background:#9a6d00}
+.tl-date{font-size:10px;color:#bbb;margin-bottom:2px}
+.tl-title{font-size:12px;font-weight:700;color:#1a1a18;margin-bottom:2px}
+.tl-detail{font-size:11px;color:#888}
+
+/* ── Score Badge ── */
+.score-badge{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;font-size:13px;font-weight:800}
+.score-a{background:#e8f0fb;color:#1a56c4}
+.score-b{background:#e6f4ed;color:#1a7f4a}
+.score-c{background:#fdf3e3;color:#9a6d00}
+.score-d{background:#fde8e8;color:#c0392b}
+
+/* ── Comparison table ── */
+.cmp-hd{background:#f8f8f5;font-weight:700}
+.cmp-row:nth-child(even){background:#fafaf8}
+
+/* ── Skill config ── */
+.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.config-group{background:#fff;border:.5px solid rgba(0,0,0,.07);border-radius:10px;padding:14px 16px}
+.config-group-title{font-size:11px;font-weight:700;color:#1a1a18;margin-bottom:10px;padding-bottom:6px;border-bottom:.5px solid rgba(0,0,0,.07)}
+.sum-indicator{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;margin-bottom:10px}
+.sum-ok{background:#e6f4ed;color:#1a7f4a}
+.sum-err{background:#fde8e8;color:#c0392b}
+
+/* ── Report card ── */
+.report-card{background:#fff;border:.5px solid rgba(0,0,0,.07);border-radius:10px;padding:13px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;transition:all .15s}
+.report-card:hover{border-color:#378ADD;background:#fafcff}
+.report-icon{font-size:22px;width:36px;text-align:center}
+.report-info{flex:1}
+.report-name{font-size:12px;font-weight:700;color:#1a1a18}
+.report-meta{font-size:10px;color:#bbb;margin-top:2px}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .sb{width:0;min-width:0;position:fixed;z-index:100;height:100%;box-shadow:2px 0 12px rgba(0,0,0,.1)}
+  .sb.open{width:220px;min-width:220px}
+  .k4{grid-template-columns:repeat(2,1fr)}
+  .g2{grid-template-columns:1fr}
+  .config-grid{grid-template-columns:1fr}
+  .topbar .hamburger{display:flex}
+}
+.hamburger{display:none;align-items:center;justify-content:center;width:32px;height:32px;border:none;background:none;cursor:pointer;font-size:18px;color:#888}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99}
+.overlay.show{display:block}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══ Sidebar ══ -->
+<aside class="sb" id="sb">
+  <div class="sb-hd">
+    <div class="sb-brand">F&amp;B 입점검토</div>
+    <div class="sb-title">entry-review<br>관리 시스템</div>
+    <span class="sb-pill">v1.2</span>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-sec">메인</div>
+    <div class="nav-item active" data-panel="dashboard">
+      <span class="nav-icon">📊</span> 대시보드
+    </div>
+    <div class="nav-item" data-panel="sites">
+      <span class="nav-icon">🏢</span> 후보지 관리
+      <span class="nav-badge" id="sites-count">1</span>
+    </div>
+    <div class="nav-sec">설정 / 기록</div>
+    <div class="nav-item" data-panel="skill">
+      <span class="nav-icon">⚙️</span> 스킬 설정
+    </div>
+    <div class="nav-item" data-panel="reports">
+      <span class="nav-icon">📁</span> 보고서
+    </div>
+    <div class="nav-item" data-panel="history">
+      <span class="nav-icon">🕐</span> 변경 이력
+    </div>
+  </nav>
+  <div class="sb-ft">김종열 · F&amp;B 점포개발</div>
+</aside>
+<div class="overlay" id="overlay" onclick="closeSb()"></div>
+
+<!-- ══ Main ══ -->
+<main class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSb()">☰</button>
+    <span class="tb-title" id="page-title">대시보드</span>
+    <span class="tb-sub" id="page-sub">전체 현황 개요</span>
+    <div class="tb-right">
+      <span class="bdg bdg-bl">entry-review v1.2</span>
+      <span style="font-size:11px;color:#bbb" id="today-date"></span>
+    </div>
+  </div>
+  <div class="panels">
+
+    <!-- ════ 1. 대시보드 ════ -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="sec-hd"><h2>전체 현황</h2><p>후보지 분석 결과 요약</p></div>
+
+      <div class="krow k4" id="kpi-row">
+        <div class="kpi"><div class="kpi-l">관리 중 후보지</div><div class="kpi-v" id="kpi-count">—</div><div class="kpi-s">등록된 후보지 수</div></div>
+        <div class="kpi"><div class="kpi-l">최근 분석일</div><div class="kpi-v" id="kpi-date" style="font-size:15px">—</div><div class="kpi-s">마지막 분석</div></div>
+        <div class="kpi"><div class="kpi-l">평균 종합 점수</div><div class="kpi-v" id="kpi-avg">—</div><div class="kpi-s">전체 평균 / 100점</div></div>
+        <div class="kpi"><div class="kpi-l">입점 권장 비율</div><div class="kpi-v" id="kpi-rec">—</div><div class="kpi-s">60점 이상 비율</div></div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd"><span class="ct">후보지별 종합점수</span></div>
+          <div class="cs">높을수록 입점 적합</div>
+          <canvas id="chart-scores" height="200"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="ct">항목별 평균 점수</span></div>
+          <div class="cs">6개 평가 항목 레이더</div>
+          <canvas id="chart-radar" height="200"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><span class="ct">최근 활동</span></div>
+        <div class="cs">최근 변경 이력 5건</div>
+        <div id="recent-activity"></div>
+      </div>
+    </div>
+
+    <!-- ════ 2. 후보지 관리 ════ -->
+    <div class="panel" id="panel-sites">
+      <div class="sec-hd"><h2>후보지 관리</h2><p>후보지별 분석 데이터 조회 · 수정 · 비교</p></div>
+
+      <div class="btn-row">
+        <button class="btn btn-pri" onclick="showAddSite()">＋ 신규 후보지 추가</button>
+        <button class="btn" onclick="compareSites()">📊 선택 비교</button>
+        <button class="btn" onclick="exportAllJSON()">⬇ 전체 JSON 내보내기</button>
+      </div>
+
+      <!-- 목록 테이블 -->
+      <div class="card" style="margin-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none">
+        <div class="tw">
+          <table id="sites-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="chk-all" onclick="toggleAllChk(this)"></th>
+                <th>건물명</th><th>주소</th><th>종합점수</th><th>권고등급</th><th>분석일</th><th>액션</th>
+              </tr>
+            </thead>
+            <tbody id="sites-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 상세 패널 -->
+      <div id="site-detail" style="display:none">
+        <div class="card" style="border-top-left-radius:0;border-top-right-radius:0;border-top:none">
+          <div id="detail-header" style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:.5px solid rgba(0,0,0,.07)">
+            <div class="score-badge" id="detail-badge">67</div>
+            <div>
+              <div style="font-size:14px;font-weight:700" id="detail-name">—</div>
+              <div style="font-size:11px;color:#bbb" id="detail-addr">—</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="btn btn-sm" onclick="saveSiteLocal()">💾 저장</button>
+              <button class="btn btn-sm" onclick="downloadSiteJSON()">⬇ JSON</button>
+              <button class="btn btn-sm" style="color:#c0392b" onclick="closeDetail()">✕ 닫기</button>
+            </div>
+          </div>
+
+          <div class="dtabs">
+            <button class="dtab active" data-dtab="info">기본정보</button>
+            <button class="dtab" data-dtab="captive">포획시장</button>
+            <button class="dtab" data-dtab="compete">경쟁분석</button>
+            <button class="dtab" data-dtab="finance">재무시뮬레이션</button>
+            <button class="dtab" data-dtab="summary">종합평가</button>
+          </div>
+
+          <!-- 기본정보 -->
+          <div class="dpanel active" id="dtab-info">
+            <div class="frow">
+              <div class="fld"><label>건물명</label><input type="text" id="f-name"></div>
+              <div class="fld"><label>주소</label><input type="text" id="f-addr"></div>
+            </div>
+            <div class="frow3">
+              <div class="fld"><label>대상공간</label><input type="text" id="f-space"></div>
+              <div class="fld"><label>전용면적(PY)</label><div class="uw"><input type="number" id="f-area"><span>PY</span></div></div>
+              <div class="fld"><label>준공일</label><input type="text" id="f-open"></div>
+            </div>
+            <div class="frow3">
+              <div class="fld"><label>보증금</label><div class="uw"><input type="number" id="f-deposit"><span>원</span></div></div>
+              <div class="fld"><label>월MG</label><div class="uw"><input type="number" id="f-mg"><span>원</span></div></div>
+              <div class="fld"><label>관리비</label><div class="uw"><input type="number" id="f-mgt"><span>원</span></div></div>
+            </div>
+          </div>
+
+          <!-- 포획시장 -->
+          <div class="dpanel" id="dtab-captive">
+            <div class="frow">
+              <div class="fld"><label>단지 전체 상주인원</label><div class="uw"><input type="number" id="f-total" oninput="recalcCaptive()"><span>명</span></div></div>
+              <div class="fld"><label>현재 입주율</label><div class="uw"><input type="number" id="f-occu" oninput="recalcCaptive()"><span>%</span></div></div>
+            </div>
+            <div class="slfld"><label>출근율 <em id="sl-commute-v">85%</em></label><input type="range" min="50" max="100" value="85" id="sl-commute" oninput="updateSlider(this,'sl-commute-v','%');recalcCaptive()"></div>
+            <div class="slfld"><label>외식율 <em id="sl-dining-v">70%</em></label><input type="range" min="30" max="100" value="70" id="sl-dining" oninput="updateSlider(this,'sl-dining-v','%');recalcCaptive()"></div>
+            <div class="slfld"><label>당사 건물 이용율 <em id="sl-blduse-v">40%</em></label><input type="range" min="10" max="80" value="40" id="sl-blduse" oninput="updateSlider(this,'sl-blduse-v','%');recalcCaptive()"></div>
+            <div class="slfld"><label>점유율 <em id="sl-share-v">6.7%</em></label><input type="range" min="1" max="20" step="0.1" value="6.7" id="sl-share" oninput="updateSlider(this,'sl-share-v','%');recalcCaptive()"></div>
+            <div class="card" style="background:#f8f8f5;border:none">
+              <div class="krow k3">
+                <div class="kpi"><div class="kpi-l">유효 포획인원</div><div class="kpi-v" id="calc-effective">—</div><div class="kpi-s">명</div></div>
+                <div class="kpi"><div class="kpi-l">일일 수요 예측</div><div class="kpi-v" id="calc-demand">—</div><div class="kpi-s">명/일</div></div>
+                <div class="kpi"><div class="kpi-l">공급부족지수</div><div class="kpi-v" id="calc-supply">—</div><div class="kpi-s">명/석</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 경쟁분석 -->
+          <div class="dpanel" id="dtab-compete">
+            <div class="g2">
+              <div>
+                <div class="fld"><label>주변 좌석 수</label><div class="uw"><input type="number" id="f-seats" oninput="recalcCompete()"><span>석</span></div></div>
+                <div class="fld"><label>공급부족지수</label><div class="uw"><input type="number" id="f-supply-idx" step="0.1"><span>명/석</span></div></div>
+                <div class="fld"><label>경쟁 강도 등급</label>
+                  <select id="f-compete-grade">
+                    <option>★★★★★ (공급 매우 부족)</option>
+                    <option>★★★★☆ (공급 부족)</option>
+                    <option>★★★☆☆ (보통)</option>
+                    <option>★★☆☆☆ (공급 충분)</option>
+                    <option>★☆☆☆☆ (공급 과잉)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="card" style="background:#f8f8f5;border:none">
+                <div class="ct" style="margin-bottom:10px">공급부족 현황</div>
+                <canvas id="chart-compete" height="180"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- 재무시뮬레이션 -->
+          <div class="dpanel" id="dtab-finance">
+            <div class="slfld"><label>월 매출 (보수적) <em id="sl-rev-con-v">51.75M</em></label><input type="range" min="20" max="150" step="0.25" value="51.75" id="sl-rev-con" oninput="updateSlider(this,'sl-rev-con-v','M');recalcFinance()"></div>
+            <div class="slfld"><label>월 매출 (기본) <em id="sl-rev-base-v">69M</em></label><input type="range" min="20" max="150" step="0.25" value="69" id="sl-rev-base" oninput="updateSlider(this,'sl-rev-base-v','M');recalcFinance()"></div>
+            <div class="slfld"><label>월 매출 (낙관적) <em id="sl-rev-opt-v">86.25M</em></label><input type="range" min="20" max="150" step="0.25" value="86.25" id="sl-rev-opt" oninput="updateSlider(this,'sl-rev-opt-v','M');recalcFinance()"></div>
+            <div class="frow3">
+              <div class="slfld"><label>식재료비율 <em id="sl-food-v">35%</em></label><input type="range" min="25" max="45" value="35" id="sl-food" oninput="updateSlider(this,'sl-food-v','%');recalcFinance()"></div>
+              <div class="slfld"><label>인건비율 <em id="sl-labor-v">25%</em></label><input type="range" min="15" max="35" value="25" id="sl-labor" oninput="updateSlider(this,'sl-labor-v','%');recalcFinance()"></div>
+              <div class="slfld"><label>기타경비율 <em id="sl-etc-v">5%</em></label><input type="range" min="3" max="10" value="5" id="sl-etc" oninput="updateSlider(this,'sl-etc-v','%');recalcFinance()"></div>
+            </div>
+            <canvas id="chart-finance" height="160"></canvas>
+            <div class="krow k3" style="margin-top:12px">
+              <div class="kpi"><div class="kpi-l">BEP</div><div class="kpi-v" id="calc-bep">—</div><div class="kpi-s">만원/월</div></div>
+              <div class="kpi"><div class="kpi-l">기본 ROI (2년)</div><div class="kpi-v" id="calc-roi">—</div><div class="kpi-s">%</div></div>
+              <div class="kpi"><div class="kpi-l">투자회수기간</div><div class="kpi-v" id="calc-payback">—</div><div class="kpi-s">개월</div></div>
+            </div>
+          </div>
+
+          <!-- 종합평가 -->
+          <div class="dpanel" id="dtab-summary">
+            <div class="g2">
+              <div>
+                <canvas id="chart-summary-radar" height="220"></canvas>
+              </div>
+              <div>
+                <div class="fld"><label>종합 점수</label><div class="uw"><input type="number" id="f-score" min="0" max="100" oninput="updateScoreBadge()"><span>점</span></div></div>
+                <div class="fld"><label>권고 등급</label><div class="kpi-v" id="f-rec-display" style="font-size:14px;margin-top:4px">—</div></div>
+                <div class="fld"><label>핵심 조건</label><textarea id="f-condition"></textarea></div>
+                <div class="fld"><label>주요 리스크</label><textarea id="f-risk"></textarea></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 비교 패널 -->
+      <div id="compare-panel" style="display:none;margin-top:14px">
+        <div class="card">
+          <div class="card-hd"><span class="ct">후보지 비교</span></div>
+          <div class="cs">선택한 후보지를 나란히 비교합니다</div>
+          <div id="compare-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ 3. 스킬 설정 ════ -->
+    <div class="panel" id="panel-skill">
+      <div class="sec-hd"><h2>스킬 설정</h2><p>entry-review 파라미터 편집 및 버전 관리</p></div>
+
+      <div class="btn-row">
+        <button class="btn btn-pri" onclick="saveSkillConfig()">💾 설정 저장 (JSON 다운로드)</button>
+        <button class="btn" onclick="resetSkillConfig()">↺ 기본값 초기화</button>
+        <button class="btn btn-bl" onclick="copySkillPath()">📋 SKILL.md 경로 복사</button>
+      </div>
+
+      <div class="config-grid">
+        <!-- 포획시장 -->
+        <div class="config-group">
+          <div class="config-group-title">포획시장 기본값</div>
+          <div class="slfld"><label>출근율 기본값 <em id="cfg-commute-v">85%</em></label><input type="range" min="50" max="100" value="85" id="cfg-commute" oninput="updateSlider(this,'cfg-commute-v','%')"></div>
+          <div class="slfld"><label>외식율 기본값 <em id="cfg-dining-v">70%</em></label><input type="range" min="30" max="100" value="70" id="cfg-dining" oninput="updateSlider(this,'cfg-dining-v','%')"></div>
+          <div class="slfld"><label>건물이용율 기본값 <em id="cfg-blduse-v">40%</em></label><input type="range" min="10" max="80" value="40" id="cfg-blduse" oninput="updateSlider(this,'cfg-blduse-v','%')"></div>
+          <div class="slfld"><label>점유율 기본값 <em id="cfg-share-v">6.7%</em></label><input type="range" min="1" max="20" step="0.1" value="6.7" id="cfg-share" oninput="updateSlider(this,'cfg-share-v','%')"></div>
+        </div>
+
+        <!-- 재무 -->
+        <div class="config-group">
+          <div class="config-group-title">재무 시뮬레이션 기본값</div>
+          <div class="slfld"><label>식재료비율 <em id="cfg-food-v">35%</em></label><input type="range" min="25" max="45" value="35" id="cfg-food" oninput="updateSlider(this,'cfg-food-v','%')"></div>
+          <div class="slfld"><label>인건비율 <em id="cfg-labor-v">25%</em></label><input type="range" min="15" max="35" value="25" id="cfg-labor" oninput="updateSlider(this,'cfg-labor-v','%')"></div>
+          <div class="slfld"><label>기타경비율 <em id="cfg-etc-v">5%</em></label><input type="range" min="3" max="10" value="5" id="cfg-etc" oninput="updateSlider(this,'cfg-etc-v','%')"></div>
+          <div class="slfld"><label>영업일수 <em id="cfg-days-v">22일</em></label><input type="range" min="18" max="26" value="22" id="cfg-days" oninput="updateSlider(this,'cfg-days-v','일')"></div>
+        </div>
+
+        <!-- 평가 배점 -->
+        <div class="config-group">
+          <div class="config-group-title">평가 배점 (합계 100점)</div>
+          <div id="score-sum-indicator" class="sum-indicator sum-ok">✓ 합계: 100점</div>
+          <div class="slfld"><label>입지등급 <em id="cfg-w1-v">15</em></label><input type="range" min="5" max="30" value="15" id="cfg-w1" oninput="updateSlider(this,'cfg-w1-v','');checkWeightSum()"></div>
+          <div class="slfld"><label>포획시장규모 <em id="cfg-w2-v">20</em></label><input type="range" min="5" max="30" value="20" id="cfg-w2" oninput="updateSlider(this,'cfg-w2-v','');checkWeightSum()"></div>
+          <div class="slfld"><label>경쟁강도 <em id="cfg-w3-v">15</em></label><input type="range" min="5" max="30" value="15" id="cfg-w3" oninput="updateSlider(this,'cfg-w3-v','');checkWeightSum()"></div>
+          <div class="slfld"><label>교통호재 <em id="cfg-w4-v">10</em></label><input type="range" min="5" max="30" value="10" id="cfg-w4" oninput="updateSlider(this,'cfg-w4-v','');checkWeightSum()"></div>
+          <div class="slfld"><label>재무건전성 <em id="cfg-w5-v">25</em></label><input type="range" min="5" max="30" value="25" id="cfg-w5" oninput="updateSlider(this,'cfg-w5-v','');checkWeightSum()"></div>
+          <div class="slfld"><label>임대조건 <em id="cfg-w6-v">15</em></label><input type="range" min="5" max="30" value="15" id="cfg-w6" oninput="updateSlider(this,'cfg-w6-v','');checkWeightSum()"></div>
+        </div>
+
+        <!-- 출력 설정 -->
+        <div class="config-group">
+          <div class="config-group-title">출력 설정</div>
+          <div class="fld"><label>Excel 시트 수</label><input type="number" id="cfg-excel" value="10" min="9" max="12"></div>
+          <div class="fld"><label>PPT 슬라이드 수</label><input type="number" id="cfg-ppt" value="11" min="10" max="14"></div>
+          <div class="fld"><label>HTML 차트 수</label><input type="number" id="cfg-html" value="12" min="8" max="16"></div>
+          <div class="fld"><label>기본 저장 경로</label><input type="text" id="cfg-path" value="C:\Users\grego\Downloads\entry-review\"></div>
+          <div style="margin-top:12px;padding:10px;background:#f8f8f5;border-radius:7px;font-size:10px;color:#888;line-height:1.7">
+            <strong style="color:#1a1a18;display:block;margin-bottom:4px">SKILL.md 경로</strong>
+            C:\Users\grego\.claude\skills\entry-review\SKILL.md
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ 4. 보고서 ════ -->
+    <div class="panel" id="panel-reports">
+      <div class="sec-hd"><h2>보고서</h2><p>생성된 HTML 대시보드 및 분석 보고서</p></div>
+
+      <div class="btn-row">
+        <button class="btn btn-pri" onclick="copyPromptTemplate()">📋 Claude 프롬프트 복사</button>
+        <button class="btn" onclick="document.getElementById('report-upload').click()">⬆ 보고서 추가</button>
+        <input type="file" id="report-upload" style="display:none" accept=".html" onchange="addReportFile(this)">
+      </div>
+
+      <div id="reports-list">
+        <!-- 트라이타워 기본 보고서 카드 -->
+        <div class="report-card">
+          <div class="report-icon">📊</div>
+          <div class="report-info">
+            <div class="report-name">제2판교 트라이타워 — HTML 대시보드</div>
+            <div class="report-meta">2026-04-14 · HTML · 종합 67점 · 조건부 입점 권장</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" onclick="alert('reports/ 폴더에 HTML 파일을 추가 후 GitHub에 푸시하면 열람 가능합니다.')">열기</button>
+          </div>
+        </div>
+        <div id="dynamic-reports"></div>
+      </div>
+
+      <div class="card" style="margin-top:14px;background:#fafcff;border-color:rgba(55,138,221,.2)">
+        <div class="ct" style="color:#1a56c4;margin-bottom:8px">보고서 생성 프롬프트 템플릿</div>
+        <div class="cs">아래 프롬프트를 Claude Code에 붙여넣어 보고서를 생성하세요</div>
+        <pre id="prompt-template" style="font-size:10px;color:#555;background:#fff;padding:12px;border-radius:7px;border:.5px solid rgba(0,0,0,.08);white-space:pre-wrap;line-height:1.7;font-family:'Courier New',monospace"></pre>
+      </div>
+    </div>
+
+    <!-- ════ 5. 변경 이력 ════ -->
+    <div class="panel" id="panel-history">
+      <div class="sec-hd"><h2>변경 이력</h2><p>스킬 설정 및 후보지 데이터 변경 기록</p></div>
+
+      <div class="btn-row">
+        <button class="btn sbtn active" data-filter="all" onclick="filterHistory('all',this)">전체</button>
+        <button class="btn sbtn" data-filter="skill" onclick="filterHistory('skill',this)">⚙️ 스킬변경</button>
+        <button class="btn sbtn" data-filter="site" onclick="filterHistory('site',this)">🏢 후보지</button>
+        <button class="btn sbtn" data-filter="report" onclick="filterHistory('report',this)">📁 보고서</button>
+      </div>
+
+      <div class="card">
+        <div class="timeline" id="timeline-list"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" onclick="addHistoryEntry()">＋ 이력 추가</button>
+      </div>
+    </div>
+
+  </div><!-- /panels -->
+</main>
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  DATA LAYER — fallback hardcoded + fetch override
+// ═══════════════════════════════════════════════════════
+const FALLBACK = {
+  sites: [{
+    id:'triatower',
+    meta:{건물명:'제2판교 트라이타워',주소:'경기도 성남시 수정구 금토동 714',대상공간:'1F 101~103호',전용면적PY:74.76,준공일:'2025-02',분석일:'2026-04-14'},
+    임대조건:{보증금:90000000,월MG:7500000,관리비:2990000},
+    포획시장:{단지전체상주:20458,현재입주율:68,출근율:85,외식율:70,건물이용율:40,점유율:6.7,일일수요:260,주변좌석수:2500,공급부족지수:8.2,공급부족등급:'★★★★★'},
+    재무:{보수적:{월매출:51750000,월순익:-900000,BEP:53250000,투자회수:null,ROI2년:null},기본:{월매출:69000000,월순익:12900000,BEP:53250000,투자회수:40,ROI2년:40},낙관적:{월매출:86250000,월순익:19800000,BEP:53250000,투자회수:26,ROI2년:91}},
+    종합:{점수:67,등급:'★★★☆☆',권고:'조건부 입점 권장',핵심조건:'렌트프리 3개월 이상 협상 필수, 카페/캐주얼 F&B 업종 고수',리스크:'보수적 시나리오에서 적자 가능, 투자회수 40개월 장기'}
+  }],
+  changelog:[
+    {date:'2026-04-14',type:'skill',title:'entry-review 스킬 v1.0 생성',detail:'dev-simulation + fnb-market + field-management 통합'},
+    {date:'2026-04-14',type:'site',title:'트라이타워 분석 완료',detail:'종합 67점, 조건부 입점 권장'},
+    {date:'2026-04-16',type:'skill',title:'스킬 v1.2 업데이트',detail:'HTML 대시보드(Step 9), 트리거 최적화, 복수 후보지 비교 추가'},
+    {date:'2026-04-16',type:'report',title:'용어 학습 가이드 생성',detail:'바이브코딩 & 웹개발 38개 용어 HTML 가이드'}
+  ],
+  skillConfig:{version:'1.2',포획시장:{출근율:85,외식율:70,건물이용율:40,점유율:6.7},재무:{식재료비율:35,인건비율:25,기타경비율:5,영업일수:22},평가배점:{입지등급:15,포획시장규모:20,경쟁강도:15,교통호재:10,재무건전성:25,임대조건:15},출력:{엑셀시트수:10,PPT슬라이드수:11,HTML차트수:12}}
+};
+
+let state = { sites:[], changelog:[], skillConfig:null, activeSite:null };
+
+async function loadData() {
+  // Load from localStorage overrides first
+  const lsSites = localStorage.getItem('er_sites');
+  const lsLog   = localStorage.getItem('er_changelog');
+  const lsCfg   = localStorage.getItem('er_skillConfig');
+
+  try {
+    const [sitesIdx, log, cfg] = await Promise.all([
+      fetch('data/sites/index.json').then(r=>r.json()).catch(()=>null),
+      fetch('data/changelog.json').then(r=>r.json()).catch(()=>null),
+      fetch('data/skill-config.json').then(r=>r.json()).catch(()=>null)
+    ]);
+    if(sitesIdx && sitesIdx.sites){
+      const loaded = await Promise.all(sitesIdx.sites.map(id=>fetch(`data/sites/${id}.json`).then(r=>r.json()).catch(()=>null)));
+      state.sites = loaded.filter(Boolean);
+    }
+    if(log) state.changelog = log;
+    if(cfg) state.skillConfig = cfg;
+  } catch(e){}
+
+  // Fallback if nothing loaded
+  if(!state.sites.length) state.sites = lsSites ? JSON.parse(lsSites) : FALLBACK.sites;
+  if(!state.changelog.length) state.changelog = lsLog ? JSON.parse(lsLog) : FALLBACK.changelog;
+  if(!state.skillConfig) state.skillConfig = lsCfg ? JSON.parse(lsCfg) : FALLBACK.skillConfig;
+
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+const PANEL_TITLES = {
+  dashboard:['대시보드','전체 현황 개요'],
+  sites:['후보지 관리','후보지별 분석 데이터'],
+  skill:['스킬 설정','entry-review 파라미터 편집'],
+  reports:['보고서','HTML 대시보드 및 보고서'],
+  history:['변경 이력','스킬/데이터 변경 기록']
+};
+
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const p = el.dataset.panel;
+    document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    document.getElementById('panel-'+p).classList.add('active');
+    document.getElementById('page-title').textContent = PANEL_TITLES[p][0];
+    document.getElementById('page-sub').textContent = PANEL_TITLES[p][1];
+    closeSb();
+  });
+});
+
+document.querySelectorAll('.dtab').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const t = el.dataset.dtab;
+    el.closest('.card').querySelectorAll('.dtab').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    el.closest('.card').querySelectorAll('.dpanel').forEach(x=>x.classList.remove('active'));
+    document.getElementById('dtab-'+t).classList.add('active');
+    if(t==='finance') renderFinanceChart();
+    if(t==='summary') renderSummaryRadar();
+    if(t==='compete') renderCompeteChart();
+  });
+});
+
+function toggleSb(){document.getElementById('sb').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeSb(){document.getElementById('sb').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════════════════════
+function renderAll(){
+  renderDashboard();
+  renderSitesTable();
+  renderTimeline(state.changelog,'all');
+  renderSkillConfig();
+  renderPromptTemplate();
+  document.getElementById('sites-count').textContent = state.sites.length;
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('ko-KR');
+}
+
+// ═══════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════
+let scoreChart, radarChart;
+function renderDashboard(){
+  const sites = state.sites;
+  document.getElementById('kpi-count').textContent = sites.length;
+  const dates = sites.map(s=>s.meta.분석일).sort().reverse();
+  document.getElementById('kpi-date').textContent = dates[0]||'—';
+  const avg = sites.length ? Math.round(sites.reduce((a,s)=>a+s.종합.점수,0)/sites.length) : 0;
+  document.getElementById('kpi-avg').textContent = avg;
+  const rec = sites.length ? Math.round(sites.filter(s=>s.종합.점수>=60).length/sites.length*100) : 0;
+  document.getElementById('kpi-rec').textContent = rec+'%';
+
+  // Score bar chart
+  const labels = sites.map(s=>s.meta.건물명.replace('제2판교 ',''));
+  const scores = sites.map(s=>s.종합.점수);
+  const colors = scores.map(v=>v>=90?'#378ADD':v>=75?'#1a7f4a':v>=60?'#e6a817':'#c0392b');
+  if(scoreChart) scoreChart.destroy();
+  scoreChart = new Chart(document.getElementById('chart-scores'),{
+    type:'bar',
+    data:{labels,datasets:[{data:scores,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},
+    options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:100,grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10}}},y:{ticks:{font:{size:11}}}}}
+  });
+
+  // Radar chart — 트라이타워 항목별 예시 점수
+  const radarData = sites.length>0 ? [
+    Math.round(sites[0].종합.점수*0.9),
+    Math.round(sites[0].종합.점수*1.1),
+    Math.round(sites[0].종합.점수*0.95),
+    Math.round(sites[0].종합.점수*0.85),
+    Math.round(sites[0].종합.점수*0.75),
+    Math.round(sites[0].종합.점수*0.9)
+  ] : [0,0,0,0,0,0];
+  if(radarChart) radarChart.destroy();
+  radarChart = new Chart(document.getElementById('chart-radar'),{
+    type:'radar',
+    data:{
+      labels:['입지등급','포획시장','경쟁강도','교통호재','재무건전성','임대조건'],
+      datasets:[{label:'평균점수',data:radarData,borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,.12)',pointBackgroundColor:'#378ADD',borderWidth:2}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:9}},pointLabels:{font:{size:10}}}}}
+  });
+
+  // Recent activity
+  const el = document.getElementById('recent-activity');
+  const recent = [...state.changelog].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  el.innerHTML = recent.map(c=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:.5px solid rgba(0,0,0,.05)">
+      <span style="font-size:14px">${{skill:'⚙️',site:'🏢',report:'📁'}[c.type]||'📌'}</span>
+      <div style="flex:1"><div style="font-size:11px;font-weight:600">${c.title}</div><div style="font-size:10px;color:#bbb">${c.detail||''}</div></div>
+      <span style="font-size:10px;color:#ccc;white-space:nowrap">${c.date}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  SITES TABLE
+// ═══════════════════════════════════════════════════════
+function renderSitesTable(){
+  const tbody = document.getElementById('sites-tbody');
+  tbody.innerHTML = state.sites.map((s,i)=>{
+    const score = s.종합.점수;
+    const tagCls = score>=90?'tbl':score>=75?'tgn':score>=60?'tam':'trd';
+    const tagTxt = score>=90?'강력권장':score>=75?'입점권장':score>=60?'조건부권장':'입점비권장';
+    return `<tr>
+      <td><input type="checkbox" class="site-chk" value="${i}"></td>
+      <td style="font-weight:600">${s.meta.건물명}</td>
+      <td style="color:#888;max-width:180px;overflow:hidden;text-overflow:ellipsis">${s.meta.주소}</td>
+      <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-bar-fill" style="width:${score}%;background:${score>=90?'#378ADD':score>=75?'#1a7f4a':score>=60?'#e6a817':'#c0392b'}"></div></div><strong style="min-width:28px;text-align:right;font-size:12px">${score}</strong></div></td>
+      <td><span class="tag ${tagCls}">${tagTxt}</span></td>
+      <td style="color:#aaa">${s.meta.분석일}</td>
+      <td><button class="btn btn-sm" onclick="openDetail(${i})">상세</button> <button class="btn btn-sm" style="color:#c0392b" onclick="deleteSite(${i})">삭제</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  SITE DETAIL
+// ═══════════════════════════════════════════════════════
+function openDetail(i){
+  state.activeSite = i;
+  const s = state.sites[i];
+  document.getElementById('site-detail').style.display='block';
+  document.getElementById('compare-panel').style.display='none';
+
+  // Header
+  const score = s.종합.점수;
+  const badge = document.getElementById('detail-badge');
+  badge.textContent = score;
+  badge.className = 'score-badge '+(score>=90?'score-a':score>=75?'score-b':score>=60?'score-c':'score-d');
+  document.getElementById('detail-name').textContent = s.meta.건물명;
+  document.getElementById('detail-addr').textContent = s.meta.주소;
+
+  // 기본정보
+  document.getElementById('f-name').value = s.meta.건물명;
+  document.getElementById('f-addr').value = s.meta.주소;
+  document.getElementById('f-space').value = s.meta.대상공간||'';
+  document.getElementById('f-area').value = s.meta.전용면적PY||'';
+  document.getElementById('f-open').value = s.meta.준공일||'';
+  document.getElementById('f-deposit').value = s.임대조건.보증금||'';
+  document.getElementById('f-mg').value = s.임대조건.월MG||'';
+  document.getElementById('f-mgt').value = s.임대조건.관리비||'';
+
+  // 포획시장
+  const pm = s.포획시장;
+  document.getElementById('f-total').value = pm.단지전체상주||'';
+  document.getElementById('f-occu').value = pm.현재입주율||'';
+  setSlider('sl-commute', pm.출근율||85, 'sl-commute-v','%');
+  setSlider('sl-dining', pm.외식율||70, 'sl-dining-v','%');
+  setSlider('sl-blduse', pm.건물이용율||40, 'sl-blduse-v','%');
+  setSlider('sl-share', pm.점유율||6.7, 'sl-share-v','%');
+  recalcCaptive();
+
+  // 경쟁분석
+  document.getElementById('f-seats').value = pm.주변좌석수||'';
+  document.getElementById('f-supply-idx').value = pm.공급부족지수||'';
+
+  // 재무
+  const fin = s.재무;
+  setSlider('sl-rev-con', (fin.보수적.월매출/1000000)||51.75, 'sl-rev-con-v','M');
+  setSlider('sl-rev-base', (fin.기본.월매출/1000000)||69, 'sl-rev-base-v','M');
+  setSlider('sl-rev-opt', (fin.낙관적.월매출/1000000)||86.25, 'sl-rev-opt-v','M');
+  const bepM = fin.기본.BEP/10000;
+  document.getElementById('calc-bep').textContent = bepM.toLocaleString();
+  document.getElementById('calc-roi').textContent = (fin.기본.ROI2년||'—')+(fin.기본.ROI2년?'%':'');
+  document.getElementById('calc-payback').textContent = fin.기본.투자회수||'—';
+
+  // 종합
+  document.getElementById('f-score').value = s.종합.점수;
+  document.getElementById('f-rec-display').textContent = s.종합.권고;
+  document.getElementById('f-condition').value = s.종합.핵심조건||'';
+  document.getElementById('f-risk').value = s.종합.리스크||'';
+
+  // Activate first tab
+  document.querySelectorAll('.dtab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.dpanel').forEach(x=>x.classList.remove('active'));
+  document.querySelector('.dtab[data-dtab="info"]').classList.add('active');
+  document.getElementById('dtab-info').classList.add('active');
+
+  // Scroll into view
+  document.getElementById('site-detail').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function closeDetail(){
+  document.getElementById('site-detail').style.display='none';
+  state.activeSite=null;
+}
+
+let financeChart, summaryRadarChart, competeChart;
+
+function recalcCaptive(){
+  const total = +document.getElementById('f-total').value||0;
+  const occu = +document.getElementById('f-occu').value/100||0.68;
+  const commute = +document.getElementById('sl-commute').value/100;
+  const dining = +document.getElementById('sl-dining').value/100;
+  const blduse = +document.getElementById('sl-blduse').value/100;
+  const share = +document.getElementById('sl-share').value/100;
+  const effective = Math.round(total * occu * commute);
+  const demand = Math.round(effective * dining * blduse * share);
+  const seats = +document.getElementById('f-seats').value||2500;
+  const supplyIdx = (effective * dining / seats).toFixed(1);
+  document.getElementById('calc-effective').textContent = effective.toLocaleString();
+  document.getElementById('calc-demand').textContent = demand.toLocaleString();
+  document.getElementById('calc-supply').textContent = supplyIdx;
+}
+
+function recalcCompete(){
+  const total = +document.getElementById('f-total').value||20458;
+  const occu = +document.getElementById('f-occu').value/100||0.68;
+  const dining = +document.getElementById('sl-dining').value/100||0.7;
+  const seats = +document.getElementById('f-seats').value||2500;
+  if(seats>0){
+    const idx = (total*occu*dining/seats).toFixed(1);
+    document.getElementById('f-supply-idx').value = idx;
+    document.getElementById('calc-supply').textContent = idx;
+  }
+  renderCompeteChart();
+}
+
+function renderCompeteChart(){
+  const demand = +document.getElementById('calc-demand').textContent.replace(/,/g,'')||260;
+  const seats = +document.getElementById('f-seats').value||2500;
+  if(competeChart) competeChart.destroy();
+  competeChart = new Chart(document.getElementById('chart-compete'),{
+    type:'doughnut',
+    data:{
+      labels:['당사 예상 수요','잔여 공급'],
+      datasets:[{data:[demand, Math.max(0,seats-demand)],backgroundColor:['#378ADD','#f0efec'],borderWidth:0}]
+    },
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}
+  });
+}
+
+function recalcFinance(){
+  renderFinanceChart();
+  const mg = state.sites[state.activeSite]?.임대조건.월MG||7500000;
+  const mgt = state.sites[state.activeSite]?.임대조건.관리비||2990000;
+  const food = +document.getElementById('sl-food').value/100;
+  const labor = +document.getElementById('sl-labor').value/100;
+  const etc = +document.getElementById('sl-etc').value/100;
+  const baseRev = +document.getElementById('sl-rev-base').value * 1000000;
+  const fixed = mg + mgt;
+  const bep = fixed / (1 - food - labor - etc);
+  document.getElementById('calc-bep').textContent = Math.round(bep/10000).toLocaleString();
+  const deposit = state.sites[state.activeSite]?.임대조건.보증금||90000000;
+  const netBase = baseRev * (1-food-labor-etc) - fixed;
+  const roi = deposit>0 ? Math.round(netBase*24/deposit*100) : 0;
+  document.getElementById('calc-roi').textContent = roi+'%';
+  const payback = netBase>0 ? Math.round(deposit/netBase) : '∞';
+  document.getElementById('calc-payback').textContent = payback;
+}
+
+function renderFinanceChart(){
+  const con = +document.getElementById('sl-rev-con').value;
+  const base = +document.getElementById('sl-rev-base').value;
+  const opt = +document.getElementById('sl-rev-opt').value;
+  const food = +document.getElementById('sl-food').value/100;
+  const labor = +document.getElementById('sl-labor').value/100;
+  const etc = +document.getElementById('sl-etc').value/100;
+  const s = state.sites[state.activeSite];
+  const fixed = s ? (s.임대조건.월MG+s.임대조건.관리비)/1000000 : 10.49;
+  const calc = r => ({식재료:+(r*food).toFixed(2), 인건비:+(r*labor).toFixed(2), 기타:+(r*etc).toFixed(2), 고정비:+fixed.toFixed(2), 순익:+(r*(1-food-labor-etc)-fixed).toFixed(2)});
+  const d = [calc(con),calc(base),calc(opt)];
+  if(financeChart) financeChart.destroy();
+  financeChart = new Chart(document.getElementById('chart-finance'),{
+    type:'bar',
+    data:{
+      labels:['보수적','기본','낙관적'],
+      datasets:[
+        {label:'식재료',data:d.map(x=>x.식재료),backgroundColor:'#f4c26a',borderRadius:3},
+        {label:'인건비',data:d.map(x=>x.인건비),backgroundColor:'#6ab0f4',borderRadius:3},
+        {label:'기타',data:d.map(x=>x.기타),backgroundColor:'#b0d4b0',borderRadius:3},
+        {label:'고정비',data:d.map(x=>x.고정비),backgroundColor:'#ddd',borderRadius:3},
+        {label:'순익',data:d.map(x=>x.순익),backgroundColor:d.map(x=>x.순익>=0?'#1a7f4a':'#c0392b'),borderRadius:3}
+      ]
+    },
+    options:{responsive:true,plugins:{legend:{labels:{font:{size:9}}}},scales:{x:{stacked:true},y:{stacked:true,ticks:{font:{size:10},callback:v=>v+'M'}}}}
+  });
+}
+
+function renderSummaryRadar(){
+  const s = state.sites[state.activeSite];
+  if(!s) return;
+  const score = s.종합.점수;
+  const data = [
+    Math.min(100,Math.round(score*0.9)),
+    Math.min(100,Math.round(score*1.15)),
+    Math.min(100,Math.round(score*0.95)),
+    Math.min(100,Math.round(score*0.8)),
+    Math.min(100,Math.round(score*0.72)),
+    Math.min(100,Math.round(score*0.88))
+  ];
+  if(summaryRadarChart) summaryRadarChart.destroy();
+  summaryRadarChart = new Chart(document.getElementById('chart-summary-radar'),{
+    type:'radar',
+    data:{
+      labels:['입지등급','포획시장','경쟁강도','교통호재','재무건전성','임대조건'],
+      datasets:[{label:s.meta.건물명,data,borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,.15)',pointBackgroundColor:'#378ADD',borderWidth:2}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:9}},pointLabels:{font:{size:10}}}}}
+  });
+  // Update rec display
+  document.getElementById('f-rec-display').textContent = s.종합.권고;
+}
+
+function updateScoreBadge(){
+  const score = +document.getElementById('f-score').value;
+  const badge = document.getElementById('detail-badge');
+  badge.textContent = score;
+  badge.className = 'score-badge '+(score>=90?'score-a':score>=75?'score-b':score>=60?'score-c':'score-d');
+  const recs = ['입점 비권장','조건부 입점 권장','입점 권장','강력 입점 권장'];
+  const ri = score>=90?3:score>=75?2:score>=60?1:0;
+  document.getElementById('f-rec-display').textContent = recs[ri];
+}
+
+function saveSiteLocal(){
+  if(state.activeSite===null) return;
+  const s = state.sites[state.activeSite];
+  s.meta.건물명 = document.getElementById('f-name').value;
+  s.meta.주소 = document.getElementById('f-addr').value;
+  s.meta.대상공간 = document.getElementById('f-space').value;
+  s.meta.전용면적PY = +document.getElementById('f-area').value;
+  s.meta.준공일 = document.getElementById('f-open').value;
+  s.임대조건.보증금 = +document.getElementById('f-deposit').value;
+  s.임대조건.월MG = +document.getElementById('f-mg').value;
+  s.임대조건.관리비 = +document.getElementById('f-mgt').value;
+  s.종합.점수 = +document.getElementById('f-score').value;
+  s.종합.핵심조건 = document.getElementById('f-condition').value;
+  s.종합.리스크 = document.getElementById('f-risk').value;
+  localStorage.setItem('er_sites', JSON.stringify(state.sites));
+  renderSitesTable();
+  alert('localStorage에 저장되었습니다.\nJSON 다운로드 → data/sites/ 에 교체 → GitHub 푸시로 영구 반영하세요.');
+}
+
+function downloadSiteJSON(){
+  if(state.activeSite===null) return;
+  const s = state.sites[state.activeSite];
+  const blob = new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download = (s.id||'site')+'.json'; a.click();
+}
+
+function exportAllJSON(){
+  const blob = new Blob([JSON.stringify(state.sites,null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download = 'all-sites.json'; a.click();
+}
+
+function deleteSite(i){
+  if(!confirm(`"${state.sites[i].meta.건물명}" 후보지를 삭제하시겠습니까?`)) return;
+  state.sites.splice(i,1);
+  localStorage.setItem('er_sites',JSON.stringify(state.sites));
+  renderSitesTable();
+  closeDetail();
+  renderDashboard();
+  document.getElementById('sites-count').textContent = state.sites.length;
+}
+
+function showAddSite(){
+  const tmpl = {
+    id:'new-site-'+Date.now(),
+    meta:{건물명:'신규 후보지',주소:'',대상공간:'',전용면적PY:0,준공일:'',분석일:new Date().toISOString().slice(0,10)},
+    임대조건:{보증금:0,월MG:0,관리비:0},
+    포획시장:{단지전체상주:0,현재입주율:0,출근율:85,외식율:70,건물이용율:40,점유율:6.7,일일수요:0,주변좌석수:0,공급부족지수:0,공급부족등급:'—'},
+    재무:{보수적:{월매출:0,월순익:0,BEP:0,투자회수:null,ROI2년:null},기본:{월매출:0,월순익:0,BEP:0,투자회수:null,ROI2년:null},낙관적:{월매출:0,월순익:0,BEP:0,투자회수:null,ROI2년:null}},
+    종합:{점수:0,등급:'—',권고:'미분석',핵심조건:'',리스크:''}
+  };
+  state.sites.push(tmpl);
+  renderSitesTable();
+  openDetail(state.sites.length-1);
+  document.getElementById('sites-count').textContent = state.sites.length;
+}
+
+function toggleAllChk(el){
+  document.querySelectorAll('.site-chk').forEach(c=>c.checked=el.checked);
+}
+
+function compareSites(){
+  const checked = [...document.querySelectorAll('.site-chk:checked')].map(c=>+c.value);
+  if(checked.length<2){alert('2개 이상 후보지를 선택하세요');return;}
+  const el = document.getElementById('compare-content');
+  const sel = checked.map(i=>state.sites[i]);
+  const rows = [
+    ['종합점수', ...sel.map(s=>`<strong>${s.종합.점수}</strong>`)],
+    ['권고', ...sel.map(s=>s.종합.권고)],
+    ['상주인원', ...sel.map(s=>(s.포획시장.단지전체상주||0).toLocaleString()+'명')],
+    ['공급부족지수', ...sel.map(s=>s.포획시장.공급부족지수+'명/석')],
+    ['월 보증금', ...sel.map(s=>(s.임대조건.보증금/10000).toLocaleString()+'만')],
+    ['월MG', ...sel.map(s=>(s.임대조건.월MG/10000).toLocaleString()+'만')],
+    ['기본 매출', ...sel.map(s=>(s.재무.기본.월매출/10000).toLocaleString()+'만')],
+    ['기본 순익', ...sel.map(s=>(s.재무.기본.월순익/10000).toLocaleString()+'만')],
+    ['투자회수', ...sel.map(s=>s.재무.기본.투자회수?(s.재무.기본.투자회수+'개월'):'—')],
+  ];
+  el.innerHTML = `<div class="tw"><table>
+    <thead><tr><th>항목</th>${sel.map(s=>`<th>${s.meta.건물명}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td${i===0?' style="font-weight:600;color:#888"':' class="tr"'}>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table></div>`;
+  document.getElementById('compare-panel').style.display='block';
+  document.getElementById('site-detail').style.display='none';
+  document.getElementById('compare-panel').scrollIntoView({behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════════════════
+//  SKILL CONFIG
+// ═══════════════════════════════════════════════════════
+function renderSkillConfig(){
+  const cfg = state.skillConfig;
+  if(!cfg) return;
+  setSlider('cfg-commute', cfg.포획시장.출근율, 'cfg-commute-v','%');
+  setSlider('cfg-dining', cfg.포획시장.외식율, 'cfg-dining-v','%');
+  setSlider('cfg-blduse', cfg.포획시장.건물이용율, 'cfg-blduse-v','%');
+  setSlider('cfg-share', cfg.포획시장.점유율, 'cfg-share-v','%');
+  setSlider('cfg-food', cfg.재무.식재료비율, 'cfg-food-v','%');
+  setSlider('cfg-labor', cfg.재무.인건비율, 'cfg-labor-v','%');
+  setSlider('cfg-etc', cfg.재무.기타경비율, 'cfg-etc-v','%');
+  setSlider('cfg-days', cfg.재무.영업일수, 'cfg-days-v','일');
+  setSlider('cfg-w1', cfg.평가배점.입지등급, 'cfg-w1-v','');
+  setSlider('cfg-w2', cfg.평가배점.포획시장규모, 'cfg-w2-v','');
+  setSlider('cfg-w3', cfg.평가배점.경쟁강도, 'cfg-w3-v','');
+  setSlider('cfg-w4', cfg.평가배점.교통호재, 'cfg-w4-v','');
+  setSlider('cfg-w5', cfg.평가배점.재무건전성, 'cfg-w5-v','');
+  setSlider('cfg-w6', cfg.평가배점.임대조건, 'cfg-w6-v','');
+  document.getElementById('cfg-excel').value = cfg.출력.엑셀시트수;
+  document.getElementById('cfg-ppt').value = cfg.출력.PPT슬라이드수;
+  document.getElementById('cfg-html').value = cfg.출력.HTML차트수;
+}
+
+function checkWeightSum(){
+  const sum = ['cfg-w1','cfg-w2','cfg-w3','cfg-w4','cfg-w5','cfg-w6'].reduce((a,id)=>a+(+document.getElementById(id).value),0);
+  const el = document.getElementById('score-sum-indicator');
+  el.textContent = (sum===100?'✓':'✗') + ' 합계: '+sum+'점';
+  el.className = 'sum-indicator '+(sum===100?'sum-ok':'sum-err');
+}
+
+function saveSkillConfig(){
+  const cfg = {
+    version: (parseFloat(state.skillConfig?.version||'1.2')+0.1).toFixed(1),
+    포획시장:{출근율:+document.getElementById('cfg-commute').value,외식율:+document.getElementById('cfg-dining').value,건물이용율:+document.getElementById('cfg-blduse').value,점유율:+document.getElementById('cfg-share').value},
+    재무:{식재료비율:+document.getElementById('cfg-food').value,인건비율:+document.getElementById('cfg-labor').value,기타경비율:+document.getElementById('cfg-etc').value,영업일수:+document.getElementById('cfg-days').value},
+    평가배점:{입지등급:+document.getElementById('cfg-w1').value,포획시장규모:+document.getElementById('cfg-w2').value,경쟁강도:+document.getElementById('cfg-w3').value,교통호재:+document.getElementById('cfg-w4').value,재무건전성:+document.getElementById('cfg-w5').value,임대조건:+document.getElementById('cfg-w6').value},
+    출력:{엑셀시트수:+document.getElementById('cfg-excel').value,PPT슬라이드수:+document.getElementById('cfg-ppt').value,HTML차트수:+document.getElementById('cfg-html').value}
+  };
+  state.skillConfig = cfg;
+  localStorage.setItem('er_skillConfig',JSON.stringify(cfg));
+  const blob = new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='skill-config.json'; a.click();
+}
+
+function resetSkillConfig(){
+  if(!confirm('기본값으로 초기화하시겠습니까?')) return;
+  state.skillConfig = FALLBACK.skillConfig;
+  renderSkillConfig();
+}
+
+function copySkillPath(){
+  navigator.clipboard.writeText('C:\\Users\\grego\\.claude\\skills\\entry-review\\SKILL.md')
+    .then(()=>alert('경로가 클립보드에 복사되었습니다.'))
+    .catch(()=>alert('C:\\Users\\grego\\.claude\\skills\\entry-review\\SKILL.md'));
+}
+
+// ═══════════════════════════════════════════════════════
+//  REPORTS
+// ═══════════════════════════════════════════════════════
+function renderPromptTemplate(){
+  document.getElementById('prompt-template').textContent =
+`entry-review 스킬로 신규 후보지를 분석해주세요.
+
+건물명: [건물명]
+주소: [주소]
+대상공간: [호수/층], 전용 [면적]PY
+임대조건: 보증금 [X]만, MG [X]만/월, 관리비 [X]만/월
+
+첨부 자료:
+- 건물 개요 이미지: [이미지 경로]
+- 층별 현황: [이미지 경로]
+
+스킬 경로: C:\\Users\\grego\\.claude\\skills\\entry-review\\SKILL.md`;
+}
+
+function copyPromptTemplate(){
+  const txt = document.getElementById('prompt-template').textContent;
+  navigator.clipboard.writeText(txt).then(()=>alert('프롬프트가 복사되었습니다. Claude Code에 붙여넣으세요.')).catch(()=>alert(txt));
+}
+
+function addReportFile(input){
+  const file = input.files[0]; if(!file) return;
+  const el = document.getElementById('dynamic-reports');
+  el.innerHTML += `<div class="report-card">
+    <div class="report-icon">📊</div>
+    <div class="report-info">
+      <div class="report-name">${file.name.replace('.html','')}</div>
+      <div class="report-meta">${new Date().toISOString().slice(0,10)} · HTML · 로컬 업로드</div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-sm" onclick="openLocalReport(this,'${URL.createObjectURL(file)}')">열기</button>
+    </div>
+  </div>`;
+}
+
+function openLocalReport(btn, url){ window.open(url,'_blank'); }
+
+// ═══════════════════════════════════════════════════════
+//  HISTORY / TIMELINE
+// ═══════════════════════════════════════════════════════
+function renderTimeline(data, filter){
+  const el = document.getElementById('timeline-list');
+  const filtered = filter==='all' ? data : data.filter(d=>d.type===filter);
+  const sorted = [...filtered].sort((a,b)=>b.date.localeCompare(a.date));
+  const icons = {skill:'⚙️',site:'🏢',report:'📁'};
+  el.innerHTML = sorted.length ? sorted.map(c=>`
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-${c.type}"></div>
+      <div class="tl-date">${c.date}${c.version?' · v'+c.version:''}</div>
+      <div class="tl-title">${icons[c.type]||'📌'} ${c.title}</div>
+      ${c.detail?`<div class="tl-detail">${c.detail}</div>`:''}
+    </div>`).join('') : '<div style="color:#ccc;font-size:11px;text-align:center;padding:20px">이력이 없습니다</div>';
+}
+
+function filterHistory(type, btn){
+  document.querySelectorAll('.btn-row .sbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTimeline(state.changelog, type);
+}
+
+function addHistoryEntry(){
+  const title = prompt('이력 제목:'); if(!title) return;
+  const detail = prompt('상세 내용 (선택):');
+  const type = prompt('유형 (skill/site/report):','skill')||'skill';
+  const entry = {date:new Date().toISOString().slice(0,10),type,title,detail:detail||''};
+  state.changelog.unshift(entry);
+  localStorage.setItem('er_changelog',JSON.stringify(state.changelog));
+  renderTimeline(state.changelog,'all');
+  renderDashboard();
+}
+
+// ═══════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════
+function updateSlider(input, valId, suffix){
+  const raw = parseFloat(input.value);
+  document.getElementById(valId).textContent = raw + suffix;
+}
+function setSlider(inputId, val, valId, suffix){
+  const el = document.getElementById(inputId);
+  if(el){el.value=val; document.getElementById(valId).textContent = val+suffix;}
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+loadData();
+</script>
+</body>
+</html>
