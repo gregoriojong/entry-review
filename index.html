@@ -138,6 +138,26 @@ tr:hover td{background:#fafaf8}
 .report-name{font-size:12px;font-weight:700;color:#1a1a18}
 .report-meta{font-size:10px;color:#bbb;margin-top:2px}
 
+/* ── EREX ── */
+.epanel{display:none}.epanel.active{display:block}
+.brand-card{background:#fff;border:.5px solid rgba(0,0,0,.07);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;transition:all .15s}
+.brand-card:hover{border-color:#9b59b6;box-shadow:0 2px 8px rgba(155,89,182,.08)}
+.brand-avatar{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.brand-body{flex:1}
+.brand-name{font-size:13px;font-weight:700;color:#1a1a18;margin-bottom:2px}
+.brand-meta{font-size:11px;color:#aaa;margin-bottom:6px}
+.brand-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+.brand-memo{font-size:10px;color:#888;line-height:1.6;border-top:.5px solid rgba(0,0,0,.06);padding-top:6px;margin-top:4px}
+.status-active{background:#e6f4ed;color:#1a7f4a}
+.status-dev{background:#fdf3e3;color:#9a6d00}
+.status-converting{background:#fde8e8;color:#c0392b}
+.status-planned{background:#e8f0fb;color:#1a56c4}
+.zone-card{background:#fff;border:.5px solid rgba(0,0,0,.07);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.zone-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.zone-icon{font-size:20px}
+.zone-title{font-size:13px;font-weight:700;flex:1}
+.zone-brands{display:flex;gap:6px;flex-wrap:wrap}
+.channel-row-active{background:#f0fff5}
 /* ── Responsive ── */
 @media(max-width:768px){
   .sb{width:0;min-width:0;position:fixed;z-index:100;height:100%;box-shadow:2px 0 12px rgba(0,0,0,.1)}
@@ -182,6 +202,10 @@ tr:hover td{background:#fafaf8}
       <span class="nav-icon">🕐</span> 변경 이력
     </div>
     <div class="nav-sec">참고 데이터</div>
+    <div class="nav-item" data-panel="erex">
+      <span class="nav-icon">🏷</span> EREX 브랜드
+      <span class="nav-badge" style="background:#9b59b6">7</span>
+    </div>
     <div class="nav-item" data-panel="marketdb">
       <span class="nav-icon">🗺</span> 상권 DB
       <span class="nav-badge" style="background:#e6a817">30</span>
@@ -497,7 +521,106 @@ tr:hover td{background:#fafaf8}
       </div>
     </div>
 
-    <!-- ════ 6. 상권 DB ════ -->
+    <!-- ════ 6. EREX 브랜드 현황 ════ -->
+    <div class="panel" id="panel-erex">
+      <div class="sec-hd"><h2>EREX 브랜드 현황</h2><p>브랜드별·유통사별 입점 현황 및 신규 파이프라인 (2026.04 기준)</p></div>
+
+      <!-- KPI -->
+      <div class="krow k4" id="erex-kpi"></div>
+
+      <!-- 탭 -->
+      <div class="dtabs" id="erex-tabs">
+        <button class="dtab active" data-etab="brands">📋 브랜드 현황</button>
+        <button class="dtab" data-etab="channels">🏬 유통사 채널</button>
+        <button class="dtab" data-etab="zones">🍽️ F&B 존별</button>
+        <button class="dtab" data-etab="pipeline">📅 입점 파이프라인</button>
+      </div>
+
+      <!-- ① 브랜드 현황 -->
+      <div class="epanel active" id="etab-brands">
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card">
+            <div class="card-hd"><span class="ct">브랜드 포트폴리오</span></div>
+            <div class="cs">상태별 구성</div>
+            <canvas id="chart-erex-status" height="200"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="ct">카테고리 분포</span></div>
+            <div class="cs">F&B 카테고리별</div>
+            <canvas id="chart-erex-cat" height="200"></canvas>
+          </div>
+        </div>
+        <div id="erex-brand-cards"></div>
+      </div>
+
+      <!-- ② 유통사 채널 -->
+      <div class="epanel" id="etab-channels">
+        <div class="card" style="padding:0;overflow:hidden">
+          <div class="tw">
+            <table id="erex-channel-table">
+              <thead>
+                <tr>
+                  <th>우선순위</th><th>유통사</th><th>업태</th>
+                  <th>현재 입점 브랜드</th><th>타깃 브랜드</th>
+                  <th>F&B 존</th><th>MD 리스크</th><th>바이어 접촉</th>
+                </tr>
+              </thead>
+              <tbody id="erex-channel-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="g2" style="margin-top:14px">
+          <div class="card">
+            <div class="card-hd"><span class="ct">유통사별 입점 브랜드 수</span></div>
+            <div class="cs">현재 운영 중인 브랜드</div>
+            <canvas id="chart-erex-channel" height="200"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="ct">유통사별 우선순위</span></div>
+            <div class="cs">★ 높을수록 핵심 채널</div>
+            <canvas id="chart-erex-priority" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ F&B 존별 -->
+      <div class="epanel" id="etab-zones">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <button class="btn sbtn active" data-zfilter="전체" onclick="filterErexZone('전체',this)">전체</button>
+          <button class="btn sbtn" data-zfilter="식당가" onclick="filterErexZone('식당가',this)">🍽️ 식당가</button>
+          <button class="btn sbtn" data-zfilter="푸드코트" onclick="filterErexZone('푸드코트',this)">🏪 푸드코트</button>
+          <button class="btn sbtn" data-zfilter="델리" onclick="filterErexZone('델리',this)">🥡 델리</button>
+          <button class="btn sbtn" data-zfilter="파인다이닝" onclick="filterErexZone('파인다이닝',this)">⭐ 파인다이닝</button>
+        </div>
+        <div id="erex-zone-cards"></div>
+      </div>
+
+      <!-- ④ 파이프라인 -->
+      <div class="epanel" id="etab-pipeline">
+        <div class="card" style="padding:0;overflow:hidden;margin-bottom:14px">
+          <div class="tw">
+            <table>
+              <thead>
+                <tr><th>유통사/점포</th><th>브랜드</th><th>존 유형</th><th>제안 단계</th><th>제안 예정</th><th>오픈 예정</th><th>기회도</th></tr>
+              </thead>
+              <tbody id="erex-pipeline-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card" style="background:#fff8e6;border-color:rgba(230,168,23,.3)">
+          <div class="ct" style="color:#9a6d00;margin-bottom:8px">🔴 즉시 필요 Action Items</div>
+          <div style="font-size:11px;color:#555;line-height:2">
+            <div>1. 현대백화점 도원점 F&B MD 담당자 접촉 → <strong>이화원·마쯔가재</strong> 입점 제안서 작성 준비 (2026 Q2 내)</div>
+            <div>2. 오크우드 호텔과 이화원·마쯔가재 <strong>유통 진출 관련 계약 조건 협의</strong> 착수</div>
+            <div>3. <strong>포팟</strong> 브랜드 컨셉 최종 확정 (메뉴·인테리어·가격대) → 백화점 제안 자료 제작</div>
+            <div>4. <strong>후아후아 → 리터치 델리</strong> 전환 컨셉 확정 → 롯데·현대 델리 MD 동시 접촉</div>
+            <div>5. <strong>도원스타일</strong> (더플라자 → 현대백화점) 성공 모델 현장 벤치마킹 방문 일정 수립</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ 7. 상권 DB ════ -->
     <div class="panel" id="panel-marketdb">
       <div class="sec-hd"><h2>상권 DB</h2><p>백화점·쇼핑몰 매출 순위 30위권 · 2024~2025 실측 기반</p></div>
 
@@ -646,6 +769,7 @@ const PANEL_TITLES = {
   skill:['스킬 설정','entry-review 파라미터 편집'],
   reports:['보고서','HTML 대시보드 및 보고서'],
   history:['변경 이력','스킬/데이터 변경 기록'],
+  erex:['EREX 브랜드 현황','브랜드별·유통사별 입점 현황 및 파이프라인'],
   marketdb:['상권 DB','백화점·몰 매출 순위 30위권 분석']
 };
 
@@ -661,6 +785,8 @@ document.querySelectorAll('.nav-item').forEach(el=>{
     closeSb();
     if(p==='marketdb' && mdbData.length===0) loadMarketDB().then(renderMarketDB);
     else if(p==='marketdb') renderMarketDB();
+    if(p==='erex' && !erexData) loadErexDB().then(renderErexPanel);
+    else if(p==='erex') renderErexPanel();
   });
 });
 
@@ -1200,6 +1326,239 @@ function setSlider(inputId, val, valId, suffix){
   const el = document.getElementById(inputId);
   if(el){el.value=val; document.getElementById(valId).textContent = val+suffix;}
 }
+
+// ═══════════════════════════════════════════════════════
+//  EREX BRAND DB
+// ═══════════════════════════════════════════════════════
+let erexData = null;
+let erexStatusChart, erexCatChart, erexChannelChart, erexPriorityChart;
+
+async function loadErexDB() {
+  try {
+    const r = await fetch('data/erex-db.json');
+    erexData = await r.json();
+  } catch(e) { erexData = null; }
+}
+
+const BRAND_STATUS = {
+  active:     { label:'🟢 운영중',   cls:'status-active' },
+  dev:        { label:'🟡 개발중',   cls:'status-dev' },
+  converting: { label:'🟠 전환준비', cls:'status-converting' },
+  planned:    { label:'🔵 전환계획', cls:'status-planned' }
+};
+const BRAND_COLORS = {
+  active:'#1a7f4a', dev:'#e6a817', converting:'#c0392b', planned:'#378ADD'
+};
+const RISK_TAG = { 높음:'trd', 보통:'tam', 낮음:'tgn', '해당없음':'tgy' };
+const BUYER_TAG = {
+  urgent:   { label:'🔴 즉시필요', cls:'trd' },
+  ready:    { label:'🟡 준비중',   cls:'tam' },
+  review:   { label:'⚪ 검토',     cls:'tgy' },
+  strategy: { label:'🔵 전략검토', cls:'tbl' }
+};
+const BRAND_AVATAR = {
+  pfchangs:'🥢', peipei:'🍜', hongbosuk:'🫕', fopot:'🍲',
+  retouchdeli:'🥡', ihwawon:'🏮', matsugani:'🍣'
+};
+const PRIORITY_STAR = n => '★'.repeat(n)+'☆'.repeat(5-n);
+
+function renderErexPanel() {
+  if(!erexData) return;
+  const { brands, channels, fnbZones, pipeline } = erexData;
+
+  // KPI
+  const activeCount = brands.filter(b=>b.상태코드==='active').length;
+  const devCount = brands.filter(b=>['dev','converting','planned'].includes(b.상태코드)).length;
+  const totalChannels = channels.filter(c=>c.입점브랜드.length>0).length;
+  const pipelineCount = pipeline.length;
+  document.getElementById('erex-kpi').innerHTML = `
+    <div class="kpi"><div class="kpi-l">운영 중 브랜드</div><div class="kpi-v up">${activeCount}</div><div class="kpi-s">개</div></div>
+    <div class="kpi"><div class="kpi-l">개발·전환 브랜드</div><div class="kpi-v" style="color:#378ADD">${devCount}</div><div class="kpi-s">개</div></div>
+    <div class="kpi"><div class="kpi-l">입점 유통사 수</div><div class="kpi-v">${totalChannels}</div><div class="kpi-s">개 채널</div></div>
+    <div class="kpi"><div class="kpi-l">신규 파이프라인</div><div class="kpi-v" style="color:#9a6d00">${pipelineCount}</div><div class="kpi-s">건 검토중</div></div>`;
+
+  renderErexBrands();
+  renderErexChannels();
+  renderErexZones('전체');
+  renderErexPipeline();
+  renderErexCharts();
+}
+
+function renderErexBrands() {
+  const { brands } = erexData;
+  const groups = [
+    { title:'▶ 기존 입점 브랜드', subtitle:'현재 대형 유통사 운영 중', codes:['active'] },
+    { title:'▶ 신규 개발 브랜드', subtitle:'신규 출점 준비 중', codes:['dev'] },
+    { title:'▶ 포맷 전환 브랜드', subtitle:'기존 브랜드 리포맷', codes:['converting'] },
+    { title:'▶ 호텔 → 유통 전환 계획', subtitle:'오크우드 호텔 브랜드 백화점 진출', codes:['planned'] }
+  ];
+  const el = document.getElementById('erex-brand-cards');
+  el.innerHTML = groups.map(g=>{
+    const list = brands.filter(b=>g.codes.includes(b.상태코드));
+    if(!list.length) return '';
+    return `<div style="margin-bottom:4px;font-size:12px;font-weight:700;color:#1a1a18;padding:8px 0 4px">${g.title} <span style="font-size:10px;color:#bbb;font-weight:400">${g.subtitle}</span></div>
+    <div class="g2">${list.map(b=>{
+      const st = BRAND_STATUS[b.상태코드];
+      const avatar = BRAND_AVATAR[b.id]||'🍴';
+      return `<div class="brand-card">
+        <div class="brand-avatar" style="background:${BRAND_COLORS[b.상태코드]}18">${avatar}</div>
+        <div class="brand-body">
+          <div class="brand-name">${b.브랜드명}</div>
+          <div class="brand-meta">${b.카테고리} · ${b.컨셉}</div>
+          <div class="brand-tags">
+            <span class="tag ${st.cls}">${st.label}</span>
+            <span class="tag tgy">${b.포지셔닝}</span>
+            <span class="tag tbl">${PRIORITY_STAR(b.우선순위)}</span>
+          </div>
+          <div style="font-size:10px;color:#888;margin-bottom:4px">🍴 ${b.주요메뉴}</div>
+          ${b.현재위치?`<div style="font-size:10px;color:#378ADD">📍 ${b.현재위치}</div>`:''}
+          ${b.타깃유통사?`<div style="font-size:10px;color:#1a7f4a">🎯 타깃: ${b.타깃유통사}</div>`:''}
+          <div class="brand-memo">${b.담당자메모}</div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }).join('');
+}
+
+function renderErexChannels() {
+  const { channels } = erexData;
+  const sorted = [...channels].sort((a,b)=>b.우선순위-a.우선순위);
+  const tbody = document.getElementById('erex-channel-tbody');
+  tbody.innerHTML = sorted.map(c=>{
+    const hasActive = c.입점브랜드.length>0;
+    const riskCls = RISK_TAG[c.MD개편리스크]||'tgy';
+    const buyer = BUYER_TAG[c.바이어코드]||{label:c.바이어접촉,cls:'tgy'};
+    const activeTags = c.입점브랜드.map(b=>`<span class="tag tgn" style="margin:1px">${b}</span>`).join('');
+    const targetTags = c.타깃브랜드.map(b=>`<span class="tag tbl" style="margin:1px">${b}</span>`).join('');
+    const zoneTags = c.FnB존유형.map(z=>`<span class="tag tgy" style="margin:1px">${z}</span>`).join('');
+    return `<tr class="${hasActive?'channel-row-active':''}">
+      <td style="text-align:center;font-weight:700;color:#9b59b6">${PRIORITY_STAR(c.우선순위)}</td>
+      <td style="font-weight:600;min-width:120px">${c.유통사}</td>
+      <td><span class="tag tgy">${c.업태}</span></td>
+      <td>${activeTags||'<span style="color:#ccc;font-size:10px">미입점</span>'}</td>
+      <td>${targetTags||'<span style="color:#ccc;font-size:10px">—</span>'}</td>
+      <td>${zoneTags}</td>
+      <td><span class="tag ${riskCls}">${c.MD개편리스크}</span></td>
+      <td><span class="tag ${buyer.cls}">${buyer.label}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderErexZones(filter) {
+  const { fnbZones } = erexData;
+  const list = filter==='전체' ? fnbZones : fnbZones.filter(z=>z.존유형===filter);
+  const el = document.getElementById('erex-zone-cards');
+  el.innerHTML = list.map(z=>{
+    const activeBadges = z.입점브랜드.map(b=>`<span class="tag tgn">${b}</span>`).join(' ');
+    const targetBadges = z.타깃브랜드.map(b=>`<span class="tag tbl">${b}</span>`).join(' ');
+    const stars = '★'.repeat(z.기회도)+'☆'.repeat(5-z.기회도);
+    return `<div class="zone-card">
+      <div class="zone-header">
+        <span class="zone-icon">${z.존아이콘}</span>
+        <div style="flex:1">
+          <div class="zone-title">${z.유통사점포} <span class="tag tgy" style="font-size:10px">${z.존유형}</span></div>
+          <div style="font-size:10px;color:#aaa">${z.층위치} · 브랜드 ${z.브랜드수}개</div>
+        </div>
+        <div style="font-size:12px;color:#e6a817;font-weight:700">${stars}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:#1a7f4a;font-weight:700;margin-bottom:4px">✅ 현재 에렉스 입점</div>
+          <div class="brand-tags">${activeBadges||'<span style="font-size:10px;color:#ccc">미입점</span>'}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#378ADD;font-weight:700;margin-bottom:4px">🎯 타깃 브랜드</div>
+          <div class="brand-tags">${targetBadges||'<span style="font-size:10px;color:#ccc">—</span>'}</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:#888;margin-top:8px;padding-top:8px;border-top:.5px solid rgba(0,0,0,.06)">${z.특이사항}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterErexZone(f, btn) {
+  document.querySelectorAll('[data-zfilter]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderErexZones(f);
+}
+
+function renderErexPipeline() {
+  const { pipeline } = erexData;
+  const STAGE = { '검토중':'tam', '제안예정':'tbl', '협의중':'tgn', '완료':'tgy' };
+  document.getElementById('erex-pipeline-tbody').innerHTML = pipeline.map(p=>{
+    const stars = '★'.repeat(p.기회도)+'☆'.repeat(5-p.기회도);
+    return `<tr>
+      <td style="font-weight:600">${p.유통사점포}</td>
+      <td><span class="tag tbl">${p.브랜드}</span></td>
+      <td><span class="tag tgy">${p.존}</span></td>
+      <td><span class="tag ${STAGE[p.단계]||'tgy'}">${p.단계}</span></td>
+      <td style="color:#888">${p.제안예정}</td>
+      <td style="color:#1a7f4a;font-weight:600">${p.오픈예정}</td>
+      <td style="color:#e6a817;font-weight:700">${stars}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderErexCharts() {
+  const { brands, channels } = erexData;
+
+  // 상태 파이
+  const statusMap = {};
+  brands.forEach(b=>{ statusMap[BRAND_STATUS[b.상태코드].label] = (statusMap[BRAND_STATUS[b.상태코드].label]||0)+1; });
+  if(erexStatusChart) erexStatusChart.destroy();
+  erexStatusChart = new Chart(document.getElementById('chart-erex-status'), {
+    type:'doughnut',
+    data:{ labels:Object.keys(statusMap), datasets:[{ data:Object.values(statusMap), backgroundColor:['#1a7f4a','#e6a817','#c0392b','#378ADD'], borderWidth:1 }] },
+    options:{ responsive:true, plugins:{ legend:{ position:'right', labels:{ font:{ size:10 }, boxWidth:12 } } } }
+  });
+
+  // 카테고리 바
+  const catMap = {};
+  brands.forEach(b=>{ catMap[b.카테고리] = (catMap[b.카테고리]||0)+1; });
+  if(erexCatChart) erexCatChart.destroy();
+  erexCatChart = new Chart(document.getElementById('chart-erex-cat'), {
+    type:'bar',
+    data:{ labels:Object.keys(catMap), datasets:[{ data:Object.values(catMap), backgroundColor:'#9b59b6', borderRadius:6 }] },
+    options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ font:{ size:9 } } }, y:{ ticks:{ stepSize:1 } } } }
+  });
+
+  // 채널별 입점 브랜드 수
+  const chLabels = channels.map(c=>c.유통사.replace(' (복수점포)','').replace(' 더현대서울(도원점)','(도원)').slice(0,8));
+  const chData = channels.map(c=>c.입점브랜드.length);
+  const chColors = channels.map(c=>c.입점브랜드.length>0?'#1a7f4a':'#f0efec');
+  if(erexChannelChart) erexChannelChart.destroy();
+  erexChannelChart = new Chart(document.getElementById('chart-erex-channel'), {
+    type:'bar',
+    data:{ labels:chLabels, datasets:[{ data:chData, backgroundColor:chColors, borderRadius:5 }] },
+    options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ font:{ size:9 } } }, y:{ ticks:{ stepSize:1 } } } }
+  });
+
+  // 우선순위 레이더 (상위 5개)
+  const top5 = [...channels].sort((a,b)=>b.우선순위-a.우선순위).slice(0,5);
+  if(erexPriorityChart) erexPriorityChart.destroy();
+  erexPriorityChart = new Chart(document.getElementById('chart-erex-priority'), {
+    type:'radar',
+    data:{
+      labels: top5.map(c=>c.유통사.split(' ')[0]),
+      datasets:[
+        { label:'우선순위', data:top5.map(c=>c.우선순위), borderColor:'#9b59b6', backgroundColor:'rgba(155,89,182,.12)', pointBackgroundColor:'#9b59b6', borderWidth:2 },
+        { label:'타깃 브랜드 수', data:top5.map(c=>c.타깃브랜드.length), borderColor:'#378ADD', backgroundColor:'rgba(55,138,221,.08)', pointBackgroundColor:'#378ADD', borderWidth:2 }
+      ]
+    },
+    options:{ responsive:true, plugins:{ legend:{ labels:{ font:{ size:9 } } } }, scales:{ r:{ min:0, max:5, ticks:{ stepSize:1, font:{ size:9 } }, pointLabels:{ font:{ size:10 } } } } }
+  });
+}
+
+// EREX 탭 이벤트
+document.querySelectorAll('[data-etab]').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const t = el.dataset.etab;
+    document.querySelectorAll('[data-etab]').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.epanel').forEach(x=>x.classList.remove('active'));
+    document.getElementById('etab-'+t).classList.add('active');
+  });
+});
 
 // ═══════════════════════════════════════════════════════
 //  MARKET DB
