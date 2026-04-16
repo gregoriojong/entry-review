@@ -1,0 +1,6 @@
+[
+  {"date": "2026-04-14", "type": "skill", "title": "entry-review 스킬 v1.0 생성", "detail": "dev-simulation + fnb-market + field-management 통합"},
+  {"date": "2026-04-14", "type": "site", "title": "트라이타워 분석 완료", "detail": "종합 67점, 조건부 입점 권장"},
+  {"date": "2026-04-16", "type": "skill", "title": "스킬 v1.2 업데이트", "detail": "HTML 대시보드(Step 9), 트리거 최적화, 복수 후보지 비교 추가"},
+  {"date": "2026-04-16", "type": "report", "title": "용어 학습 가이드 생성", "detail": "바이브코딩 & 웹개발 38개 용어 HTML 가이드"}
+]
