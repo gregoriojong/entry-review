@@ -181,6 +181,11 @@ tr:hover td{background:#fafaf8}
     <div class="nav-item" data-panel="history">
       <span class="nav-icon">🕐</span> 변경 이력
     </div>
+    <div class="nav-sec">참고 데이터</div>
+    <div class="nav-item" data-panel="marketdb">
+      <span class="nav-icon">🗺</span> 상권 DB
+      <span class="nav-badge" style="background:#e6a817">30</span>
+    </div>
   </nav>
   <div class="sb-ft">김종열 · F&amp;B 점포개발</div>
 </aside>
@@ -492,6 +497,90 @@ tr:hover td{background:#fafaf8}
       </div>
     </div>
 
+    <!-- ════ 6. 상권 DB ════ -->
+    <div class="panel" id="panel-marketdb">
+      <div class="sec-hd"><h2>상권 DB</h2><p>백화점·쇼핑몰 매출 순위 30위권 · 2024~2025 실측 기반</p></div>
+
+      <!-- 필터·검색 -->
+      <div class="btn-row" style="align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <input type="text" id="mdb-search" placeholder="점포명·지역 검색…" style="height:32px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;background:#fff;outline:none;width:200px" oninput="renderMarketDB()">
+        <select id="mdb-chain" style="height:32px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;background:#fff;outline:none" onchange="renderMarketDB()">
+          <option value="">전체 유통사</option>
+          <option>신세계백화점</option>
+          <option>롯데백화점</option>
+          <option>현대백화점</option>
+          <option>갤러리아백화점</option>
+          <option>신세계(스타필드)</option>
+          <option>복합몰(IFC서울)</option>
+          <option>복합몰(경방)</option>
+          <option>AK플라자</option>
+          <option>NC백화점</option>
+          <option>롯데(타임빌라스)</option>
+        </select>
+        <select id="mdb-diff" style="height:32px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;background:#fff;outline:none" onchange="renderMarketDB()">
+          <option value="">전체 입점난이도</option>
+          <option>최상</option><option>상</option><option>중상</option><option>중</option><option>중하</option>
+        </select>
+        <select id="mdb-sort" style="height:32px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;background:#fff;outline:none" onchange="renderMarketDB()">
+          <option value="매출">매출순</option>
+          <option value="방문객">방문객순</option>
+          <option value="FnB">F&B비중순</option>
+          <option value="공실">공실률순</option>
+        </select>
+        <button class="btn btn-bl btn-sm" onclick="exportMarketCSV()">⬇ CSV</button>
+      </div>
+
+      <!-- KPI 요약 -->
+      <div class="krow k4" id="mdb-kpi-row" style="margin-bottom:14px"></div>
+
+      <!-- 차트 행 -->
+      <div class="g2" style="margin-bottom:14px">
+        <div class="card">
+          <div class="card-hd"><span class="ct">매출 TOP 10</span></div>
+          <div class="cs">연간 매출(억원) 기준</div>
+          <canvas id="chart-mdb-top10" height="200"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="ct">유통사별 매출 점유</span></div>
+          <div class="cs">전체 30개 점포 합산</div>
+          <canvas id="chart-mdb-chain" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- 상세 테이블 -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="tw">
+          <table id="mdb-table">
+            <thead>
+              <tr>
+                <th>순위</th><th>유통사</th><th>점포명</th><th>지역</th>
+                <th class="tr">연간매출(억)</th><th class="tr">일방문객(만)</th>
+                <th class="tr">F&B비중</th><th>입점난이도</th><th>개발자 메모</th>
+              </tr>
+            </thead>
+            <tbody id="mdb-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 상세 카드 (클릭 시 표시) -->
+      <div id="mdb-detail" style="display:none;margin-top:14px">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-size:14px;font-weight:700" id="mdb-detail-title">—</div>
+            <button class="btn btn-sm" onclick="document.getElementById('mdb-detail').style.display='none'">✕ 닫기</button>
+          </div>
+          <div class="g2" style="margin-bottom:0" id="mdb-detail-content"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;font-size:10px;color:#bbb;line-height:1.8">
+        ※ 데이터 출처: 어패럴뉴스, 신세계·롯데·현대 공시·언론보도, 산업통상자원부 유통업체 동향(2024~2025)<br>
+        ※ (추정) 표기 항목은 공식 발표 없이 업계 관행·유사 점포 데이터 기반 추정값 포함<br>
+        ※ 복합몰(스타필드·IFC몰·타임스퀘어) 매출은 비공개 또는 비상장으로 업계 추정치 반영
+      </div>
+    </div>
+
   </div><!-- /panels -->
 </main>
 </div><!-- /app -->
@@ -556,7 +645,8 @@ const PANEL_TITLES = {
   sites:['후보지 관리','후보지별 분석 데이터'],
   skill:['스킬 설정','entry-review 파라미터 편집'],
   reports:['보고서','HTML 대시보드 및 보고서'],
-  history:['변경 이력','스킬/데이터 변경 기록']
+  history:['변경 이력','스킬/데이터 변경 기록'],
+  marketdb:['상권 DB','백화점·몰 매출 순위 30위권 분석']
 };
 
 document.querySelectorAll('.nav-item').forEach(el=>{
@@ -569,6 +659,8 @@ document.querySelectorAll('.nav-item').forEach(el=>{
     document.getElementById('page-title').textContent = PANEL_TITLES[p][0];
     document.getElementById('page-sub').textContent = PANEL_TITLES[p][1];
     closeSb();
+    if(p==='marketdb' && mdbData.length===0) loadMarketDB().then(renderMarketDB);
+    else if(p==='marketdb') renderMarketDB();
   });
 });
 
@@ -1107,6 +1199,184 @@ function updateSlider(input, valId, suffix){
 function setSlider(inputId, val, valId, suffix){
   const el = document.getElementById(inputId);
   if(el){el.value=val; document.getElementById(valId).textContent = val+suffix;}
+}
+
+// ═══════════════════════════════════════════════════════
+//  MARKET DB
+// ═══════════════════════════════════════════════════════
+let mdbData = [];
+let mdbTop10Chart, mdbChainChart;
+
+async function loadMarketDB() {
+  try {
+    const r = await fetch('data/market-db.json');
+    mdbData = await r.json();
+  } catch(e) {
+    mdbData = [];
+  }
+}
+
+const DIFF_ORDER = {'최상':5,'상':4,'중상':3,'중':2,'중하':1};
+const DIFF_TAG = {'최상':'trd','상':'tam','중상':'tbl','중':'tgy','중하':'tgn'};
+const CHAIN_COLORS = {
+  '신세계백화점':'#1a56c4','롯데백화점':'#c0392b','현대백화점':'#1a7f4a',
+  '갤러리아백화점':'#9a6d00','신세계(스타필드)':'#378ADD','복합몰(IFC서울)':'#888',
+  '복합몰(경방)':'#b06000','AK플라자':'#7b3f9e','NC백화점':'#2eaaa0','롯데(타임빌라스)':'#e67e22'
+};
+
+function renderMarketDB() {
+  if(!mdbData.length) return;
+  const q = (document.getElementById('mdb-search')?.value||'').toLowerCase();
+  const chain = document.getElementById('mdb-chain')?.value||'';
+  const diff = document.getElementById('mdb-diff')?.value||'';
+  const sort = document.getElementById('mdb-sort')?.value||'매출';
+
+  let data = mdbData.filter(d=>{
+    const matchQ = !q || d.점포명.toLowerCase().includes(q) || d.지역.toLowerCase().includes(q) || d.유통사.toLowerCase().includes(q);
+    const matchChain = !chain || d.유통사===chain;
+    const matchDiff = !diff || d.FnB입점경쟁도.난이도===diff;
+    return matchQ && matchChain && matchDiff;
+  });
+
+  data = [...data].sort((a,b)=>{
+    if(sort==='매출') return b.연간매출_억 - a.연간매출_억;
+    if(sort==='방문객') return b.일방문객_만명 - a.일방문객_만명;
+    if(sort==='FnB') return b.FnB비중_pct - a.FnB비중_pct;
+    if(sort==='공실') return b.FnB입점경쟁도.공실률_pct - a.FnB입점경쟁도.공실률_pct;
+    return 0;
+  });
+
+  // KPI
+  const totalSales = data.reduce((s,d)=>s+d.연간매출_억,0);
+  const avgVisitor = data.length ? (data.reduce((s,d)=>s+d.일방문객_만명,0)/data.length).toFixed(1) : 0;
+  const avgFnB = data.length ? (data.reduce((s,d)=>s+d.FnB비중_pct,0)/data.length).toFixed(1) : 0;
+  const easyCount = data.filter(d=>['중하','중'].includes(d.FnB입점경쟁도.난이도)).length;
+  document.getElementById('mdb-kpi-row').innerHTML = `
+    <div class="kpi"><div class="kpi-l">필터 대상 점포</div><div class="kpi-v">${data.length}<span style="font-size:12px;color:#aaa">개</span></div><div class="kpi-s">전체 30개 중</div></div>
+    <div class="kpi"><div class="kpi-l">합산 연간 매출</div><div class="kpi-v" style="font-size:16px">${(totalSales/10000).toFixed(1)}<span style="font-size:11px;color:#aaa">조</span></div><div class="kpi-s">억원 기준</div></div>
+    <div class="kpi"><div class="kpi-l">평균 F&B 비중</div><div class="kpi-v">${avgFnB}<span style="font-size:12px;color:#aaa">%</span></div><div class="kpi-s">전체 평균</div></div>
+    <div class="kpi"><div class="kpi-l">입점 가능 점포</div><div class="kpi-v blu">${easyCount}<span style="font-size:12px;color:#aaa">개</span></div><div class="kpi-s">난이도 중·중하 기준</div></div>`;
+
+  // Top10 차트
+  const top10 = [...mdbData].sort((a,b)=>b.연간매출_억-a.연간매출_억).slice(0,10);
+  if(mdbTop10Chart) mdbTop10Chart.destroy();
+  mdbTop10Chart = new Chart(document.getElementById('chart-mdb-top10'),{
+    type:'bar',
+    data:{
+      labels: top10.map(d=>d.점포명.replace('(에비뉴엘·롯데월드몰)','').replace('(대구신세계)','').slice(0,8)),
+      datasets:[{
+        data: top10.map(d=>d.연간매출_억),
+        backgroundColor: top10.map(d=>CHAIN_COLORS[d.유통사]||'#aaa'),
+        borderRadius:5, borderSkipped:false
+      }]
+    },
+    options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v>=10000?(v/10000).toFixed(1)+'조':(v/1000).toFixed(1)+'천억',font:{size:9}},grid:{color:'rgba(0,0,0,.04)'}},y:{ticks:{font:{size:10}}}}}
+  });
+
+  // Chain pie
+  const chainMap = {};
+  mdbData.forEach(d=>{ chainMap[d.유통사] = (chainMap[d.유통사]||0)+d.연간매출_억; });
+  const chainLabels = Object.keys(chainMap);
+  if(mdbChainChart) mdbChainChart.destroy();
+  mdbChainChart = new Chart(document.getElementById('chart-mdb-chain'),{
+    type:'doughnut',
+    data:{
+      labels:chainLabels,
+      datasets:[{data:chainLabels.map(k=>chainMap[k]),backgroundColor:chainLabels.map(k=>CHAIN_COLORS[k]||'#ccc'),borderWidth:1}]
+    },
+    options:{responsive:true,plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:10}}}}
+  });
+
+  // Table
+  const tbody = document.getElementById('mdb-tbody');
+  tbody.innerHTML = data.map((d,i)=>{
+    const diffCls = DIFF_TAG[d.FnB입점경쟁도.난이도]||'tgy';
+    const chainColor = CHAIN_COLORS[d.유통사]||'#888';
+    return `<tr style="cursor:pointer" onclick="showMdbDetail(${d.id})">
+      <td style="font-weight:700;color:#aaa;text-align:center">${i+1}</td>
+      <td><span style="font-size:10px;font-weight:700;color:${chainColor}">${d.유통사}</span></td>
+      <td style="font-weight:600">${d.점포명}</td>
+      <td style="color:#888;font-size:11px">${d.지역}</td>
+      <td class="tr"><strong>${d.연간매출_억.toLocaleString()}</strong></td>
+      <td class="tr">${d.일방문객_만명}</td>
+      <td class="tr"><span style="color:#378ADD;font-weight:700">${d.FnB비중_pct}%</span></td>
+      <td><span class="tag ${diffCls}">${d.FnB입점경쟁도.난이도}</span></td>
+      <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;color:#888;font-size:10px">${d.개발자메모.slice(0,60)}…</td>
+    </tr>`;
+  }).join('');
+}
+
+function showMdbDetail(id) {
+  const d = mdbData.find(x=>x.id===id);
+  if(!d) return;
+  document.getElementById('mdb-detail-title').textContent = `${d.유통사} · ${d.점포명} — ${d.지역}`;
+  const diffCls = DIFF_TAG[d.FnB입점경쟁도.난이도]||'tgy';
+  document.getElementById('mdb-detail-content').innerHTML = `
+    <div>
+      <div class="krow k3" style="margin-bottom:10px">
+        <div class="kpi"><div class="kpi-l">연간 매출</div><div class="kpi-v" style="font-size:16px">${d.연간매출_억.toLocaleString()}</div><div class="kpi-s">억원</div></div>
+        <div class="kpi"><div class="kpi-l">일 방문객</div><div class="kpi-v">${d.일방문객_만명}</div><div class="kpi-s">만명</div></div>
+        <div class="kpi"><div class="kpi-l">F&B 비중</div><div class="kpi-v blu">${d.FnB비중_pct}%</div><div class="kpi-s">매출 대비</div></div>
+      </div>
+      <div class="card" style="background:#f8f8f5;border:none;margin-bottom:8px">
+        <div class="ct" style="margin-bottom:6px">입점 경쟁도</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span class="tag ${diffCls}">${d.FnB입점경쟁도.난이도}</span>
+          <span style="font-size:11px;color:#888">공실률 약 ${d.FnB입점경쟁도.공실률_pct}%</span>
+        </div>
+        <div style="font-size:11px;color:#666">${d.FnB입점경쟁도.특이사항}</div>
+      </div>
+      <div class="card" style="background:#f8f8f5;border:none;margin-bottom:8px">
+        <div class="ct" style="margin-bottom:6px">F&B 구성</div>
+        <div style="font-size:11px;color:#666;margin-bottom:4px"><strong>규모:</strong> ${d.FnB구성.식당가규모}</div>
+        <div style="font-size:11px;color:#666;margin-bottom:4px"><strong>대표 브랜드:</strong> ${d.FnB구성.대표브랜드}</div>
+        <div style="font-size:11px;color:#378ADD"><strong>리뉴얼:</strong> ${d.FnB구성.리뉴얼현황}</div>
+      </div>
+      <div class="card" style="background:#fafcff;border-color:rgba(55,138,221,.2);border:1px solid rgba(55,138,221,.2)">
+        <div class="ct" style="color:#1a56c4;margin-bottom:6px">⚡ 개발자 메모</div>
+        <div style="font-size:11px;color:#555;line-height:1.8">${d.개발자메모}</div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="background:#f8f8f5;border:none;margin-bottom:8px">
+        <div class="ct" style="margin-bottom:6px">고객층</div>
+        <div style="font-size:11px;color:#666;line-height:1.8">
+          <div>주연령대: <strong>${d.고객층.주연령대}</strong></div>
+          <div>성별: <strong>${d.고객층.성별비중}</strong></div>
+          <div>소득 수준: ${d.고객층.소득수준}</div>
+          <div style="color:#378ADD;margin-top:4px">${d.고객층.특이사항}</div>
+        </div>
+      </div>
+      <div class="card" style="background:#f8f8f5;border:none;margin-bottom:8px">
+        <div class="ct" style="margin-bottom:6px">주변 상권 (반경 5~10km)</div>
+        <div style="margin-bottom:6px">
+          ${['오피스','주거','관광'].map(k=>`
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:10px;color:#888;width:30px">${k}</span>
+              <div style="flex:1;height:6px;background:#f0efec;border-radius:3px;overflow:hidden">
+                <div style="height:100%;background:${{오피스:'#378ADD',주거:'#1a7f4a',관광:'#e6a817'}[k]};width:${d.주변상권특성[k+'비중']}%;border-radius:3px"></div>
+              </div>
+              <span style="font-size:11px;font-weight:700;width:30px;text-align:right">${d.주변상권특성[k+'비중']}%</span>
+            </div>`).join('')}
+        </div>
+        <div style="font-size:10px;color:#aaa">${d.주변상권특성.기타}</div>
+      </div>
+      <div class="card" style="background:#f8f8f5;border:none">
+        <div class="ct" style="margin-bottom:6px">교통</div>
+        <div style="font-size:11px;color:#666;margin-bottom:4px">🚇 ${d.교통.지하철}</div>
+        <div style="font-size:11px;color:#aaa">일 유동인구: ${d.교통.일유동인구}</div>
+      </div>
+    </div>`;
+  document.getElementById('mdb-detail').style.display='block';
+  document.getElementById('mdb-detail').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function exportMarketCSV() {
+  const rows = [['순위','유통사','점포명','지역','연간매출(억)','일방문객(만명)','F&B비중(%)','입점난이도','공실률(%)','개발자메모']];
+  mdbData.forEach((d,i)=>rows.push([i+1,d.유통사,d.점포명,d.지역,d.연간매출_억,d.일방문객_만명,d.FnB비중_pct,d.FnB입점경쟁도.난이도,d.FnB입점경쟁도.공실률_pct,d.개발자메모.replace(/,/g,'·')]));
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='market-db.csv'; a.click();
 }
 
 // ═══════════════════════════════════════════════════════
