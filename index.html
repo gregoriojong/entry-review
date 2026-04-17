@@ -688,13 +688,25 @@ tr:hover td{background:#fafaf8}
         </div>
       </div>
 
+      <!-- 순위 비교 차트 -->
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div>
+            <div class="card-hd"><span class="ct">연간매출 순위 vs F&B매출 순위 비교</span></div>
+            <div class="cs">두 순위 차이가 클수록 F&B 전략적 가치가 총매출과 다름 — <span style="color:#1a7f4a;font-weight:700">▲ = F&B순위가 더 높음 (복합몰·외식특화)</span> · <span style="color:#c0392b;font-weight:700">▼ = F&B순위가 더 낮음 (명품·럭셔리 위주)</span></div>
+          </div>
+          <div id="mdb-rank-legend" style="font-size:10px;color:#888;text-align:right;line-height:1.8"></div>
+        </div>
+        <canvas id="chart-mdb-rank" height="120"></canvas>
+      </div>
+
       <!-- 상세 테이블 -->
       <div class="card" style="padding:0;overflow:hidden">
         <div class="tw">
           <table id="mdb-table">
             <thead>
               <tr>
-                <th>순위</th><th>유통사</th><th>점포명</th><th>지역</th>
+                <th style="min-width:76px">총매출<br><span style="color:#1a7f4a">F&B</span> 순위</th><th>유통사</th><th>점포명</th><th>지역</th>
                 <th class="tr">연간매출(억)</th><th class="tr">일방문객(만)</th>
                 <th class="tr">F&B비중/매출</th><th class="tr">F&B 일매출</th><th title="진입장벽 수준 — 최상·상=파인다이닝·스타셰프 전용으로 일반 캐주얼 입점 불가에 가까움 / 중~중하=일반 F&B 브랜드 입점 검토 가능">진입장벽 ⓘ</th><th>개발자 메모</th>
               </tr>
@@ -1629,7 +1641,7 @@ document.querySelectorAll('[data-etab]').forEach(el=>{
 //  MARKET DB
 // ═══════════════════════════════════════════════════════
 let mdbData = [];
-let mdbTop10Chart, mdbChainChart;
+let mdbTop10Chart, mdbChainChart, mdbRankChart;
 
 async function loadMarketDB() {
   try {
@@ -1653,7 +1665,12 @@ function renderMarketDB() {
   const q = (document.getElementById('mdb-search')?.value||'').toLowerCase();
   const chain = document.getElementById('mdb-chain')?.value||'';
   const diff = document.getElementById('mdb-diff')?.value||'';
-  const sort = document.getElementById('mdb-sort')?.value||'매출';
+  const sort = document.getElementById('mdb-sort')?.value||'FnB매출';
+
+  // ── 전체 기준 두 순위 사전계산 (필터 무관) ──
+  const totalRankMap={}, fnbRankMap={};
+  [...mdbData].sort((a,b)=>b.연간매출_억-a.연간매출_억).forEach((d,i)=>totalRankMap[d.id]=i+1);
+  [...mdbData].sort((a,b)=>(b.FnB매출_억||0)-(a.FnB매출_억||0)).forEach((d,i)=>fnbRankMap[d.id]=i+1);
 
   let data = mdbData.filter(d=>{
     const matchQ = !q || d.점포명.toLowerCase().includes(q) || d.지역.toLowerCase().includes(q) || d.유통사.toLowerCase().includes(q);
@@ -1712,13 +1729,59 @@ function renderMarketDB() {
     options:{responsive:true,plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:10}}}}
   });
 
+  // ── 순위 비교 차트 (전체 30개, 순위 차이 기준 정렬) ──
+  const rankDiffData = [...mdbData].map(d=>({
+    name: d.점포명.replace('(에비뉴엘·롯데월드몰)','').replace('(대구신세계)','').replace('(아트앤사이언스)','').slice(0,8),
+    totalRank: totalRankMap[d.id],
+    fnbRank: fnbRankMap[d.id],
+    delta: totalRankMap[d.id] - fnbRankMap[d.id]
+  })).sort((a,b)=>b.delta-a.delta);
+  if(mdbRankChart) mdbRankChart.destroy();
+  mdbRankChart = new Chart(document.getElementById('chart-mdb-rank'),{
+    type:'bar',
+    data:{
+      labels: rankDiffData.map(d=>d.name),
+      datasets:[
+        {label:'연간매출 순위',data:rankDiffData.map(d=>d.totalRank),backgroundColor:rankDiffData.map(d=>d.delta>2?'rgba(26,86,196,0.35)':d.delta<-2?'rgba(192,57,43,0.7)':'rgba(26,86,196,0.6)'),borderRadius:2},
+        {label:'F&B매출 순위',data:rankDiffData.map(d=>d.fnbRank),backgroundColor:rankDiffData.map(d=>d.delta>2?'rgba(26,127,74,0.85)':d.delta<-2?'rgba(26,127,74,0.3)':'rgba(26,127,74,0.6)'),borderRadius:2}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:true,position:'top',labels:{font:{size:10},boxWidth:12}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw}위`}}
+      },
+      scales:{
+        x:{ticks:{font:{size:9},maxRotation:35},grid:{color:'rgba(0,0,0,.04)'}},
+        y:{
+          reverse:true,
+          min:0,max:31,
+          title:{display:true,text:'순위 (낮을수록 좋음)',font:{size:9}},
+          ticks:{callback:v=>v+'위',font:{size:9}},
+          grid:{color:'rgba(0,0,0,.04)'}
+        }
+      }
+    }
+  });
+  // Legend 설명 업데이트
+  const top3up = rankDiffData.filter(d=>d.delta>0).slice(0,3).map(d=>`${d.name} ▲${d.delta}`).join(' · ');
+  const top3dn = [...rankDiffData].reverse().filter(d=>d.delta<0).slice(0,3).map(d=>`${d.name} ▼${Math.abs(d.delta)}`).join(' · ');
+  document.getElementById('mdb-rank-legend').innerHTML = `<span style="color:#1a7f4a">F&B 강세: ${top3up||'—'}</span><br><span style="color:#c0392b">F&B 약세: ${top3dn||'—'}</span>`;
+
   // Table
   const tbody = document.getElementById('mdb-tbody');
   tbody.innerHTML = data.map((d,i)=>{
     const diffCls = DIFF_TAG[d.FnB입점경쟁도.난이도]||'tgy';
     const chainColor = CHAIN_COLORS[d.유통사]||'#888';
+    const tr = totalRankMap[d.id], fr = fnbRankMap[d.id], delta = tr - fr;
+    const deltaTxt = delta>0?`<span style="color:#1a7f4a;font-weight:700">▲${delta}</span>`:delta<0?`<span style="color:#c0392b;font-weight:700">▼${Math.abs(delta)}</span>`:`<span style="color:#ccc">—</span>`;
     return `<tr style="cursor:pointer" onclick="showMdbDetail(${d.id})">
-      <td style="font-weight:700;color:#aaa;text-align:center">${i+1}</td>
+      <td style="text-align:center;min-width:72px">
+        <div style="font-size:10px;color:#888">총 <strong style="color:#1a56c4">${tr}</strong>위</div>
+        <div style="font-size:10px;color:#888">F&B <strong style="color:#1a7f4a">${fr}</strong>위</div>
+        <div style="font-size:10px;margin-top:1px">${deltaTxt}</div>
+      </td>
       <td><span style="font-size:10px;font-weight:700;color:${chainColor}">${d.유통사}</span></td>
       <td style="font-weight:600">${d.점포명}</td>
       <td style="color:#888;font-size:11px">${d.지역}</td>
