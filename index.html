@@ -569,6 +569,23 @@ tr:hover td{background:#fafaf8}
             </table>
           </div>
         </div>
+
+        <!-- 유동인구 상세 (행 클릭 시 표시) -->
+        <div id="erex-pop-detail" style="display:none;margin-top:12px">
+          <div class="card" style="border:1px solid rgba(155,89,182,.2);background:#fdf9ff">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div style="font-weight:700;font-size:13px;color:#6c3483" id="erex-pop-title">유동인구 분석</div>
+              <button class="btn btn-sm" onclick="document.getElementById('erex-pop-detail').style.display='none'">✕</button>
+            </div>
+            <div class="krow k4" id="erex-pop-kpi" style="margin-bottom:10px"></div>
+            <div class="g2" id="erex-pop-body"></div>
+            <div style="margin-top:10px;padding-top:10px;border-top:.5px solid rgba(0,0,0,.07)">
+              <div style="font-size:10px;font-weight:700;color:#6c3483;margin-bottom:4px">🔍 개발자 유동인구 분석</div>
+              <div style="font-size:11px;color:#555;line-height:1.8" id="erex-pop-memo"></div>
+            </div>
+          </div>
+        </div>
+
         <div class="g2" style="margin-top:14px">
           <div class="card">
             <div class="card-hd"><span class="ct">유통사별 입점 브랜드 수</span></div>
@@ -646,6 +663,7 @@ tr:hover td{background:#fafaf8}
         </select>
         <select id="mdb-sort" style="height:32px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;background:#fff;outline:none" onchange="renderMarketDB()">
           <option value="매출">매출순</option>
+          <option value="FnB매출">F&B매출순</option>
           <option value="방문객">방문객순</option>
           <option value="FnB">F&B비중순</option>
           <option value="공실">공실률순</option>
@@ -678,7 +696,7 @@ tr:hover td{background:#fafaf8}
               <tr>
                 <th>순위</th><th>유통사</th><th>점포명</th><th>지역</th>
                 <th class="tr">연간매출(억)</th><th class="tr">일방문객(만)</th>
-                <th class="tr">F&B비중</th><th>입점난이도</th><th>개발자 메모</th>
+                <th class="tr">F&B비중/매출</th><th class="tr">F&B 일매출</th><th>입점난이도</th><th>개발자 메모</th>
               </tr>
             </thead>
             <tbody id="mdb-tbody"></tbody>
@@ -1424,16 +1442,18 @@ function renderErexChannels() {
   const { channels } = erexData;
   const sorted = [...channels].sort((a,b)=>b.우선순위-a.우선순위);
   const tbody = document.getElementById('erex-channel-tbody');
-  tbody.innerHTML = sorted.map(c=>{
+  tbody.innerHTML = sorted.map((c,i)=>{
     const hasActive = c.입점브랜드.length>0;
+    const hasPop = !!c.유동인구분석;
     const riskCls = RISK_TAG[c.MD개편리스크]||'tgy';
     const buyer = BUYER_TAG[c.바이어코드]||{label:c.바이어접촉,cls:'tgy'};
     const activeTags = c.입점브랜드.map(b=>`<span class="tag tgn" style="margin:1px">${b}</span>`).join('');
     const targetTags = c.타깃브랜드.map(b=>`<span class="tag tbl" style="margin:1px">${b}</span>`).join('');
     const zoneTags = c.FnB존유형.map(z=>`<span class="tag tgy" style="margin:1px">${z}</span>`).join('');
-    return `<tr class="${hasActive?'channel-row-active':''}">
+    const popHint = hasPop ? `<span style="font-size:9px;color:#9b59b6;margin-left:4px">👥유동</span>` : '';
+    return `<tr class="${hasActive?'channel-row-active':''}" style="cursor:${hasPop?'pointer':'default'}" onclick="showErexPopDetail('${c.유통사.replace(/'/g,"\\'")}')">
       <td style="text-align:center;font-weight:700;color:#9b59b6">${PRIORITY_STAR(c.우선순위)}</td>
-      <td style="font-weight:600;min-width:120px">${c.유통사}</td>
+      <td style="font-weight:600;min-width:120px">${c.유통사}${popHint}</td>
       <td><span class="tag tgy">${c.업태}</span></td>
       <td>${activeTags||'<span style="color:#ccc;font-size:10px">미입점</span>'}</td>
       <td>${targetTags||'<span style="color:#ccc;font-size:10px">—</span>'}</td>
@@ -1442,6 +1462,50 @@ function renderErexChannels() {
       <td><span class="tag ${buyer.cls}">${buyer.label}</span></td>
     </tr>`;
   }).join('');
+}
+
+function showErexPopDetail(channelName) {
+  const c = erexData.channels.find(x=>x.유통사===channelName);
+  if(!c || !c.유동인구분석) return;
+  const p = c.유동인구분석;
+  document.getElementById('erex-pop-title').textContent = `👥 유동인구 분석 — ${c.유통사}`;
+  document.getElementById('erex-pop-kpi').innerHTML = `
+    <div class="kpi" style="border-left:3px solid #9b59b6"><div class="kpi-l">지하철 일 승하차</div><div class="kpi-v" style="color:#6c3483;font-size:15px">${p.일지하철승하차.split('(')[0].trim()}</div><div class="kpi-s">${p.지하철역}</div></div>
+    <div class="kpi" style="border-left:3px solid #9b59b6"><div class="kpi-l">점포 일 방문객</div><div class="kpi-v" style="color:#6c3483">${p.일방문객_만명}<span style="font-size:11px;color:#aaa">만명</span></div><div class="kpi-s">외국인 ${p.외국인비중_pct}%</div></div>
+    <div class="kpi" style="border-left:3px solid #1a7f4a"><div class="kpi-l">반경 3km 직장인</div><div class="kpi-v" style="color:#1a7f4a;font-size:14px">${p.반경3km_직장인}</div><div class="kpi-s">오피스 포획 시장</div></div>
+    <div class="kpi" style="border-left:3px solid #e6a817"><div class="kpi-l">피크 타임</div><div class="kpi-v" style="color:#b7860b;font-size:13px">${p.피크타임.split(',')[0]}</div><div class="kpi-s">매출 집중 시간대</div></div>`;
+  document.getElementById('erex-pop-body').innerHTML = `
+    <div>
+      <div class="card" style="background:#f8f8f5;border:none;margin-bottom:8px">
+        <div class="ct" style="margin-bottom:6px">🚇 지하철 유입 현황</div>
+        <div style="font-size:11px;color:#555;line-height:1.8">
+          <div><strong>노선·역:</strong> ${p.지하철역}</div>
+          <div><strong>일 승하차:</strong> ${p.일지하철승하차}</div>
+          <div style="color:#378ADD;margin-top:4px">주요 유입 경로: ${p.주요유입경로}</div>
+        </div>
+      </div>
+      <div class="card" style="background:#f8f8f5;border:none">
+        <div class="ct" style="margin-bottom:6px">🏢 주변 아파트·거주 인구</div>
+        <div style="font-size:11px;color:#555;line-height:1.8">
+          <div><strong>반경 1km 아파트:</strong> ${p.반경1km_아파트}</div>
+          <div><strong>반경 5km 상주인구:</strong> ${p.반경5km_상주인구}</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="background:#f8f8f5;border:none;margin-bottom:8px">
+        <div class="ct" style="margin-bottom:6px">💼 오피스·직장인 포획 시장</div>
+        <div style="font-size:11px;color:#555;line-height:1.8">
+          <div><strong>반경 3km 직장인:</strong> ${p.반경3km_직장인}</div>
+          <div><strong>외국인 비중:</strong> ${p.외국인비중_pct}%</div>
+          <div><strong>피크 타임:</strong> ${p.피크타임}</div>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('erex-pop-memo').textContent = p.개발자분석;
+  const det = document.getElementById('erex-pop-detail');
+  det.style.display = 'block';
+  det.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function renderErexZones(filter) {
@@ -1599,6 +1663,7 @@ function renderMarketDB() {
 
   data = [...data].sort((a,b)=>{
     if(sort==='매출') return b.연간매출_억 - a.연간매출_억;
+    if(sort==='FnB매출') return (b.FnB매출_억||0) - (a.FnB매출_억||0);
     if(sort==='방문객') return b.일방문객_만명 - a.일방문객_만명;
     if(sort==='FnB') return b.FnB비중_pct - a.FnB비중_pct;
     if(sort==='공실') return b.FnB입점경쟁도.공실률_pct - a.FnB입점경쟁도.공실률_pct;
@@ -1607,13 +1672,13 @@ function renderMarketDB() {
 
   // KPI
   const totalSales = data.reduce((s,d)=>s+d.연간매출_억,0);
-  const avgVisitor = data.length ? (data.reduce((s,d)=>s+d.일방문객_만명,0)/data.length).toFixed(1) : 0;
+  const totalFnB = data.reduce((s,d)=>s+(d.FnB매출_억||0),0);
   const avgFnB = data.length ? (data.reduce((s,d)=>s+d.FnB비중_pct,0)/data.length).toFixed(1) : 0;
   const easyCount = data.filter(d=>['중하','중'].includes(d.FnB입점경쟁도.난이도)).length;
   document.getElementById('mdb-kpi-row').innerHTML = `
     <div class="kpi"><div class="kpi-l">필터 대상 점포</div><div class="kpi-v">${data.length}<span style="font-size:12px;color:#aaa">개</span></div><div class="kpi-s">전체 30개 중</div></div>
     <div class="kpi"><div class="kpi-l">합산 연간 매출</div><div class="kpi-v" style="font-size:16px">${(totalSales/10000).toFixed(1)}<span style="font-size:11px;color:#aaa">조</span></div><div class="kpi-s">억원 기준</div></div>
-    <div class="kpi"><div class="kpi-l">평균 F&B 비중</div><div class="kpi-v">${avgFnB}<span style="font-size:12px;color:#aaa">%</span></div><div class="kpi-s">전체 평균</div></div>
+    <div class="kpi"><div class="kpi-l">합산 F&B 매출</div><div class="kpi-v" style="font-size:16px;color:#1a7f4a">${(totalFnB/10000).toFixed(2)}<span style="font-size:11px;color:#aaa">조</span></div><div class="kpi-s">F&B 평균 ${avgFnB}% 기준</div></div>
     <div class="kpi"><div class="kpi-l">입점 가능 점포</div><div class="kpi-v blu">${easyCount}<span style="font-size:12px;color:#aaa">개</span></div><div class="kpi-s">난이도 중·중하 기준</div></div>`;
 
   // Top10 차트
@@ -1658,9 +1723,10 @@ function renderMarketDB() {
       <td style="color:#888;font-size:11px">${d.지역}</td>
       <td class="tr"><strong>${d.연간매출_억.toLocaleString()}</strong></td>
       <td class="tr">${d.일방문객_만명}</td>
-      <td class="tr"><span style="color:#378ADD;font-weight:700">${d.FnB비중_pct}%</span></td>
+      <td class="tr"><span style="color:#378ADD;font-weight:700">${d.FnB비중_pct}%</span><br><span style="font-size:10px;color:#1a7f4a;font-weight:600">${(d.FnB매출_억||0).toLocaleString()}억</span></td>
+      <td class="tr"><span style="font-size:11px;color:#555">${(d.FnB일매출_만원||0).toLocaleString()}</span><span style="font-size:9px;color:#aaa">만원</span></td>
       <td><span class="tag ${diffCls}">${d.FnB입점경쟁도.난이도}</span></td>
-      <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;color:#888;font-size:10px">${d.개발자메모.slice(0,60)}…</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;color:#888;font-size:10px">${d.개발자메모.slice(0,55)}…</td>
     </tr>`;
   }).join('');
 }
@@ -1672,10 +1738,19 @@ function showMdbDetail(id) {
   const diffCls = DIFF_TAG[d.FnB입점경쟁도.난이도]||'tgy';
   document.getElementById('mdb-detail-content').innerHTML = `
     <div>
-      <div class="krow k3" style="margin-bottom:10px">
+      <div class="krow k3" style="margin-bottom:8px">
         <div class="kpi"><div class="kpi-l">연간 매출</div><div class="kpi-v" style="font-size:16px">${d.연간매출_억.toLocaleString()}</div><div class="kpi-s">억원</div></div>
         <div class="kpi"><div class="kpi-l">일 방문객</div><div class="kpi-v">${d.일방문객_만명}</div><div class="kpi-s">만명</div></div>
-        <div class="kpi"><div class="kpi-l">F&B 비중</div><div class="kpi-v blu">${d.FnB비중_pct}%</div><div class="kpi-s">매출 대비</div></div>
+        <div class="kpi"><div class="kpi-l">F&B 비중</div><div class="kpi-v blu">${d.FnB비중_pct}%</div><div class="kpi-s">전체 매출 대비</div></div>
+      </div>
+      <div class="krow k3" style="margin-bottom:10px">
+        <div class="kpi" style="border-left:3px solid #1a7f4a"><div class="kpi-l">F&B 연간 매출</div><div class="kpi-v" style="color:#1a7f4a">${(d.FnB매출_억||0).toLocaleString()}</div><div class="kpi-s">억원</div></div>
+        <div class="kpi" style="border-left:3px solid #1a7f4a"><div class="kpi-l">F&B 일 매출</div><div class="kpi-v" style="color:#1a7f4a">${(d.FnB일매출_만원||0).toLocaleString()}</div><div class="kpi-s">만원/일 (연 ÷ 365)</div></div>
+        <div class="kpi" style="border-left:3px solid #1a7f4a"><div class="kpi-l">F&B 비중 근거</div><div class="kpi-v" style="font-size:11px;color:#555;line-height:1.4;white-space:normal">${d.FnB비중_pct}% 적용</div><div class="kpi-s">아래 근거 참조</div></div>
+      </div>
+      <div class="card" style="background:#f2f9f4;border-color:rgba(26,127,74,.2);border:1px solid rgba(26,127,74,.2);margin-bottom:8px">
+        <div class="ct" style="color:#1a7f4a;margin-bottom:5px">📊 F&B 매출 산출 근거</div>
+        <div style="font-size:10px;color:#555;line-height:1.8">${d.FnB매출근거||'—'}</div>
       </div>
       <div class="card" style="background:#f8f8f5;border:none;margin-bottom:8px">
         <div class="ct" style="margin-bottom:6px">입점 경쟁도</div>
@@ -1731,8 +1806,8 @@ function showMdbDetail(id) {
 }
 
 function exportMarketCSV() {
-  const rows = [['순위','유통사','점포명','지역','연간매출(억)','일방문객(만명)','F&B비중(%)','입점난이도','공실률(%)','개발자메모']];
-  mdbData.forEach((d,i)=>rows.push([i+1,d.유통사,d.점포명,d.지역,d.연간매출_억,d.일방문객_만명,d.FnB비중_pct,d.FnB입점경쟁도.난이도,d.FnB입점경쟁도.공실률_pct,d.개발자메모.replace(/,/g,'·')]));
+  const rows = [['순위','유통사','점포명','지역','연간매출(억)','FnB매출(억)','FnB일매출(만원)','일방문객(만명)','F&B비중(%)','입점난이도','공실률(%)','개발자메모']];
+  mdbData.forEach((d,i)=>rows.push([i+1,d.유통사,d.점포명,d.지역,d.연간매출_억,d.FnB매출_억||0,d.FnB일매출_만원||0,d.일방문객_만명,d.FnB비중_pct,d.FnB입점경쟁도.난이도,d.FnB입점경쟁도.공실률_pct,d.개발자메모.replace(/,/g,'·')]));
   const csv = rows.map(r=>r.join(',')).join('\n');
   const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
   const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='market-db.csv'; a.click();
