@@ -662,8 +662,8 @@ tr:hover td{background:#fafaf8}
           <option>최상</option><option>상</option><option>중상</option><option>중</option><option>중하</option>
         </select>
         <select id="mdb-sort" style="height:32px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;background:#fff;outline:none" onchange="renderMarketDB()">
-          <option value="매출">매출순</option>
           <option value="FnB매출">F&B매출순</option>
+          <option value="매출">연간매출순</option>
           <option value="방문객">방문객순</option>
           <option value="FnB">F&B비중순</option>
           <option value="공실">공실률순</option>
@@ -696,7 +696,7 @@ tr:hover td{background:#fafaf8}
               <tr>
                 <th>순위</th><th>유통사</th><th>점포명</th><th>지역</th>
                 <th class="tr">연간매출(억)</th><th class="tr">일방문객(만)</th>
-                <th class="tr">F&B비중/매출</th><th class="tr">F&B 일매출</th><th>입점난이도</th><th>개발자 메모</th>
+                <th class="tr">F&B비중/매출</th><th class="tr">F&B 일매출</th><th title="진입장벽 수준 — 최상·상=파인다이닝·스타셰프 전용으로 일반 캐주얼 입점 불가에 가까움 / 중~중하=일반 F&B 브랜드 입점 검토 가능">진입장벽 ⓘ</th><th>개발자 메모</th>
               </tr>
             </thead>
             <tbody id="mdb-tbody"></tbody>
@@ -716,8 +716,9 @@ tr:hover td{background:#fafaf8}
       </div>
 
       <div style="margin-top:10px;font-size:10px;color:#bbb;line-height:1.8">
+        ※ <strong style="color:#c0392b">진입장벽 최상·상</strong> = 파인다이닝·미쉐린급·스타셰프 전용. 일반 캐주얼 F&B 브랜드 직접 입점 사실상 불가 (F&B 비중이 낮아도 선별성 극히 높음)<br>
+        ※ <strong style="color:#378ADD">F&B 매출 = 연간매출 × F&B비중%</strong>으로 산출. F&B비중은 각사 IR·식당가 면적·업계 추정 교차검증 적용 (2024년 기준)<br>
         ※ 데이터 출처: 어패럴뉴스, 신세계·롯데·현대 공시·언론보도, 산업통상자원부 유통업체 동향(2024~2025)<br>
-        ※ (추정) 표기 항목은 공식 발표 없이 업계 관행·유사 점포 데이터 기반 추정값 포함<br>
         ※ 복합몰(스타필드·IFC몰·타임스퀘어) 매출은 비공개 또는 비상장으로 업계 추정치 반영
       </div>
     </div>
@@ -1753,10 +1754,11 @@ function showMdbDetail(id) {
         <div style="font-size:10px;color:#555;line-height:1.8">${d.FnB매출근거||'—'}</div>
       </div>
       <div class="card" style="background:#f8f8f5;border:none;margin-bottom:8px">
-        <div class="ct" style="margin-bottom:6px">입점 경쟁도</div>
+        <div class="ct" style="margin-bottom:6px">F&B 진입장벽</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <span class="tag ${diffCls}">${d.FnB입점경쟁도.난이도}</span>
-          <span style="font-size:11px;color:#888">공실률 약 ${d.FnB입점경쟁도.공실률_pct}%</span>
+          <span style="font-size:10px;color:${'최상'===d.FnB입점경쟁도.난이도||'상'===d.FnB입점경쟁도.난이도?'#c0392b':'#888'}">${{'최상':'파인다이닝 전용·캐주얼 진입불가','상':'프리미엄 브랜드 한정','중상':'선별 입점 가능','중':'일반 브랜드 검토 가능','중하':'입점 진입 유리'}[d.FnB입점경쟁도.난이도]||''}</span>
+          <span style="font-size:11px;color:#aaa">공실 ${d.FnB입점경쟁도.공실률_pct}%</span>
         </div>
         <div style="font-size:11px;color:#666">${d.FnB입점경쟁도.특이사항}</div>
       </div>
