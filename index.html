@@ -257,6 +257,19 @@ tr:hover td{background:#fafaf8}
         <div class="cs">최근 변경 이력 5건</div>
         <div id="recent-activity"></div>
       </div>
+
+      <!-- EREX 손익 요약 대시보드 카드 -->
+      <div class="card" style="border-left:3px solid #9b59b6;background:linear-gradient(135deg,#fdf9ff 0%,#fff 100%)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div>
+            <div class="ct" style="color:#6c3483">📊 EREX 손익 현황</div>
+            <div class="cs">ELX 영업본부 합계 (2022~2025)</div>
+          </div>
+          <a href="#" onclick="event.preventDefault();document.querySelector('[data-nav=erex]').click();setTimeout(()=>document.querySelector('[data-etab=pl]').click(),100)" style="font-size:11px;color:#9b59b6;text-decoration:none">상세 보기 →</a>
+        </div>
+        <div class="krow k4" id="dash-erex-kpi" style="margin-bottom:10px"></div>
+        <canvas id="chart-dash-erex-pl" height="90"></canvas>
+      </div>
     </div>
 
     <!-- ════ 2. 후보지 관리 ════ -->
@@ -534,6 +547,8 @@ tr:hover td{background:#fafaf8}
         <button class="dtab" data-etab="channels">🏬 유통사 채널</button>
         <button class="dtab" data-etab="zones">🍽️ F&B 존별</button>
         <button class="dtab" data-etab="pipeline">📅 입점 파이프라인</button>
+        <button class="dtab" data-etab="stores">🏪 기존 매장 현황</button>
+        <button class="dtab" data-etab="pl">📊 손익 현황</button>
       </div>
 
       <!-- ① 브랜드 현황 -->
@@ -610,6 +625,107 @@ tr:hover td{background:#fafaf8}
           <button class="btn sbtn" data-zfilter="파인다이닝" onclick="filterErexZone('파인다이닝',this)">⭐ 파인다이닝</button>
         </div>
         <div id="erex-zone-cards"></div>
+      </div>
+
+      <!-- ⑤ 기존 매장 현황 -->
+      <div class="epanel" id="etab-stores">
+        <div class="card" style="margin-bottom:12px;background:#f3f7ff;border-color:rgba(55,138,221,.2)">
+          <div style="font-size:11px;color:#1a56c4;line-height:1.8">
+            💡 <strong>신규 입점 검토 시 참고</strong> — 아래 기존 매장 실적을 벤치마크로 활용하세요.
+            동일 유통사·유사 규모 매장의 <strong>객단가·회전율·수수료율</strong>과 비교하면 신규점 수익성을 빠르게 가늠할 수 있습니다.
+            (월매출·일방문객 수치는 계약 조건 기반 추정값입니다.)
+          </div>
+        </div>
+        <!-- 필터 -->
+        <div class="btn-row" style="margin-bottom:10px;gap:6px;flex-wrap:wrap">
+          <select id="store-team-filter" style="height:30px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;background:#fff;outline:none" onchange="renderErexStores()">
+            <option value="">전체 사업팀</option>
+            <option value="글로벌">글로벌(PFC)</option>
+            <option value="다이닝">다이닝</option>
+            <option value="FC">FC(PP)</option>
+          </select>
+          <select id="store-sort" style="height:30px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;background:#fff;outline:none" onchange="renderErexStores()">
+            <option value="월매출">월매출 순</option>
+            <option value="면적">면적 순</option>
+            <option value="회전율">회전율 순</option>
+            <option value="수수료">수수료율 순</option>
+            <option value="객단가">객단가 순</option>
+          </select>
+        </div>
+        <!-- KPI 요약 -->
+        <div class="krow k4" id="store-kpi" style="margin-bottom:12px"></div>
+        <!-- 테이블 -->
+        <div class="card" style="padding:0;overflow:hidden;margin-bottom:14px">
+          <div class="tw">
+            <table id="erex-store-table">
+              <thead>
+                <tr>
+                  <th>점포명</th><th>브랜드/팀</th><th>지역</th>
+                  <th style="min-width:68px">전용면적<br><span style="color:#888;font-weight:400">(평/㎡)</span></th>
+                  <th>좌석수</th>
+                  <th style="min-width:64px">객단가<br><span style="color:#888;font-weight:400">(만원)</span></th>
+                  <th style="min-width:76px">월매출 추정<br><span style="color:#1a7f4a;font-weight:400">(만원)</span></th>
+                  <th style="min-width:60px">일방문객<br><span style="color:#888;font-weight:400">(추정)</span></th>
+                  <th>회전율<br><span style="color:#888;font-weight:400">(일)</span></th>
+                  <th>수수료율</th>
+                  <th style="min-width:60px">계약종료</th>
+                  <th style="min-width:160px">입지 특징</th>
+                </tr>
+              </thead>
+              <tbody id="erex-store-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- 비교 차트 -->
+        <div class="g2">
+          <div class="card">
+            <div class="card-hd"><span class="ct">매장별 월매출 추정</span></div>
+            <div class="cs">전용면적 대비 매출 분포</div>
+            <canvas id="chart-store-revenue" height="200"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="ct">매출 평당 효율 (만원/평)</span></div>
+            <div class="cs">면적당 매출 — 입지 효율성 지표</div>
+            <canvas id="chart-store-efficiency" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑥ 손익 현황 -->
+      <div class="epanel" id="etab-pl">
+        <!-- P&L KPI -->
+        <div class="krow k4" id="pl-kpi" style="margin-bottom:12px"></div>
+        <!-- 연도별 추이 -->
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card">
+            <div class="card-hd"><span class="ct">연도별 매출·영업이익 추이</span></div>
+            <div class="cs">2022~2026 YTD (ELX 영업본부 합계)</div>
+            <canvas id="chart-pl-annual" height="220"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="ct">2025년 월별 매출·영업이익</span></div>
+            <div class="cs">월별 성과 흐름</div>
+            <canvas id="chart-pl-monthly" height="220"></canvas>
+          </div>
+        </div>
+        <!-- 비용 구조 + 부문 비교 -->
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card">
+            <div class="card-hd"><span class="ct">2025년 비용 구조</span></div>
+            <div class="cs">매출 대비 원가 구성</div>
+            <canvas id="chart-pl-cost" height="220"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="ct">부문별 수익성 (2025)</span></div>
+            <div class="cs">영업본부 vs 컨세션</div>
+            <canvas id="chart-pl-segment" height="220"></canvas>
+          </div>
+        </div>
+        <!-- 성과 해설 -->
+        <div class="card" style="background:#f0f9f4;border-color:rgba(26,127,74,.2)">
+          <div class="ct" style="color:#1a5c38;margin-bottom:8px">📈 손익 분석 요약</div>
+          <div id="pl-memo" style="font-size:11px;color:#333;line-height:2"></div>
+        </div>
       </div>
 
       <!-- ④ 파이프라인 -->
@@ -848,6 +964,8 @@ function renderAll(){
   renderPromptTemplate();
   document.getElementById('sites-count').textContent = state.sites.length;
   document.getElementById('today-date').textContent = new Date().toLocaleDateString('ko-KR');
+  // 대시보드용 EREX P&L 미리 로드
+  loadErexDB().then(()=>{ if(erexData) renderDashErexPL(); });
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1363,6 +1481,9 @@ function setSlider(inputId, val, valId, suffix){
 // ═══════════════════════════════════════════════════════
 let erexData = null;
 let erexStatusChart, erexCatChart, erexChannelChart, erexPriorityChart;
+let erexStoreRevChart, erexStoreEffChart;
+let erexPlAnnualChart, erexPlMonthlyChart, erexPlCostChart, erexPlSegChart;
+let dashErexPlChart;
 
 async function loadErexDB() {
   try {
@@ -1395,24 +1516,29 @@ const PRIORITY_STAR = n => '★'.repeat(n)+'☆'.repeat(5-n);
 
 function renderErexPanel() {
   if(!erexData) return;
-  const { brands, channels, fnbZones, pipeline } = erexData;
+  const { brands, channels, fnbZones, pipeline, stores, pl } = erexData;
 
   // KPI
   const activeCount = brands.filter(b=>b.상태코드==='active').length;
   const devCount = brands.filter(b=>['dev','converting','planned'].includes(b.상태코드)).length;
   const totalChannels = channels.filter(c=>c.입점브랜드.length>0).length;
-  const pipelineCount = pipeline.length;
+  const storeCount = (stores||[]).length;
+  const latest = pl ? pl.연도별[pl.연도별.length-1] : null;
+  const prev = pl ? pl.연도별[pl.연도별.length-2] : null;
+  const growthPct = (latest && prev && prev.매출_억>0) ? ((latest.매출_억-prev.매출_억)/prev.매출_억*100).toFixed(1) : '—';
   document.getElementById('erex-kpi').innerHTML = `
-    <div class="kpi"><div class="kpi-l">운영 중 브랜드</div><div class="kpi-v up">${activeCount}</div><div class="kpi-s">개</div></div>
-    <div class="kpi"><div class="kpi-l">개발·전환 브랜드</div><div class="kpi-v" style="color:#378ADD">${devCount}</div><div class="kpi-s">개</div></div>
-    <div class="kpi"><div class="kpi-l">입점 유통사 수</div><div class="kpi-v">${totalChannels}</div><div class="kpi-s">개 채널</div></div>
-    <div class="kpi"><div class="kpi-l">신규 파이프라인</div><div class="kpi-v" style="color:#9a6d00">${pipelineCount}</div><div class="kpi-s">건 검토중</div></div>`;
+    <div class="kpi"><div class="kpi-l">운영 중 브랜드</div><div class="kpi-v up">${activeCount}</div><div class="kpi-s">개 (개발중 ${devCount}개)</div></div>
+    <div class="kpi"><div class="kpi-l">현재 운영 매장</div><div class="kpi-v" style="color:#378ADD">${storeCount}</div><div class="kpi-s">개 점포</div></div>
+    <div class="kpi"><div class="kpi-l">${latest?latest.연도:'2025'} 매출</div><div class="kpi-v" style="color:#1a7f4a">${latest?latest.매출_억.toFixed(0):'—'}</div><div class="kpi-s">억원 (YoY +${growthPct}%)</div></div>
+    <div class="kpi"><div class="kpi-l">${latest?latest.연도:'2025'} 영업이익률</div><div class="kpi-v" style="color:#9b59b6">${latest?latest.영업이익률_pct.toFixed(1):'—'}</div><div class="kpi-s">% (${latest?latest.영업이익_억.toFixed(1):'—'}억원)</div></div>`;
 
   renderErexBrands();
   renderErexChannels();
   renderErexZones('전체');
   renderErexPipeline();
   renderErexCharts();
+  renderErexStores();
+  renderErexPL();
 }
 
 function renderErexBrands() {
@@ -1623,6 +1749,202 @@ function renderErexCharts() {
       ]
     },
     options:{ responsive:true, plugins:{ legend:{ labels:{ font:{ size:9 } } } }, scales:{ r:{ min:0, max:5, ticks:{ stepSize:1, font:{ size:9 } }, pointLabels:{ font:{ size:10 } } } } }
+  });
+}
+
+function renderErexStores() {
+  if(!erexData || !erexData.stores) return;
+  const teamFilter = document.getElementById('store-team-filter')?.value || '';
+  const sortKey = document.getElementById('store-sort')?.value || '월매출';
+  let list = [...erexData.stores];
+  if(teamFilter) list = list.filter(s=>s.사업팀===teamFilter);
+  const sortFn = {
+    '월매출': (a,b)=>b.월매출_추정_만원-a.월매출_추정_만원,
+    '면적': (a,b)=>b.전용면적_평-a.전용면적_평,
+    '회전율': (a,b)=>b.회전율_일-a.회전율_일,
+    '수수료': (a,b)=>a.수수료율_pct-b.수수료율_pct,
+    '객단가': (a,b)=>b.객단가_만원-a.객단가_만원
+  };
+  list.sort(sortFn[sortKey]||sortFn['월매출']);
+
+  // KPI 요약
+  const totalMonthly = list.reduce((s,x)=>s+x.월매출_추정_만원,0);
+  const avgADT = (list.reduce((s,x)=>s+x.객단가_만원,0)/list.length).toFixed(1);
+  const avgTurn = (list.reduce((s,x)=>s+x.회전율_일,0)/list.length).toFixed(1);
+  const avgCom = (list.reduce((s,x)=>s+x.수수료율_pct,0)/list.length).toFixed(1);
+  const kpiEl = document.getElementById('store-kpi');
+  if(kpiEl) kpiEl.innerHTML = `
+    <div class="kpi" style="border-left:3px solid #9b59b6"><div class="kpi-l">운영 매장 수</div><div class="kpi-v" style="color:#6c3483">${list.length}</div><div class="kpi-s">개 점포</div></div>
+    <div class="kpi" style="border-left:3px solid #1a7f4a"><div class="kpi-l">월매출 합산(추정)</div><div class="kpi-v" style="color:#1a7f4a">${(totalMonthly/10000).toFixed(1)}</div><div class="kpi-s">억원/월</div></div>
+    <div class="kpi" style="border-left:3px solid #378ADD"><div class="kpi-l">평균 객단가</div><div class="kpi-v" style="color:#1a56c4">${avgADT}</div><div class="kpi-s">만원</div></div>
+    <div class="kpi" style="border-left:3px solid #e6a817"><div class="kpi-l">평균 회전율</div><div class="kpi-v" style="color:#9a6d00">${avgTurn}</div><div class="kpi-s">회/일 (평균 수수료 ${avgCom}%)</div></div>`;
+
+  // 테이블
+  const TEAM_TAG = { '글로벌':'tbl', '다이닝':'trd', 'FC':'tgn' };
+  const tbodyEl = document.getElementById('erex-store-tbody');
+  if(tbodyEl) tbodyEl.innerHTML = list.map(s=>{
+    const effic = s.전용면적_평>0 ? (s.월매출_추정_만원/s.전용면적_평).toFixed(0) : '—';
+    const contDate = s.계약종료 ? s.계약종료.slice(0,7) : '—';
+    const comColor = s.수수료율_pct===0?'#888':s.수수료율_pct>=20?'#c0392b':s.수수료율_pct<=10?'#1a7f4a':'#555';
+    const turnColor = s.회전율_일>=2?'#1a7f4a':s.회전율_일>=1.5?'#378ADD':s.회전율_일>=1?'#e6a817':'#c0392b';
+    return `<tr>
+      <td style="font-weight:600;min-width:100px">${s.점포명}</td>
+      <td><span class="tag ${TEAM_TAG[s.사업팀]||'tgy'}" style="margin-right:3px">${s.사업팀}</span><br><span style="font-size:10px;color:#555">${s.브랜드}</span></td>
+      <td style="font-size:11px">${s.지역}</td>
+      <td style="text-align:center"><strong>${s.전용면적_평}</strong><br><span style="font-size:10px;color:#aaa">${s['전용면적_㎡']}㎡</span></td>
+      <td style="text-align:center"><strong>${s.좌석수}</strong><span style="font-size:10px;color:#aaa">석</span></td>
+      <td style="text-align:center;color:#1a56c4;font-weight:700">${s.객단가_만원.toFixed(1)}만</td>
+      <td style="text-align:center"><strong style="color:#1a7f4a">${s.월매출_추정_만원.toLocaleString()}</strong><br><span style="font-size:9px;color:#aaa">효율 ${effic}만/평</span></td>
+      <td style="text-align:center">${s.일방문객_추정.toLocaleString()}<span style="font-size:10px;color:#aaa">명</span></td>
+      <td style="text-align:center;color:${turnColor};font-weight:700">${s.회전율_일.toFixed(1)}회</td>
+      <td style="text-align:center;color:${comColor};font-weight:600">${s.수수료율_pct>0?s.수수료율_pct+'%':'고정'}</td>
+      <td style="text-align:center;font-size:10px;color:${contDate<'2026-08'?'#c0392b':'#555'}">${contDate}</td>
+      <td style="font-size:10px;color:#555;min-width:150px;max-width:200px">${s.입지특징}</td>
+    </tr>`;
+  }).join('');
+
+  // 매장별 월매출 차트
+  const labels = list.map(s=>s.점포명.replace('PFC ','').replace(' (오크우드)','').slice(0,8));
+  const colors = list.map(s=>s.사업팀==='글로벌'?'#378ADD':s.사업팀==='다이닝'?'#9b59b6':'#1a7f4a');
+  if(erexStoreRevChart) erexStoreRevChart.destroy();
+  const revCanvas = document.getElementById('chart-store-revenue');
+  if(revCanvas) erexStoreRevChart = new Chart(revCanvas, {
+    type:'bar',
+    data:{ labels, datasets:[{ data:list.map(s=>s.월매출_추정_만원), backgroundColor:colors, borderRadius:5 }] },
+    options:{ responsive:true, plugins:{ legend:{display:false}, tooltip:{ callbacks:{label:ctx=>`${(ctx.parsed.y/10000).toFixed(1)}억원/월`} } }, scales:{ x:{ticks:{font:{size:9}}}, y:{ticks:{callback:v=>`${(v/10000).toFixed(0)}억`,font:{size:9}}} } }
+  });
+
+  // 효율 차트
+  const effList = list.map(s=>({ name:s.점포명.replace('PFC ','').replace(' (오크우드)','').slice(0,8), eff:s.전용면적_평>0?(s.월매출_추정_만원/s.전용면적_평):0, color:colors[list.indexOf(s)] })).sort((a,b)=>b.eff-a.eff);
+  if(erexStoreEffChart) erexStoreEffChart.destroy();
+  const effCanvas = document.getElementById('chart-store-efficiency');
+  if(effCanvas) erexStoreEffChart = new Chart(effCanvas, {
+    type:'bar',
+    data:{ labels:effList.map(x=>x.name), datasets:[{ data:effList.map(x=>x.eff.toFixed(0)), backgroundColor:effList.map(x=>x.color), borderRadius:5 }] },
+    options:{ responsive:true, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}만원/평`}} }, scales:{ x:{ticks:{font:{size:9}}}, y:{ticks:{callback:v=>`${v}만`,font:{size:9}}} } }
+  });
+}
+
+function renderErexPL() {
+  if(!erexData || !erexData.pl) return;
+  const { pl } = erexData;
+
+  // KPI
+  const yr2025 = pl.연도별.find(y=>y.연도==='2025');
+  const yr2024 = pl.연도별.find(y=>y.연도==='2024');
+  const yr2026 = pl.연도별.find(y=>y.연도==='2026 YTD');
+  const growth = yr2024&&yr2025 ? ((yr2025.매출_억-yr2024.매출_억)/yr2024.매출_억*100).toFixed(1) : '—';
+  const plKpi = document.getElementById('pl-kpi');
+  if(plKpi) plKpi.innerHTML = `
+    <div class="kpi" style="border-left:3px solid #9b59b6"><div class="kpi-l">2025 연매출</div><div class="kpi-v" style="color:#6c3483">${yr2025?yr2025.매출_억.toFixed(0):'—'}</div><div class="kpi-s">억원 (YoY +${growth}%)</div></div>
+    <div class="kpi" style="border-left:3px solid #1a7f4a"><div class="kpi-l">2025 영업이익</div><div class="kpi-v" style="color:#1a7f4a">${yr2025?yr2025.영업이익_억.toFixed(1):'—'}</div><div class="kpi-s">억원</div></div>
+    <div class="kpi" style="border-left:3px solid #378ADD"><div class="kpi-l">2025 영업이익률</div><div class="kpi-v" style="color:#1a56c4">${yr2025?yr2025.영업이익률_pct.toFixed(1):'—'}</div><div class="kpi-s">% (2024: ${yr2024?yr2024.영업이익률_pct.toFixed(1):'—'}%)</div></div>
+    <div class="kpi" style="border-left:3px solid #e6a817"><div class="kpi-l">2026 YTD (2월)</div><div class="kpi-v" style="color:#9a6d00">${yr2026?yr2026.매출_억.toFixed(0):'—'}</div><div class="kpi-s">억원 / 이익 ${yr2026?yr2026.영업이익_억.toFixed(1):'—'}억</div></div>`;
+
+  // 연도별 추이 차트
+  const annLabels = pl.연도별.map(y=>y.연도);
+  if(erexPlAnnualChart) erexPlAnnualChart.destroy();
+  const annCanvas = document.getElementById('chart-pl-annual');
+  if(annCanvas) erexPlAnnualChart = new Chart(annCanvas, {
+    type:'bar',
+    data:{ labels:annLabels, datasets:[
+      { label:'매출(억)', data:pl.연도별.map(y=>y.매출_억), backgroundColor:'rgba(55,138,221,.7)', borderRadius:5, yAxisID:'y' },
+      { label:'영업이익(억)', data:pl.연도별.map(y=>y.영업이익_억), backgroundColor:pl.연도별.map(y=>y.영업이익_억>=0?'rgba(26,127,74,.8)':'rgba(192,57,43,.8)'), borderRadius:5, yAxisID:'y' },
+      { type:'line', label:'영업이익률(%)', data:pl.연도별.map(y=>y.영업이익률_pct), borderColor:'#9b59b6', backgroundColor:'transparent', pointBackgroundColor:'#9b59b6', borderWidth:2, yAxisID:'y2' }
+    ]},
+    options:{ responsive:true, plugins:{ legend:{labels:{font:{size:9}}} }, scales:{
+      y:{ticks:{callback:v=>`${v}억`,font:{size:9}}},
+      y2:{position:'right',ticks:{callback:v=>`${v}%`,font:{size:9}},grid:{display:false}}
+    }}
+  });
+
+  // 월별 2025 차트
+  const monLabels = pl.월별_2025.map(m=>m.월);
+  if(erexPlMonthlyChart) erexPlMonthlyChart.destroy();
+  const monCanvas = document.getElementById('chart-pl-monthly');
+  if(monCanvas) erexPlMonthlyChart = new Chart(monCanvas, {
+    type:'bar',
+    data:{ labels:monLabels, datasets:[
+      { label:'매출(억)', data:pl.월별_2025.map(m=>m.매출_억), backgroundColor:'rgba(55,138,221,.6)', borderRadius:4, yAxisID:'y' },
+      { type:'line', label:'영업이익(억)', data:pl.월별_2025.map(m=>m.영업이익_억), borderColor:'#1a7f4a', backgroundColor:'rgba(26,127,74,.08)', fill:true, pointBackgroundColor:'#1a7f4a', borderWidth:2, yAxisID:'y2' }
+    ]},
+    options:{ responsive:true, plugins:{ legend:{labels:{font:{size:9}}} }, scales:{
+      y:{ticks:{callback:v=>`${v}억`,font:{size:9}}},
+      y2:{position:'right',ticks:{callback:v=>`${v}억`,font:{size:9}},grid:{display:false}}
+    }}
+  });
+
+  // 비용 구조 도넛 (2025 영업본부)
+  const biz = pl.부문별_2025.영업본부;
+  const rev = biz.매출_억;
+  const laborR = biz.노무비율_pct, matR = biz.재료비율_pct;
+  const rentR = (yr2025.임차료_억/rev*100).toFixed(1)*1;
+  const comR = (yr2025.수수료_억/rev*100).toFixed(1)*1;
+  const opR = biz.영업이익률_pct;
+  const otherR = Math.max(0,(100-matR-laborR-rentR-comR-opR)).toFixed(1)*1;
+  if(erexPlCostChart) erexPlCostChart.destroy();
+  const costCanvas = document.getElementById('chart-pl-cost');
+  if(costCanvas) erexPlCostChart = new Chart(costCanvas, {
+    type:'doughnut',
+    data:{ labels:['재료비','노무비','임차료','수수료','기타원가','영업이익'], datasets:[{ data:[matR,laborR,rentR,comR,otherR,opR], backgroundColor:['#e6a817','#378ADD','#9b59b6','#c0392b','#ccc','#1a7f4a'], borderWidth:1 }] },
+    options:{ responsive:true, plugins:{ legend:{position:'right',labels:{font:{size:9},boxWidth:10}}, tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed.toFixed(1)}%`}} } }
+  });
+
+  // 부문별 비교 (영업본부 vs 컨세션)
+  const seg = pl.부문별_2025;
+  if(erexPlSegChart) erexPlSegChart.destroy();
+  const segCanvas = document.getElementById('chart-pl-segment');
+  if(segCanvas) erexPlSegChart = new Chart(segCanvas, {
+    type:'bar',
+    data:{ labels:['영업본부','컨세션'],
+      datasets:[
+        { label:'매출(억)', data:[seg.영업본부.매출_억, seg.컨세션.매출_억], backgroundColor:['rgba(55,138,221,.7)','rgba(155,89,182,.7)'], borderRadius:6, yAxisID:'y' },
+        { type:'line', label:'영업이익률(%)', data:[seg.영업본부.영업이익률_pct, seg.컨세션.영업이익률_pct], borderColor:'#1a7f4a', backgroundColor:'transparent', pointBackgroundColor:'#1a7f4a', borderWidth:2, yAxisID:'y2' }
+      ]},
+    options:{ responsive:true, plugins:{ legend:{labels:{font:{size:9}}} }, scales:{
+      y:{ticks:{callback:v=>`${v}억`,font:{size:9}}},
+      y2:{position:'right',min:0,max:10,ticks:{callback:v=>`${v}%`,font:{size:9}},grid:{display:false}}
+    }}
+  });
+
+  // 해설 메모
+  const memoEl = document.getElementById('pl-memo');
+  if(memoEl) memoEl.innerHTML = `
+    <div>✅ <strong>매출 성장:</strong> 2022년 437억 → 2025년 589억, 3년간 <strong>+34.7%</strong> 성장. 코로나 이후 회복 완료 및 신규 점포 출점 효과.</div>
+    <div>✅ <strong>수익성 개선:</strong> 영업이익률 2022년 <strong style="color:#c0392b">-0.8%</strong> → 2025년 <strong style="color:#1a7f4a">+5.5%</strong>. 임차료 구조 개선(85억→79억) + 매출 성장 레버리지.</div>
+    <div>✅ <strong>2025년 성수기 집중:</strong> 7월(6.6억)·8월(5.4억) 영업이익 집중. 비수기(1~2월) 적자 구조는 백화점 식당가 특성상 구조적.</div>
+    <div>⚠️ <strong>컨세션 vs 영업본부:</strong> 컨세션(위탁운영) 재료비율 50.8%로 영업본부(27.7%) 대비 높음 — 단체급식 특성. 영업이익률은 양 부문 유사(4.7% vs 5.5%).</div>
+    <div>🎯 <strong>2026 목표:</strong> YTD(2월) 매출 97.9억, 영업이익 6.2억(이익률 6.3%) — 전년 동기 대비 양호. 신규점(용산·광주) 정상화 시 600억 돌파 가능.</div>`;
+}
+
+function renderDashErexPL() {
+  if(!erexData || !erexData.pl) return;
+  const { pl } = erexData;
+  const kpiEl = document.getElementById('dash-erex-kpi');
+  if(!kpiEl) return;
+  const yr2025 = pl.연도별.find(y=>y.연도==='2025');
+  const yr2024 = pl.연도별.find(y=>y.연도==='2024');
+  const growth = yr2024&&yr2025 ? ((yr2025.매출_억-yr2024.매출_억)/yr2024.매출_억*100).toFixed(1) : '—';
+  kpiEl.innerHTML = `
+    <div class="kpi" style="border-left:3px solid #9b59b6;padding:8px 10px"><div class="kpi-l" style="font-size:10px">2025 매출</div><div class="kpi-v" style="color:#6c3483;font-size:18px">${yr2025?yr2025.매출_억.toFixed(0):'—'}</div><div class="kpi-s">억원</div></div>
+    <div class="kpi" style="border-left:3px solid #1a7f4a;padding:8px 10px"><div class="kpi-l" style="font-size:10px">영업이익</div><div class="kpi-v" style="color:#1a7f4a;font-size:18px">${yr2025?yr2025.영업이익_억.toFixed(1):'—'}</div><div class="kpi-s">억원</div></div>
+    <div class="kpi" style="border-left:3px solid #378ADD;padding:8px 10px"><div class="kpi-l" style="font-size:10px">영업이익률</div><div class="kpi-v" style="color:#1a56c4;font-size:18px">${yr2025?yr2025.영업이익률_pct.toFixed(1):'—'}</div><div class="kpi-s">%</div></div>
+    <div class="kpi" style="border-left:3px solid #e6a817;padding:8px 10px"><div class="kpi-l" style="font-size:10px">YoY 성장</div><div class="kpi-v" style="color:#9a6d00;font-size:18px">+${growth}</div><div class="kpi-s">%</div></div>`;
+  // 대시보드 미니 추이 차트
+  const canvas = document.getElementById('chart-dash-erex-pl');
+  if(!canvas) return;
+  if(dashErexPlChart) dashErexPlChart.destroy();
+  dashErexPlChart = new Chart(canvas, {
+    type:'bar',
+    data:{ labels: pl.연도별.map(y=>y.연도),
+      datasets:[
+        { label:'매출(억)', data:pl.연도별.map(y=>y.매출_억), backgroundColor:'rgba(155,89,182,.5)', borderRadius:4, yAxisID:'y' },
+        { type:'line', label:'영업이익률(%)', data:pl.연도별.map(y=>y.영업이익률_pct), borderColor:'#1a7f4a', backgroundColor:'transparent', pointBackgroundColor:'#1a7f4a', borderWidth:2, yAxisID:'y2' }
+      ]},
+    options:{ responsive:true, plugins:{ legend:{labels:{font:{size:9},boxWidth:10}} }, scales:{
+      y:{ticks:{callback:v=>`${v}억`,font:{size:8}}},
+      y2:{position:'right',ticks:{callback:v=>`${v}%`,font:{size:8}},grid:{display:false}}
+    }}
   });
 }
 
