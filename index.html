@@ -865,6 +865,71 @@ tr:hover td{background:#fafaf8}
           </div>
         </div>
 
+        <!-- ─── 부문별 월별 분석 ─── -->
+        <div class="card" style="margin-bottom:14px;padding-bottom:4px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div>
+              <span class="ct">부문별 월별 분석</span>
+              <span class="cs" style="margin-left:6px" id="seg-mon-year-label">2025년 기준</span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <select id="seg-year-sel" style="height:28px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 8px;font-size:11px;background:#fff;outline:none" onchange="renderSegMonthly()">
+                <option value="2025" selected>2025년</option>
+                <option value="2026">2026년</option>
+              </select>
+              <button class="btn btn-sm" style="font-size:10px;padding:3px 8px" onclick="toggleSegTable()">📋 월별 테이블</button>
+            </div>
+          </div>
+
+          <!-- 부문별 KPI 요약 -->
+          <div class="krow k4" id="seg-kpi" style="margin-bottom:10px"></div>
+
+          <!-- 차트 2열 -->
+          <div class="g2" style="margin-bottom:10px">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">📊 부문별 월 매출 비교</div>
+              <canvas id="chart-seg-revenue" height="200"></canvas>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">📈 부문별 월별 영업이익 추이</div>
+              <canvas id="chart-seg-profit" height="200"></canvas>
+            </div>
+          </div>
+
+          <!-- 이익률 비교 차트 -->
+          <div>
+            <div style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">📉 부문별 영업이익률 비교 (%)</div>
+            <canvas id="chart-seg-rate" height="130"></canvas>
+          </div>
+        </div>
+
+        <!-- 부문별 월별 테이블 (토글) -->
+        <div id="seg-table-wrap" style="display:none;margin-bottom:14px">
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="padding:10px 14px 6px;display:flex;justify-content:space-between;align-items:center">
+              <span class="ct" style="font-size:12px">📋 부문별 월별 손익 상세</span>
+              <button class="btn btn-sm" style="font-size:10px" onclick="toggleSegTable()">닫기</button>
+            </div>
+            <div class="tw">
+              <table id="seg-monthly-table">
+                <thead><tr>
+                  <th>월</th>
+                  <th style="text-align:right;color:#378ADD">영업본부 매출</th>
+                  <th style="text-align:right;color:#1a7f4a">영업본부 이익</th>
+                  <th style="text-align:right;color:#378ADD">영업본부 이익률</th>
+                  <th style="text-align:right;color:#9b59b6">컨세션 매출</th>
+                  <th style="text-align:right;color:#1a7f4a">컨세션 이익</th>
+                  <th style="text-align:right;color:#9b59b6">컨세션 이익률</th>
+                  <th style="text-align:right;color:#555">합계 매출</th>
+                  <th style="text-align:right;color:#555">합계 이익</th>
+                  <th style="text-align:right;color:#555">합산 이익률</th>
+                </tr></thead>
+                <tbody id="seg-monthly-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- 업데이트 이력 테이블 -->
         <div class="card" style="padding:0;overflow:hidden;margin-bottom:14px" id="pl-history-wrap">
           <div style="padding:12px 14px 8px;display:flex;justify-content:space-between;align-items:center">
@@ -1655,7 +1720,7 @@ let dashErexPlChart;
 
 async function loadErexDB() {
   try {
-    const r = await fetch('data/erex-db.json');
+    const r = await fetch('data/erex-db.json?v=' + Date.now());
     erexData = await r.json();
   } catch(e) { erexData = null; }
 }
@@ -2403,6 +2468,189 @@ function renderErexPL() {
     <div>🎯 <strong>2026 목표:</strong> 신규점(용산·광주) 정상화 + 도원점 입점 시 600억 돌파. ✏️ 월별 업로드로 실시간 추적하세요.</div>`;
 
   renderPlHistory();
+  renderSegMonthly();
+}
+
+// ─────────────────────────────────────────────
+//  부문별 월별 분석 차트
+// ─────────────────────────────────────────────
+let segRevChart, segProfitChart, segRateChart;
+
+function toggleSegTable() {
+  const w = document.getElementById('seg-table-wrap');
+  if(w) w.style.display = w.style.display==='none'?'block':'none';
+}
+
+function getSegMonData(pl, year) {
+  const segBase = pl.부문별_월별_2025 || {};
+  const updates = loadPlUpdates().filter(u=>String(u.연도)===String(year));
+  const divs = ['영업본부','컨세션'];
+
+  return divs.map(div=>{
+    // 기본 데이터: 2025년만 사용
+    let base = {};
+    if(String(year)==='2025' && segBase[div]) {
+      segBase[div].forEach(m=>{ base[m.월]={...m, 소스:'기본'}; });
+    }
+    // localStorage 덮어쓰기
+    updates.filter(u=>(u.사업부||'영업본부')===div).forEach(u=>{
+      base[u.월]={ 월:u.월, 매출_억:+u.매출_억, 영업이익_억:+u.영업이익_억,
+        영업이익률_pct:u.매출_억>0?(+u.영업이익_억/+u.매출_억*100):0, 소스:'입력' };
+    });
+    return { div, data: MON_ORDER.filter(m=>base[m]).map(m=>base[m]) };
+  });
+}
+
+function renderSegMonthly() {
+  if(!erexData || !erexData.pl) return;
+  const { pl } = erexData;
+  const year = document.getElementById('seg-year-sel')?.value || '2025';
+  const labelEl = document.getElementById('seg-mon-year-label');
+  if(labelEl) labelEl.textContent = year+'년 기준';
+
+  const segData = getSegMonData(pl, year);
+  const bizData  = segData.find(s=>s.div==='영업본부')?.data || [];
+  const consData = segData.find(s=>s.div==='컨세션')?.data || [];
+  const labels   = [...new Set([...bizData.map(m=>m.월),...consData.map(m=>m.월)])];
+  const getV=(arr,월,key)=>arr.find(m=>m.월===월)?.[key]??null;
+
+  // ─ KPI ─
+  const bizTotRev  = bizData.reduce((s,m)=>s+m.매출_억,0);
+  const bizTotOp   = bizData.reduce((s,m)=>s+m.영업이익_억,0);
+  const consTotRev = consData.reduce((s,m)=>s+m.매출_억,0);
+  const consTotOp  = consData.reduce((s,m)=>s+m.영업이익_억,0);
+  const bizRate    = bizTotRev>0?(bizTotOp/bizTotRev*100).toFixed(1):'—';
+  const consRate   = consTotRev>0?(consTotOp/consTotRev*100).toFixed(1):'—';
+  const kpiEl = document.getElementById('seg-kpi');
+  if(kpiEl) kpiEl.innerHTML = `
+    <div class="kpi" style="border-left:3px solid #378ADD"><div class="kpi-l">영업본부 매출 (${year})</div><div class="kpi-v" style="color:#1a56c4;font-size:20px">${bizTotRev?bizTotRev.toFixed(1):'미입력'}</div><div class="kpi-s">억원</div></div>
+    <div class="kpi" style="border-left:3px solid #378ADD"><div class="kpi-l">영업본부 영업이익률</div><div class="kpi-v" style="color:${parseFloat(bizRate)>=0?'#1a7f4a':'#c0392b'}">${bizTotRev?bizRate+'%':'—'}</div><div class="kpi-s">${bizTotRev?`이익 ${bizTotOp.toFixed(1)}억`:'데이터 없음'}</div></div>
+    <div class="kpi" style="border-left:3px solid #9b59b6"><div class="kpi-l">컨세션 매출 (${year})</div><div class="kpi-v" style="color:#6c3483;font-size:20px">${consTotRev?consTotRev.toFixed(1):'미입력'}</div><div class="kpi-s">억원</div></div>
+    <div class="kpi" style="border-left:3px solid #9b59b6"><div class="kpi-l">컨세션 영업이익률</div><div class="kpi-v" style="color:${parseFloat(consRate)>=0?'#1a7f4a':'#c0392b'}">${consTotRev?consRate+'%':'—'}</div><div class="kpi-s">${consTotRev?`이익 ${consTotOp.toFixed(1)}억`:'데이터 없음'}</div></div>`;
+
+  // ─ 매출 grouped bar ─
+  if(segRevChart) segRevChart.destroy();
+  const revCanvas = document.getElementById('chart-seg-revenue');
+  if(revCanvas && labels.length) {
+    segRevChart = new Chart(revCanvas, {
+      type:'bar',
+      data:{ labels,
+        datasets:[
+          { label:'영업본부(억)', data:labels.map(m=>getV(bizData,m,'매출_억')),
+            backgroundColor:'rgba(55,138,221,.7)', borderRadius:4 },
+          { label:'컨세션(억)', data:labels.map(m=>getV(consData,m,'매출_억')),
+            backgroundColor:'rgba(155,89,182,.7)', borderRadius:4 }
+        ]},
+      options:{ responsive:true, plugins:{ legend:{labels:{font:{size:9}}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(1)||'—'}억`}}
+      }, scales:{
+        x:{ticks:{font:{size:9}},grid:{display:false}},
+        y:{ticks:{callback:v=>`${v}억`,font:{size:9}},grid:{color:'rgba(0,0,0,.04)'}}
+      }}
+    });
+  }
+
+  // ─ 영업이익 line chart ─
+  if(segProfitChart) segProfitChart.destroy();
+  const profCanvas = document.getElementById('chart-seg-profit');
+  if(profCanvas && labels.length) {
+    segProfitChart = new Chart(profCanvas, {
+      type:'line',
+      data:{ labels,
+        datasets:[
+          { label:'영업본부(억)', data:labels.map(m=>getV(bizData,m,'영업이익_억')),
+            borderColor:'#378ADD', backgroundColor:'rgba(55,138,221,.08)', fill:true,
+            pointBackgroundColor:'#378ADD', borderWidth:2, tension:0.3,
+            pointRadius:4, pointHoverRadius:6 },
+          { label:'컨세션(억)', data:labels.map(m=>getV(consData,m,'영업이익_억')),
+            borderColor:'#9b59b6', backgroundColor:'rgba(155,89,182,.08)', fill:true,
+            pointBackgroundColor:'#9b59b6', borderWidth:2, tension:0.3,
+            pointRadius:4, pointHoverRadius:6 }
+        ]},
+      options:{ responsive:true, plugins:{ legend:{labels:{font:{size:9}}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(1)||'—'}억`}}
+      }, scales:{
+        x:{ticks:{font:{size:9}},grid:{display:false}},
+        y:{ticks:{callback:v=>`${v}억`,font:{size:9}},grid:{color:'rgba(0,0,0,.04)'},
+           afterDataLimits:axis=>{axis.min=Math.min(axis.min,-1);}}
+      }}
+    });
+  }
+
+  // ─ 이익률 비교 line chart ─
+  if(segRateChart) segRateChart.destroy();
+  const rateCanvas = document.getElementById('chart-seg-rate');
+  if(rateCanvas && labels.length) {
+    segRateChart = new Chart(rateCanvas, {
+      type:'line',
+      data:{ labels,
+        datasets:[
+          { label:'영업본부 이익률(%)', data:labels.map(m=>getV(bizData,m,'영업이익률_pct')),
+            borderColor:'#378ADD', backgroundColor:'transparent',
+            pointBackgroundColor:labels.map(m=>{ const v=getV(bizData,m,'영업이익률_pct'); return v>=0?'#378ADD':'#c0392b'; }),
+            borderWidth:2.5, tension:0.3, pointRadius:5, pointHoverRadius:7 },
+          { label:'컨세션 이익률(%)', data:labels.map(m=>getV(consData,m,'영업이익률_pct')),
+            borderColor:'#9b59b6', backgroundColor:'transparent',
+            pointBackgroundColor:labels.map(m=>{ const v=getV(consData,m,'영업이익률_pct'); return v>=0?'#9b59b6':'#c0392b'; }),
+            borderWidth:2.5, tension:0.3, pointRadius:5, pointHoverRadius:7 }
+        ]},
+      options:{ responsive:true, plugins:{ legend:{labels:{font:{size:9}}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(1)||'—'}%`}},
+        annotation:{} },
+        scales:{
+          x:{ticks:{font:{size:9}},grid:{display:false}},
+          y:{ticks:{callback:v=>`${v}%`,font:{size:9}},grid:{color:'rgba(0,0,0,.04)'},
+             afterDataLimits:axis=>{axis.min=Math.min(axis.min,-3);}}
+        }
+      }
+    });
+  }
+
+  // ─ 월별 테이블 ─
+  const tbody = document.getElementById('seg-monthly-tbody');
+  if(tbody && labels.length) {
+    const allMons = MON_ORDER.filter(m=>labels.includes(m));
+    let totalBizRev=0,totalBizOp=0,totalConsRev=0,totalConsOp=0;
+    const rows = allMons.map(m=>{
+      const bRev=getV(bizData,m,'매출_억')??0, bOp=getV(bizData,m,'영업이익_억')??0;
+      const cRev=getV(consData,m,'매출_억')??0, cOp=getV(consData,m,'영업이익_억')??0;
+      const bRate=bRev>0?(bOp/bRev*100).toFixed(1):'—';
+      const cRate=cRev>0?(cOp/cRev*100).toFixed(1):'—';
+      const tRev=bRev+cRev, tOp=bOp+cOp;
+      const tRate=tRev>0?(tOp/tRev*100).toFixed(1):'—';
+      totalBizRev+=bRev; totalBizOp+=bOp; totalConsRev+=cRev; totalConsOp+=cOp;
+      const opC=v=>+v>=0?'#1a7f4a':'#c0392b';
+      return `<tr>
+        <td style="text-align:center;font-weight:600">${m}</td>
+        <td style="text-align:right;color:#1a56c4">${bRev?bRev.toFixed(1):'—'}</td>
+        <td style="text-align:right;color:${opC(bOp)};font-weight:600">${bRev?bOp.toFixed(1):'—'}</td>
+        <td style="text-align:right;color:${opC(bRate)}">${bRev?bRate+'%':'—'}</td>
+        <td style="text-align:right;color:#6c3483">${cRev?cRev.toFixed(1):'—'}</td>
+        <td style="text-align:right;color:${opC(cOp)};font-weight:600">${cRev?cOp.toFixed(1):'—'}</td>
+        <td style="text-align:right;color:${opC(cRate)}">${cRev?cRate+'%':'—'}</td>
+        <td style="text-align:right;font-weight:700">${tRev?tRev.toFixed(1):'—'}</td>
+        <td style="text-align:right;font-weight:700;color:${opC(tOp)}">${tRev?tOp.toFixed(1):'—'}</td>
+        <td style="text-align:right;color:${opC(tRate)}">${tRev?tRate+'%':'—'}</td>
+      </tr>`;
+    });
+    const tBizRate=(totalBizRev>0?(totalBizOp/totalBizRev*100).toFixed(1):'—');
+    const tConsRate=(totalConsRev>0?(totalConsOp/totalConsRev*100).toFixed(1):'—');
+    const tRev=totalBizRev+totalConsRev, tOp=totalBizOp+totalConsOp;
+    const tRate=tRev>0?(tOp/tRev*100).toFixed(1):'—';
+    rows.push(`<tr style="background:#f5f5f0;font-weight:700">
+      <td style="text-align:center">합계</td>
+      <td style="text-align:right;color:#1a56c4">${totalBizRev.toFixed(1)}</td>
+      <td style="text-align:right;color:${+totalBizOp>=0?'#1a7f4a':'#c0392b'}">${totalBizOp.toFixed(1)}</td>
+      <td style="text-align:right">${tBizRate}%</td>
+      <td style="text-align:right;color:#6c3483">${totalConsRev.toFixed(1)}</td>
+      <td style="text-align:right;color:${+totalConsOp>=0?'#1a7f4a':'#c0392b'}">${totalConsOp.toFixed(1)}</td>
+      <td style="text-align:right">${tConsRate}%</td>
+      <td style="text-align:right">${tRev.toFixed(1)}</td>
+      <td style="text-align:right;color:${+tOp>=0?'#1a7f4a':'#c0392b'}">${tOp.toFixed(1)}</td>
+      <td style="text-align:right">${tRate}%</td>
+    </tr>`);
+    tbody.innerHTML = rows.join('');
+  }
 }
 
 function renderDashErexPL() {
