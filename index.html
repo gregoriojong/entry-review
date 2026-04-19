@@ -140,6 +140,13 @@ tr:hover td{background:#fafaf8}
 
 /* ── EREX ── */
 .epanel{display:none}.epanel.active{display:block}
+/* ── Store Compare ── */
+.scmp-card{background:#fff;border:1.5px solid rgba(0,0,0,.1);border-radius:9px;padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s;min-width:130px;display:flex;align-items:flex-start;gap:8px}
+.scmp-card:hover{border-color:#378ADD;background:#fafcff}
+.scmp-card.sel{border-color:#378ADD!important;background:#edf4ff}
+.scmp-card input[type=checkbox]{accent-color:#378ADD;flex-shrink:0;margin-top:2px;pointer-events:none}
+td.cmp-best{background:#e6f4ed!important;color:#1a7f4a!important;font-weight:700!important}
+td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!important}
 .brand-card{background:#fff;border:.5px solid rgba(0,0,0,.07);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;transition:all .15s}
 .brand-card:hover{border-color:#9b59b6;box-shadow:0 2px 8px rgba(155,89,182,.08)}
 .brand-avatar{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
@@ -689,6 +696,54 @@ tr:hover td{background:#fafaf8}
             <canvas id="chart-store-efficiency" height="200"></canvas>
           </div>
         </div>
+
+        <!-- ── 매장 비교 분석 ── -->
+        <div style="margin-top:14px">
+          <button onclick="toggleStoreCompare()" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:#f3f7ff;border:1px solid rgba(55,138,221,.25);border-radius:9px;padding:10px 16px;font-size:12px;font-weight:700;color:#1a56c4;cursor:pointer;outline:none">
+            <span>📊 매장 비교 분석 — 같은 브랜드 내 매장 선택 후 지표 비교</span>
+            <span id="scmp-arrow">▼</span>
+          </button>
+          <div id="scmp-wrap" style="display:none;margin-top:10px">
+            <!-- 브랜드 선택 + 힌트 -->
+            <div class="card" style="padding:12px 14px;margin-bottom:10px">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+                <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">브랜드 선택</label>
+                <select id="scmp-brand" onchange="renderScmpCards()" style="height:30px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;background:#fff;outline:none">
+                  <option value="">-- 브랜드 선택 --</option>
+                </select>
+                <span id="scmp-hint" style="font-size:11px;color:#aaa">브랜드 선택 후 매장을 2개 이상 체크하세요</span>
+              </div>
+              <!-- 매장 카드 -->
+              <div id="scmp-cards" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+            </div>
+
+            <!-- 비교 결과 -->
+            <div id="scmp-result" style="display:none">
+              <!-- 비교 테이블 -->
+              <div class="card" style="padding:0;overflow:hidden;margin-bottom:14px">
+                <div style="padding:12px 16px 8px">
+                  <div class="ct">지표 비교 테이블</div>
+                  <div class="cs">최고값 <span style="background:#e6f4ed;color:#1a7f4a;padding:1px 5px;border-radius:4px;font-size:10px">녹색</span>&nbsp; 최저(불리) <span style="background:#fde8e8;color:#c0392b;padding:1px 5px;border-radius:4px;font-size:10px">적색</span> 하이라이트</div>
+                </div>
+                <div class="tw"><table id="scmp-table"></table></div>
+              </div>
+              <!-- 차트 2종 -->
+              <div class="g2">
+                <div class="card">
+                  <div class="card-hd"><span class="ct">월매출 vs 면적효율</span></div>
+                  <div class="cs">막대=월매출(만원) / 선=면적효율(만원/평)</div>
+                  <canvas id="chart-scmp-mixed" height="220"></canvas>
+                </div>
+                <div class="card">
+                  <div class="card-hd"><span class="ct">종합 성과 레이더</span></div>
+                  <div class="cs">6개 지표 정규화 비교 (브랜드 내 최고=100점)</div>
+                  <canvas id="chart-scmp-radar" height="220"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- ⑥ 손익 현황 -->
@@ -1715,6 +1770,8 @@ function setSlider(inputId, val, valId, suffix){
 let erexData = null;
 let erexStatusChart, erexCatChart, erexChannelChart, erexPriorityChart;
 let erexStoreRevChart, erexStoreEffChart;
+let scmpMixedChart, scmpRadarChart;
+let scmpSelectedIds = new Set();
 let erexPlAnnualChart, erexPlMonthlyChart, erexPlCostChart, erexPlSegChart;
 let dashErexPlChart;
 
@@ -2055,6 +2112,189 @@ function renderErexStores() {
     type:'bar',
     data:{ labels:effList.map(x=>x.name), datasets:[{ data:effList.map(x=>x.eff.toFixed(0)), backgroundColor:effList.map(x=>x.color), borderRadius:5 }] },
     options:{ responsive:true, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}만원/평`}} }, scales:{ x:{ticks:{font:{size:9}}}, y:{ticks:{callback:v=>`${v}만`,font:{size:9}}} } }
+  });
+}
+
+// ─────────────────────────────────────────────
+//  매장 비교 분석 (Store Compare)
+// ─────────────────────────────────────────────
+const SCMP_COLORS = ['#378ADD','#1a7f4a','#9b59b6','#e6a817','#c0392b','#555'];
+
+function toggleStoreCompare() {
+  const wrap = document.getElementById('scmp-wrap');
+  const arrow = document.getElementById('scmp-arrow');
+  const isOpen = wrap.style.display !== 'none';
+  wrap.style.display = isOpen ? 'none' : 'block';
+  if(arrow) arrow.textContent = isOpen ? '▼' : '▲';
+  if(!isOpen) populateScmpBrandSel();
+}
+
+function populateScmpBrandSel() {
+  if(!erexData || !erexData.stores) return;
+  const sel = document.getElementById('scmp-brand');
+  if(!sel || sel.options.length > 1) return; // 이미 채워진 경우 스킵
+  const brandMap = {};
+  erexData.stores.forEach(s=>{ brandMap[s.브랜드] = (brandMap[s.브랜드]||0)+1; });
+  const eligible = Object.entries(brandMap).filter(([,n])=>n>=2).sort((a,b)=>b[1]-a[1]);
+  sel.innerHTML = '<option value="">-- 브랜드 선택 --</option>'
+    + eligible.map(([b,n])=>`<option value="${b}">${b} (${n}개 매장)</option>`).join('');
+}
+
+function renderScmpCards() {
+  if(!erexData) return;
+  const brand = document.getElementById('scmp-brand')?.value;
+  const cardsEl = document.getElementById('scmp-cards');
+  scmpSelectedIds.clear();
+  document.getElementById('scmp-result').style.display = 'none';
+  if(!cardsEl) return;
+  if(!brand) { cardsEl.innerHTML=''; updateScmpHint(); return; }
+
+  const stores = erexData.stores.filter(s=>s.브랜드===brand);
+  cardsEl.innerHTML = stores.map(s=>{
+    const effic = s.전용면적_평>0 ? (s.월매출_추정_만원/s.전용면적_평).toFixed(0) : '—';
+    return `<div class="scmp-card" id="scmp-c-${s.id}" onclick="toggleScmpCard('${s.id}')">
+      <input type="checkbox" id="scmp-cb-${s.id}">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#1a2340;line-height:1.3">${s.점포명.replace('PFC ','').replace(' (오크우드)','')}</div>
+        <div style="font-size:10px;color:#888;margin-top:1px">${s.지역}</div>
+        <div style="font-size:10px;color:#1a7f4a;margin-top:2px">월매출 ${(s.월매출_추정_만원/10000).toFixed(1)}억</div>
+        <div style="font-size:10px;color:#555">이익률 ${s.영업이익률_추정_pct}% · 효율 ${effic}만/평</div>
+      </div>
+    </div>`;
+  }).join('');
+  updateScmpHint();
+}
+
+function toggleScmpCard(id) {
+  const card = document.getElementById('scmp-c-'+id);
+  const cb = document.getElementById('scmp-cb-'+id);
+  if(!card) return;
+  if(scmpSelectedIds.has(id)) {
+    scmpSelectedIds.delete(id);
+    card.classList.remove('sel');
+    if(cb) cb.checked = false;
+  } else {
+    scmpSelectedIds.add(id);
+    card.classList.add('sel');
+    if(cb) cb.checked = true;
+  }
+  updateScmpHint();
+  if(scmpSelectedIds.size >= 2) renderScmpResult();
+  else document.getElementById('scmp-result').style.display = 'none';
+}
+
+function updateScmpHint() {
+  const el = document.getElementById('scmp-hint');
+  if(!el) return;
+  const n = scmpSelectedIds.size;
+  if(n===0) { el.textContent='브랜드 선택 후 매장을 2개 이상 체크하세요'; el.style.color='#aaa'; }
+  else if(n===1) { el.textContent='1개 선택됨 — 1개 더 선택하세요'; el.style.color='#e6a817'; }
+  else { el.textContent=`${n}개 매장 선택됨`; el.style.color='#1a7f4a'; }
+}
+
+function renderScmpResult() {
+  if(!erexData) return;
+  const stores = [...scmpSelectedIds].map(id=>erexData.stores.find(s=>s.id===id)).filter(Boolean);
+  if(stores.length < 2) return;
+  document.getElementById('scmp-result').style.display = 'block';
+
+  // ─ 비교 테이블 ─
+  const effic = s=>s.전용면적_평>0 ? s.월매출_추정_만원/s.전용면적_평 : 0;
+  const ROWS = [
+    { k:'지역',      fmt:s=>s.지역,          num:false },
+    { k:'유통사',    fmt:s=>s.유통사,         num:false },
+    { k:'오픈연도',  fmt:s=>s.오픈연도+'년',  num:false },
+    { k:'전용면적',  fmt:s=>`${s.전용면적_평}평<br><span style="font-size:10px;color:#aaa">${s['전용면적_㎡']}㎡</span>`,   num:true, vals:stores.map(s=>s.전용면적_평), best:'max' },
+    { k:'좌석수',    fmt:s=>s.좌석수+'석',    num:true, vals:stores.map(s=>s.좌석수), best:'max' },
+    { k:'객단가',    fmt:s=>s.객단가_만원.toFixed(1)+'만원', num:true, vals:stores.map(s=>s.객단가_만원), best:'max' },
+    { k:'월매출(추정)',  fmt:s=>`<strong>${(s.월매출_추정_만원/10000).toFixed(1)}억</strong><br><span style="font-size:10px;color:#aaa">${s.월매출_추정_만원.toLocaleString()}만</span>`, num:true, vals:stores.map(s=>s.월매출_추정_만원), best:'max' },
+    { k:'일매출(추정)', fmt:s=>`${s.일매출_추정_만원.toLocaleString()}만원`, num:true, vals:stores.map(s=>s.일매출_추정_만원), best:'max' },
+    { k:'면적효율',  fmt:s=>s.전용면적_평>0?`${(s.월매출_추정_만원/s.전용면적_평).toFixed(0)}만/평`:'—', num:true, vals:stores.map(effic), best:'max' },
+    { k:'일방문객',  fmt:s=>s.일방문객_추정.toLocaleString()+'명', num:true, vals:stores.map(s=>s.일방문객_추정), best:'max' },
+    { k:'회전율',    fmt:s=>s.회전율_일.toFixed(1)+'회/일', num:true, vals:stores.map(s=>s.회전율_일), best:'max' },
+    { k:'수수료율',  fmt:s=>s.수수료율_pct>0?s.수수료율_pct+'%':'고정(임차)', num:true, vals:stores.map(s=>s.수수료율_pct), best:'min' },
+    { k:'임차료(MG)', fmt:s=>s.임차료_MG_만원>0?s.임차료_MG_만원.toLocaleString()+'만':'수수료방식', num:false },
+    { k:'영업이익률(추정)', fmt:s=>s.영업이익률_추정_pct+'%', num:true, vals:stores.map(s=>s.영업이익률_추정_pct), best:'max' },
+    { k:'계약종료',  fmt:s=>s.계약종료||'—', num:false },
+  ];
+
+  const tableEl = document.getElementById('scmp-table');
+  if(tableEl) tableEl.innerHTML = `
+    <thead><tr>
+      <th style="background:#f5f7fa;text-align:left;min-width:90px;font-size:11px">지표</th>
+      ${stores.map((s,i)=>`<th style="text-align:center;min-width:120px;border-bottom:3px solid ${SCMP_COLORS[i%6]};font-size:12px">${s.점포명.replace('PFC ','').replace(' (오크우드)','')}</th>`).join('')}
+    </tr></thead>
+    <tbody>${ROWS.map(row=>{
+      let bestIdx=-1, worstIdx=-1;
+      if(row.num && row.vals) {
+        const posVals = row.vals.filter(v=>v>0);
+        if(posVals.length>0) {
+          const mx=Math.max(...row.vals), mn=Math.min(...posVals);
+          bestIdx = row.best==='max' ? row.vals.indexOf(mx) : row.vals.indexOf(mn);
+          worstIdx = row.best==='max' ? row.vals.indexOf(mn) : row.vals.indexOf(mx);
+        }
+      }
+      return `<tr>
+        <td style="background:#f5f7fa;font-size:11px;font-weight:600;color:#666;white-space:nowrap">${row.k}</td>
+        ${stores.map((s,i)=>{
+          const cls = i===bestIdx?'cmp-best':i===worstIdx&&row.vals?.filter(v=>v>0).length>1?'cmp-low':'';
+          return `<td class="${cls}" style="text-align:center;font-size:12px">${row.fmt(s)}</td>`;
+        }).join('')}
+      </tr>`;
+    }).join('')}</tbody>`;
+
+  // ─ 혼합 차트 (월매출 bar + 면적효율 line) ─
+  if(scmpMixedChart) scmpMixedChart.destroy();
+  const mixCanvas = document.getElementById('chart-scmp-mixed');
+  const shortNames = stores.map(s=>s.점포명.replace('PFC ','').replace(' (오크우드)','').slice(0,9));
+  if(mixCanvas) scmpMixedChart = new Chart(mixCanvas, {
+    type:'bar',
+    data:{ labels:shortNames,
+      datasets:[
+        { label:'월매출(만원)', data:stores.map(s=>s.월매출_추정_만원), backgroundColor:SCMP_COLORS.slice(0,stores.length).map(c=>c+'bb'), borderRadius:5, yAxisID:'y' },
+        { type:'line', label:'면적효율(만/평)', data:stores.map(s=>s.전용면적_평>0?(s.월매출_추정_만원/s.전용면적_평).toFixed(0):0),
+          borderColor:'#e6a817', backgroundColor:'rgba(230,168,23,.12)', pointBackgroundColor:stores.map((_,i)=>SCMP_COLORS[i%6]),
+          borderWidth:2, tension:0.3, pointRadius:5, yAxisID:'y2' }
+      ]},
+    options:{ responsive:true,
+      plugins:{ legend:{labels:{font:{size:9}}}, tooltip:{callbacks:{label:ctx=>ctx.dataset.yAxisID==='y'?`${(ctx.parsed.y/10000).toFixed(1)}억원/월`:ctx.parsed.y+'만원/평'}} },
+      scales:{
+        x:{ticks:{font:{size:9}},grid:{display:false}},
+        y:{ticks:{callback:v=>`${(v/10000).toFixed(0)}억`,font:{size:9}},grid:{color:'rgba(0,0,0,.04)'}},
+        y2:{position:'right',ticks:{callback:v=>v+'만/평',font:{size:9}},grid:{display:false}}
+      }}
+  });
+
+  // ─ 레이더 차트 ─
+  if(scmpRadarChart) scmpRadarChart.destroy();
+  const radarCanvas = document.getElementById('chart-scmp-radar');
+  const norm = (vals, best) => {
+    const arr = vals.map(Number);
+    const mx = Math.max(...arr), mn = Math.min(...arr);
+    if(mx===mn) return arr.map(()=>70);
+    return arr.map(v=>best==='max'?((v-mn)/(mx-mn)*70+30):(((mx-v)/(mx-mn))*70+30));
+  };
+  const radarMets = [
+    { label:'월매출',   vals:stores.map(s=>s.월매출_추정_만원), best:'max' },
+    { label:'객단가',   vals:stores.map(s=>s.객단가_만원), best:'max' },
+    { label:'회전율',   vals:stores.map(s=>s.회전율_일), best:'max' },
+    { label:'이익률',   vals:stores.map(s=>s.영업이익률_추정_pct), best:'max' },
+    { label:'면적효율', vals:stores.map(effic), best:'max' },
+    { label:'저수수료', vals:stores.map(s=>s.수수료율_pct>0?s.수수료율_pct:15), best:'min' },
+  ];
+  if(radarCanvas) scmpRadarChart = new Chart(radarCanvas, {
+    type:'radar',
+    data:{ labels:radarMets.map(m=>m.label),
+      datasets:stores.map((s,i)=>({
+        label:s.점포명.replace('PFC ','').replace(' (오크우드)','').slice(0,10),
+        data:radarMets.map((m,mi)=>norm(m.vals,m.best)[i]),
+        borderColor:SCMP_COLORS[i%6], backgroundColor:SCMP_COLORS[i%6]+'22',
+        pointBackgroundColor:SCMP_COLORS[i%6], borderWidth:2, pointRadius:4
+      }))},
+    options:{ responsive:true,
+      scales:{ r:{ min:0, max:100, ticks:{stepSize:25,font:{size:8},callback:()=>''}, pointLabels:{font:{size:11}}, grid:{color:'rgba(0,0,0,.08)'}, angleLines:{color:'rgba(0,0,0,.07)'} }},
+      plugins:{ legend:{labels:{font:{size:9},boxWidth:12}} }
+    }
   });
 }
 
