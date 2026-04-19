@@ -693,26 +693,80 @@ tr:hover td{background:#fafaf8}
 
       <!-- ⑥ 손익 현황 -->
       <div class="epanel" id="etab-pl">
+        <!-- 툴바 -->
+        <div class="btn-row" style="margin-bottom:12px;align-items:center;flex-wrap:wrap;gap:8px">
+          <select id="pl-year-sel" style="height:32px;border:.5px solid rgba(0,0,0,.13);border-radius:7px;padding:0 10px;font-size:12px;background:#fff;outline:none" onchange="renderErexPL()">
+            <option value="2025">2025년</option>
+            <option value="2026" selected>2026년</option>
+          </select>
+          <button class="btn btn-pri btn-sm" onclick="togglePlForm()">＋ 월별 데이터 입력</button>
+          <button class="btn btn-sm" onclick="exportPlJSON()">📤 JSON 내보내기</button>
+          <span id="pl-update-badge" style="font-size:10px;color:#9b59b6;display:none"></span>
+        </div>
+
+        <!-- 월별 입력 폼 (토글) -->
+        <div id="pl-form-wrap" style="display:none;margin-bottom:14px">
+          <div class="card" style="border:1.5px solid rgba(155,89,182,.3);background:#fdf9ff">
+            <div style="font-weight:700;font-size:12px;color:#6c3483;margin-bottom:12px">📝 월별 손익 데이터 입력</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:12px">
+              <div><label style="font-size:10px;color:#666;display:block;margin-bottom:3px">연도 *</label>
+                <select id="pf-year" style="width:100%;height:30px;border:.5px solid rgba(0,0,0,.2);border-radius:6px;padding:0 8px;font-size:12px;background:#fff" onchange="pfAutoCalc()">
+                  <option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option>
+                </select></div>
+              <div><label style="font-size:10px;color:#666;display:block;margin-bottom:3px">월 *</label>
+                <select id="pf-month" style="width:100%;height:30px;border:.5px solid rgba(0,0,0,.2);border-radius:6px;padding:0 8px;font-size:12px;background:#fff">
+                  <option value="1월">1월</option><option value="2월">2월</option><option value="3월" selected>3월</option>
+                  <option value="4월">4월</option><option value="5월">5월</option><option value="6월">6월</option>
+                  <option value="7월">7월</option><option value="8월">8월</option><option value="9월">9월</option>
+                  <option value="10월">10월</option><option value="11월">11월</option><option value="12월">12월</option>
+                </select></div>
+              <div><label style="font-size:10px;color:#1a56c4;font-weight:600;display:block;margin-bottom:3px">매출 (억원) *</label>
+                <input type="number" id="pf-rev" step="0.1" placeholder="예: 54.5" style="width:100%;height:30px;border:.5px solid rgba(0,0,0,.2);border-radius:6px;padding:0 8px;font-size:12px;box-sizing:border-box" oninput="pfAutoCalc()"></div>
+              <div><label style="font-size:10px;color:#666;display:block;margin-bottom:3px">재료비 (억원)</label>
+                <input type="number" id="pf-mat" step="0.1" placeholder="예: 15.1" style="width:100%;height:30px;border:.5px solid rgba(0,0,0,.2);border-radius:6px;padding:0 8px;font-size:12px;box-sizing:border-box" oninput="pfAutoCalc()"></div>
+              <div><label style="font-size:10px;color:#666;display:block;margin-bottom:3px">노무비 (억원)</label>
+                <input type="number" id="pf-lab" step="0.1" placeholder="예: 15.9" style="width:100%;height:30px;border:.5px solid rgba(0,0,0,.2);border-radius:6px;padding:0 8px;font-size:12px;box-sizing:border-box" oninput="pfAutoCalc()"></div>
+              <div><label style="font-size:10px;color:#666;display:block;margin-bottom:3px">제경비 (억원)</label>
+                <input type="number" id="pf-ohd" step="0.1" placeholder="예: 14.4" style="width:100%;height:30px;border:.5px solid rgba(0,0,0,.2);border-radius:6px;padding:0 8px;font-size:12px;box-sizing:border-box" oninput="pfAutoCalc()"></div>
+              <div><label style="font-size:10px;color:#666;display:block;margin-bottom:3px">임차료 (억원)</label>
+                <input type="number" id="pf-rent" step="0.1" placeholder="예: 6.6" style="width:100%;height:30px;border:.5px solid rgba(0,0,0,.2);border-radius:6px;padding:0 8px;font-size:12px;box-sizing:border-box" oninput="pfAutoCalc()"></div>
+              <div><label style="font-size:10px;color:#666;display:block;margin-bottom:3px">수수료 (억원)</label>
+                <input type="number" id="pf-com" step="0.1" placeholder="예: 1.7" style="width:100%;height:30px;border:.5px solid rgba(0,0,0,.2);border-radius:6px;padding:0 8px;font-size:12px;box-sizing:border-box" oninput="pfAutoCalc()"></div>
+              <div><label style="font-size:10px;color:#1a7f4a;font-weight:600;display:block;margin-bottom:3px">영업이익 (억원) *</label>
+                <input type="number" id="pf-op" step="0.1" placeholder="자동계산↑" style="width:100%;height:30px;border:.5px solid rgba(26,127,74,.4);border-radius:6px;padding:0 8px;font-size:12px;background:#f0f9f4;box-sizing:border-box"></div>
+              <div style="grid-column:span 2"><label style="font-size:10px;color:#666;display:block;margin-bottom:3px">메모 (선택)</label>
+                <input type="text" id="pf-memo" placeholder="예: 설 연휴 효과, 신규점 오픈 등" style="width:100%;height:30px;border:.5px solid rgba(0,0,0,.2);border-radius:6px;padding:0 8px;font-size:12px;box-sizing:border-box"></div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn btn-pri btn-sm" onclick="savePlEntry()">💾 저장</button>
+              <button class="btn btn-sm" onclick="togglePlForm()">취소</button>
+              <span id="pf-msg" style="font-size:11px;color:#1a7f4a"></span>
+            </div>
+          </div>
+        </div>
+
         <!-- P&L KPI -->
         <div class="krow k4" id="pl-kpi" style="margin-bottom:12px"></div>
-        <!-- 연도별 추이 -->
+
+        <!-- 연도별 추이 + 월별 차트 -->
         <div class="g2" style="margin-bottom:14px">
           <div class="card">
             <div class="card-hd"><span class="ct">연도별 매출·영업이익 추이</span></div>
-            <div class="cs">2022~2026 YTD (ELX 영업본부 합계)</div>
+            <div class="cs">2022~현재 (ELX 영업본부 합계)</div>
             <canvas id="chart-pl-annual" height="220"></canvas>
           </div>
           <div class="card">
-            <div class="card-hd"><span class="ct">2025년 월별 매출·영업이익</span></div>
-            <div class="cs">월별 성과 흐름</div>
+            <div class="card-hd"><span class="ct"><span id="pl-mon-title">월별</span> 매출·영업이익</span></div>
+            <div class="cs">입력된 월별 성과 흐름</div>
             <canvas id="chart-pl-monthly" height="220"></canvas>
           </div>
         </div>
+
         <!-- 비용 구조 + 부문 비교 -->
         <div class="g2" style="margin-bottom:14px">
           <div class="card">
-            <div class="card-hd"><span class="ct">2025년 비용 구조</span></div>
-            <div class="cs">매출 대비 원가 구성</div>
+            <div class="card-hd"><span class="ct">비용 구조 분석</span></div>
+            <div class="cs">최신 연간 원가 구성</div>
             <canvas id="chart-pl-cost" height="220"></canvas>
           </div>
           <div class="card">
@@ -721,6 +775,27 @@ tr:hover td{background:#fafaf8}
             <canvas id="chart-pl-segment" height="220"></canvas>
           </div>
         </div>
+
+        <!-- 업데이트 이력 테이블 -->
+        <div class="card" style="padding:0;overflow:hidden;margin-bottom:14px" id="pl-history-wrap">
+          <div style="padding:12px 14px 8px;display:flex;justify-content:space-between;align-items:center">
+            <div><span class="ct" style="font-size:12px">📋 월별 입력 이력</span> <span id="pl-hist-count" style="font-size:10px;color:#aaa"></span></div>
+            <button class="btn btn-sm" style="color:#c0392b;font-size:10px" onclick="clearPlHistory()" id="pl-clear-btn" style="display:none">전체 삭제</button>
+          </div>
+          <div class="tw">
+            <table id="pl-history-table">
+              <thead><tr>
+                <th>연도</th><th>월</th>
+                <th style="text-align:right">매출(억)</th><th style="text-align:right">재료비</th><th style="text-align:right">노무비</th>
+                <th style="text-align:right">제경비</th><th style="text-align:right">임차료</th><th style="text-align:right">수수료</th>
+                <th style="text-align:right;color:#1a7f4a">영업이익</th><th style="text-align:right;color:#1a56c4">이익률</th>
+                <th>메모</th><th>입력일</th><th>삭제</th>
+              </tr></thead>
+              <tbody id="pl-history-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- 성과 해설 -->
         <div class="card" style="background:#f0f9f4;border-color:rgba(26,127,74,.2)">
           <div class="ct" style="color:#1a5c38;margin-bottom:8px">📈 손익 분석 요약</div>
@@ -940,10 +1015,14 @@ document.querySelectorAll('.nav-item').forEach(el=>{
 document.querySelectorAll('.dtab').forEach(el=>{
   el.addEventListener('click',()=>{
     const t = el.dataset.dtab;
-    el.closest('.card').querySelectorAll('.dtab').forEach(x=>x.classList.remove('active'));
+    if(!t) return; // data-etab 버튼(EREX 탭)은 별도 핸들러에서 처리
+    const card = el.closest('.card');
+    if(!card) return;
+    card.querySelectorAll('.dtab').forEach(x=>x.classList.remove('active'));
     el.classList.add('active');
-    el.closest('.card').querySelectorAll('.dpanel').forEach(x=>x.classList.remove('active'));
-    document.getElementById('dtab-'+t).classList.add('active');
+    card.querySelectorAll('.dpanel').forEach(x=>x.classList.remove('active'));
+    const panel = document.getElementById('dtab-'+t);
+    if(panel) panel.classList.add('active');
     if(t==='finance') renderFinanceChart();
     if(t==='summary') renderSummaryRadar();
     if(t==='compete') renderCompeteChart();
@@ -1825,32 +1904,190 @@ function renderErexStores() {
   });
 }
 
+// ─────────────────────────────────────────────
+//  P&L 월별 업데이트 localStorage 관리
+// ─────────────────────────────────────────────
+const PL_STORE_KEY = 'er_erex_pl_updates';
+const MON_ORDER = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+
+function loadPlUpdates() {
+  try { return JSON.parse(localStorage.getItem(PL_STORE_KEY)||'[]'); } catch(e){ return []; }
+}
+function savePlUpdates(arr) { localStorage.setItem(PL_STORE_KEY, JSON.stringify(arr)); }
+
+// 기본 월별 데이터 + localStorage 업데이트 머지 (선택 연도)
+function mergePlMonthly(pl, year) {
+  const updates = loadPlUpdates().filter(u=>String(u.연도)===String(year));
+  // 기초 데이터: 2025년은 erex-db.json의 월별_2025 사용, 그 외엔 빈 배열
+  let base = {};
+  if(String(year)==='2025' && pl.월별_2025) {
+    pl.월별_2025.forEach(m=>{ base[m.월]={...m, 소스:'기본'}; });
+  }
+  // localStorage 업데이트로 덮어쓰기
+  updates.forEach(u=>{ base[u.월]={월:u.월, 매출_억:+u.매출_억, 영업이익_억:+u.영업이익_억, 재료비_억:+(u.재료비_억||0), 노무비_억:+(u.노무비_억||0), 제경비_억:+(u.제경비_억||0), 임차료_억:+(u.임차료_억||0), 수수료_억:+(u.수수료_억||0), 메모:u.메모||'', 소스:'입력'}; });
+  return MON_ORDER.filter(m=>base[m]).map(m=>base[m]);
+}
+
+// 연도별 요약에 localStorage 집계를 반영
+function buildAnnualSummary(pl) {
+  const updates = loadPlUpdates();
+  const years = [...new Set(updates.map(u=>String(u.연도)))];
+  const result = [...pl.연도별];
+  years.forEach(yr=>{
+    const mons = updates.filter(u=>String(u.연도)===yr);
+    if(!mons.length) return;
+    const totalRev = mons.reduce((s,u)=>s+(+u.매출_억||0),0);
+    const totalOp  = mons.reduce((s,u)=>s+(+u.영업이익_억||0),0);
+    const opRate   = totalRev>0?(totalOp/totalRev*100):0;
+    const label = `${yr} (입력 ${mons.length}개월)`;
+    const idx = result.findIndex(y=>y.연도===yr||y.연도===label||y.연도.startsWith(yr));
+    const entry = { 연도:label, 매출_억:+totalRev.toFixed(1), 영업이익_억:+totalOp.toFixed(1), 영업이익률_pct:+opRate.toFixed(1), 재료비_억:0, 노무비_억:0, 임차료_억:0, 수수료_억:0 };
+    if(idx>=0) result[idx]=entry; else result.push(entry);
+  });
+  return result;
+}
+
+function togglePlForm() {
+  const w = document.getElementById('pl-form-wrap');
+  if(w) w.style.display = w.style.display==='none'?'block':'none';
+}
+
+function pfAutoCalc() {
+  const rev = +document.getElementById('pf-rev')?.value||0;
+  const mat = +document.getElementById('pf-mat')?.value||0;
+  const lab = +document.getElementById('pf-lab')?.value||0;
+  const ohd = +document.getElementById('pf-ohd')?.value||0;
+  const rnt = +document.getElementById('pf-rent')?.value||0;
+  const com = +document.getElementById('pf-com')?.value||0;
+  if(rev>0 && (mat+lab+ohd+rnt+com)>0) {
+    const op = rev - mat - lab - ohd - rnt - com;
+    const opEl = document.getElementById('pf-op');
+    if(opEl && !opEl._manualEdited) opEl.value = op.toFixed(1);
+  }
+}
+
+function savePlEntry() {
+  const yr  = document.getElementById('pf-year')?.value;
+  const mon = document.getElementById('pf-month')?.value;
+  const rev = +document.getElementById('pf-rev')?.value;
+  const op  = +document.getElementById('pf-op')?.value;
+  const msg = document.getElementById('pf-msg');
+  if(!yr||!mon||!rev||isNaN(op)){ if(msg) msg.textContent='연도·월·매출·영업이익은 필수입니다.'; msg.style.color='#c0392b'; return; }
+  const entry = {
+    연도:yr, 월:mon,
+    매출_억: +document.getElementById('pf-rev')?.value||0,
+    재료비_억: +document.getElementById('pf-mat')?.value||0,
+    노무비_억: +document.getElementById('pf-lab')?.value||0,
+    제경비_억: +document.getElementById('pf-ohd')?.value||0,
+    임차료_억: +document.getElementById('pf-rent')?.value||0,
+    수수료_억: +document.getElementById('pf-com')?.value||0,
+    영업이익_억: op,
+    메모: document.getElementById('pf-memo')?.value||'',
+    입력일: new Date().toISOString().slice(0,10)
+  };
+  const arr = loadPlUpdates();
+  const dup = arr.findIndex(u=>String(u.연도)===String(yr)&&u.월===mon);
+  if(dup>=0){ arr[dup]=entry; } else { arr.push(entry); }
+  savePlUpdates(arr);
+  if(msg){ msg.textContent=`✅ ${yr}년 ${mon} 저장 완료 (${entry.매출_억}억원, 이익 ${op.toFixed(1)}억)`; msg.style.color='#1a7f4a'; }
+  // 폼 초기화
+  ['pf-rev','pf-mat','pf-lab','pf-ohd','pf-rent','pf-com','pf-op','pf-memo'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+  renderErexPL();
+  renderPlHistory();
+}
+
+function deletePlEntry(yr, mon) {
+  const arr = loadPlUpdates().filter(u=>!(String(u.연도)===String(yr)&&u.월===mon));
+  savePlUpdates(arr);
+  renderErexPL();
+  renderPlHistory();
+}
+
+function clearPlHistory() {
+  if(!confirm('입력된 모든 월별 손익 데이터를 삭제하시겠습니까?')) return;
+  savePlUpdates([]);
+  renderErexPL();
+  renderPlHistory();
+}
+
+function renderPlHistory() {
+  const arr = loadPlUpdates().slice().sort((a,b)=>String(b.연도).localeCompare(String(a.연도))||MON_ORDER.indexOf(b.월)-MON_ORDER.indexOf(a.월));
+  const tbody = document.getElementById('pl-history-tbody');
+  const countEl = document.getElementById('pl-hist-count');
+  const clearBtn = document.getElementById('pl-clear-btn');
+  if(countEl) countEl.textContent = arr.length ? `(${arr.length}건)` : '(없음)';
+  if(clearBtn) clearBtn.style.display = arr.length?'block':'none';
+  const badge = document.getElementById('pl-update-badge');
+  if(badge){ if(arr.length){ badge.textContent=`📌 ${arr.length}건 입력됨`; badge.style.display='inline'; } else badge.style.display='none'; }
+  if(!tbody) return;
+  if(!arr.length){ tbody.innerHTML=`<tr><td colspan="13" style="text-align:center;color:#bbb;padding:16px">입력된 데이터가 없습니다. ＋ 버튼으로 월별 손익을 입력하세요.</td></tr>`; return; }
+  tbody.innerHTML = arr.map(u=>{
+    const opRate = u.매출_억>0?(u.영업이익_억/u.매출_억*100).toFixed(1):'—';
+    const opColor = u.영업이익_억>=0?'#1a7f4a':'#c0392b';
+    return `<tr>
+      <td style="text-align:center;font-weight:600">${u.연도}</td>
+      <td style="text-align:center">${u.월}</td>
+      <td style="text-align:right;font-weight:700;color:#1a56c4">${(+u.매출_억).toFixed(1)}</td>
+      <td style="text-align:right;color:#777">${u.재료비_억?(+u.재료비_억).toFixed(1):'—'}</td>
+      <td style="text-align:right;color:#777">${u.노무비_억?(+u.노무비_억).toFixed(1):'—'}</td>
+      <td style="text-align:right;color:#777">${u.제경비_억?(+u.제경비_억).toFixed(1):'—'}</td>
+      <td style="text-align:right;color:#777">${u.임차료_억?(+u.임차료_억).toFixed(1):'—'}</td>
+      <td style="text-align:right;color:#777">${u.수수료_억?(+u.수수료_억).toFixed(1):'—'}</td>
+      <td style="text-align:right;font-weight:700;color:${opColor}">${(+u.영업이익_억).toFixed(1)}</td>
+      <td style="text-align:right;color:${opColor}">${opRate}%</td>
+      <td style="font-size:10px;color:#555;max-width:120px">${u.메모||'—'}</td>
+      <td style="font-size:10px;color:#aaa;text-align:center">${u.입력일||'—'}</td>
+      <td style="text-align:center"><button class="btn btn-sm" style="color:#c0392b;padding:2px 6px;font-size:10px" onclick="deletePlEntry('${u.연도}','${u.월}')">삭제</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function exportPlJSON() {
+  const arr = loadPlUpdates();
+  if(!arr.length){ alert('입력된 데이터가 없습니다.'); return; }
+  const byYear = {};
+  arr.forEach(u=>{ if(!byYear[u.연도]) byYear[u.연도]=[]; byYear[u.연도].push({월:u.월, 매출_억:+u.매출_억, 영업이익_억:+u.영업이익_억}); });
+  Object.keys(byYear).forEach(yr=>byYear[yr].sort((a,b)=>MON_ORDER.indexOf(a.월)-MON_ORDER.indexOf(b.월)));
+  const json = JSON.stringify(byYear, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`erex_pl_update_${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
 function renderErexPL() {
   if(!erexData || !erexData.pl) return;
   const { pl } = erexData;
+  const selYear = document.getElementById('pl-year-sel')?.value || '2025';
 
-  // KPI
+  // 연도별 요약 (기본 + 입력 데이터 반영)
+  const annualData = buildAnnualSummary(pl);
   const yr2025 = pl.연도별.find(y=>y.연도==='2025');
   const yr2024 = pl.연도별.find(y=>y.연도==='2024');
-  const yr2026 = pl.연도별.find(y=>y.연도==='2026 YTD');
+  const ytdEntry = loadPlUpdates().length ? { 연도:selYear, ...(() => {
+    const mons = loadPlUpdates().filter(u=>String(u.연도)===selYear);
+    const tot = mons.reduce((s,u)=>s+(+u.매출_억||0),0);
+    const op  = mons.reduce((s,u)=>s+(+u.영업이익_억||0),0);
+    return { 매출_억:+tot.toFixed(1), 영업이익_억:+op.toFixed(1), 영업이익률_pct:tot>0?+(op/tot*100).toFixed(1):0, count:mons.length };
+  })()} : null;
+
   const growth = yr2024&&yr2025 ? ((yr2025.매출_억-yr2024.매출_억)/yr2024.매출_억*100).toFixed(1) : '—';
   const plKpi = document.getElementById('pl-kpi');
   if(plKpi) plKpi.innerHTML = `
     <div class="kpi" style="border-left:3px solid #9b59b6"><div class="kpi-l">2025 연매출</div><div class="kpi-v" style="color:#6c3483">${yr2025?yr2025.매출_억.toFixed(0):'—'}</div><div class="kpi-s">억원 (YoY +${growth}%)</div></div>
-    <div class="kpi" style="border-left:3px solid #1a7f4a"><div class="kpi-l">2025 영업이익</div><div class="kpi-v" style="color:#1a7f4a">${yr2025?yr2025.영업이익_억.toFixed(1):'—'}</div><div class="kpi-s">억원</div></div>
-    <div class="kpi" style="border-left:3px solid #378ADD"><div class="kpi-l">2025 영업이익률</div><div class="kpi-v" style="color:#1a56c4">${yr2025?yr2025.영업이익률_pct.toFixed(1):'—'}</div><div class="kpi-s">% (2024: ${yr2024?yr2024.영업이익률_pct.toFixed(1):'—'}%)</div></div>
-    <div class="kpi" style="border-left:3px solid #e6a817"><div class="kpi-l">2026 YTD (2월)</div><div class="kpi-v" style="color:#9a6d00">${yr2026?yr2026.매출_억.toFixed(0):'—'}</div><div class="kpi-s">억원 / 이익 ${yr2026?yr2026.영업이익_억.toFixed(1):'—'}억</div></div>`;
+    <div class="kpi" style="border-left:3px solid #1a7f4a"><div class="kpi-l">2025 영업이익</div><div class="kpi-v" style="color:#1a7f4a">${yr2025?yr2025.영업이익_억.toFixed(1):'—'}</div><div class="kpi-s">억원 (이익률 ${yr2025?yr2025.영업이익률_pct.toFixed(1):'—'}%)</div></div>
+    <div class="kpi" style="border-left:3px solid #378ADD"><div class="kpi-l">${selYear}년 누계 매출</div><div class="kpi-v" style="color:#1a56c4">${ytdEntry&&ytdEntry.count?ytdEntry.매출_억.toFixed(1):'미입력'}</div><div class="kpi-s">${ytdEntry&&ytdEntry.count?`억원 (${ytdEntry.count}개월 입력)`:'＋ 버튼으로 입력'}</div></div>
+    <div class="kpi" style="border-left:3px solid #e6a817"><div class="kpi-l">${selYear}년 영업이익률</div><div class="kpi-v" style="color:#9a6d00">${ytdEntry&&ytdEntry.count?ytdEntry.영업이익률_pct.toFixed(1)+'%':'—'}</div><div class="kpi-s">${ytdEntry&&ytdEntry.count?`이익 ${ytdEntry.영업이익_억.toFixed(1)}억원`:'데이터 없음'}</div></div>`;
 
   // 연도별 추이 차트
-  const annLabels = pl.연도별.map(y=>y.연도);
   if(erexPlAnnualChart) erexPlAnnualChart.destroy();
   const annCanvas = document.getElementById('chart-pl-annual');
   if(annCanvas) erexPlAnnualChart = new Chart(annCanvas, {
     type:'bar',
-    data:{ labels:annLabels, datasets:[
-      { label:'매출(억)', data:pl.연도별.map(y=>y.매출_억), backgroundColor:'rgba(55,138,221,.7)', borderRadius:5, yAxisID:'y' },
-      { label:'영업이익(억)', data:pl.연도별.map(y=>y.영업이익_억), backgroundColor:pl.연도별.map(y=>y.영업이익_억>=0?'rgba(26,127,74,.8)':'rgba(192,57,43,.8)'), borderRadius:5, yAxisID:'y' },
-      { type:'line', label:'영업이익률(%)', data:pl.연도별.map(y=>y.영업이익률_pct), borderColor:'#9b59b6', backgroundColor:'transparent', pointBackgroundColor:'#9b59b6', borderWidth:2, yAxisID:'y2' }
+    data:{ labels:annualData.map(y=>y.연도), datasets:[
+      { label:'매출(억)', data:annualData.map(y=>y.매출_억), backgroundColor:'rgba(55,138,221,.7)', borderRadius:5, yAxisID:'y' },
+      { label:'영업이익(억)', data:annualData.map(y=>y.영업이익_억), backgroundColor:annualData.map(y=>y.영업이익_억>=0?'rgba(26,127,74,.8)':'rgba(192,57,43,.8)'), borderRadius:5, yAxisID:'y' },
+      { type:'line', label:'영업이익률(%)', data:annualData.map(y=>y.영업이익률_pct), borderColor:'#9b59b6', backgroundColor:'transparent', pointBackgroundColor:'#9b59b6', borderWidth:2, yAxisID:'y2' }
     ]},
     options:{ responsive:true, plugins:{ legend:{labels:{font:{size:9}}} }, scales:{
       y:{ticks:{callback:v=>`${v}억`,font:{size:9}}},
@@ -1858,30 +2095,46 @@ function renderErexPL() {
     }}
   });
 
-  // 월별 2025 차트
-  const monLabels = pl.월별_2025.map(m=>m.월);
+  // 월별 차트 (선택 연도 기준, 기본+입력 머지)
+  const monData = mergePlMonthly(pl, selYear);
+  const monTitleEl = document.getElementById('pl-mon-title');
+  if(monTitleEl) monTitleEl.textContent = `${selYear}년`;
   if(erexPlMonthlyChart) erexPlMonthlyChart.destroy();
   const monCanvas = document.getElementById('chart-pl-monthly');
-  if(monCanvas) erexPlMonthlyChart = new Chart(monCanvas, {
-    type:'bar',
-    data:{ labels:monLabels, datasets:[
-      { label:'매출(억)', data:pl.월별_2025.map(m=>m.매출_억), backgroundColor:'rgba(55,138,221,.6)', borderRadius:4, yAxisID:'y' },
-      { type:'line', label:'영업이익(억)', data:pl.월별_2025.map(m=>m.영업이익_억), borderColor:'#1a7f4a', backgroundColor:'rgba(26,127,74,.08)', fill:true, pointBackgroundColor:'#1a7f4a', borderWidth:2, yAxisID:'y2' }
-    ]},
-    options:{ responsive:true, plugins:{ legend:{labels:{font:{size:9}}} }, scales:{
-      y:{ticks:{callback:v=>`${v}억`,font:{size:9}}},
-      y2:{position:'right',ticks:{callback:v=>`${v}억`,font:{size:9}},grid:{display:false}}
-    }}
-  });
+  if(monCanvas) {
+    if(monData.length) {
+      erexPlMonthlyChart = new Chart(monCanvas, {
+        type:'bar',
+        data:{ labels:monData.map(m=>m.월), datasets:[
+          { label:'매출(억)', data:monData.map(m=>m.매출_억), backgroundColor:monData.map(m=>m.소스==='입력'?'rgba(155,89,182,.7)':'rgba(55,138,221,.6)'), borderRadius:4, yAxisID:'y' },
+          { type:'line', label:'영업이익(억)', data:monData.map(m=>m.영업이익_억), borderColor:'#1a7f4a', backgroundColor:'rgba(26,127,74,.08)', fill:true, pointBackgroundColor:monData.map(m=>m.소스==='입력'?'#9b59b6':'#1a7f4a'), borderWidth:2, yAxisID:'y2' }
+        ]},
+        options:{ responsive:true,
+          plugins:{ legend:{labels:{font:{size:9}}},
+            tooltip:{callbacks:{afterLabel:ctx=>{ const d=monData[ctx.dataIndex]; return d.메모?`메모: ${d.메모}`:''; }}}
+          },
+          scales:{ y:{ticks:{callback:v=>`${v}억`,font:{size:9}}}, y2:{position:'right',ticks:{callback:v=>`${v}억`,font:{size:9}},grid:{display:false}} }
+        }
+      });
+    } else {
+      // 데이터 없을 때 빈 상태 표시
+      const ctx = monCanvas.getContext('2d');
+      ctx.clearRect(0,0,monCanvas.width,monCanvas.height);
+      ctx.fillStyle='#bbb'; ctx.font='13px Arial'; ctx.textAlign='center';
+      ctx.fillText(`${selYear}년 입력된 월별 데이터가 없습니다.`, monCanvas.width/2, monCanvas.height/2);
+      ctx.fillStyle='#ddd'; ctx.font='11px Arial';
+      ctx.fillText('＋ 월별 데이터 입력 버튼을 클릭하세요.', monCanvas.width/2, monCanvas.height/2+22);
+    }
+  }
 
   // 비용 구조 도넛 (2025 영업본부)
-  const biz = pl.부문별_2025.영업본부;
-  const rev = biz.매출_억;
-  const laborR = biz.노무비율_pct, matR = biz.재료비율_pct;
-  const rentR = (yr2025.임차료_억/rev*100).toFixed(1)*1;
-  const comR = (yr2025.수수료_억/rev*100).toFixed(1)*1;
-  const opR = biz.영업이익률_pct;
-  const otherR = Math.max(0,(100-matR-laborR-rentR-comR-opR)).toFixed(1)*1;
+  const biz = pl.부문별_2025?.영업본부;
+  const rev = biz?.매출_억||1;
+  const laborR = biz?.노무비율_pct||0, matR = biz?.재료비율_pct||0;
+  const rentR = yr2025 ? +(yr2025.임차료_억/rev*100).toFixed(1) : 0;
+  const comR  = yr2025 ? +(yr2025.수수료_억/rev*100).toFixed(1) : 0;
+  const opR   = biz?.영업이익률_pct||0;
+  const otherR = Math.max(0,+(100-matR-laborR-rentR-comR-opR).toFixed(1));
   if(erexPlCostChart) erexPlCostChart.destroy();
   const costCanvas = document.getElementById('chart-pl-cost');
   if(costCanvas) erexPlCostChart = new Chart(costCanvas, {
@@ -1890,11 +2143,11 @@ function renderErexPL() {
     options:{ responsive:true, plugins:{ legend:{position:'right',labels:{font:{size:9},boxWidth:10}}, tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed.toFixed(1)}%`}} } }
   });
 
-  // 부문별 비교 (영업본부 vs 컨세션)
+  // 부문별 비교
   const seg = pl.부문별_2025;
   if(erexPlSegChart) erexPlSegChart.destroy();
   const segCanvas = document.getElementById('chart-pl-segment');
-  if(segCanvas) erexPlSegChart = new Chart(segCanvas, {
+  if(seg&&segCanvas) erexPlSegChart = new Chart(segCanvas, {
     type:'bar',
     data:{ labels:['영업본부','컨세션'],
       datasets:[
@@ -1909,12 +2162,19 @@ function renderErexPL() {
 
   // 해설 메모
   const memoEl = document.getElementById('pl-memo');
+  const updates = loadPlUpdates();
+  const cur26 = updates.filter(u=>String(u.연도)==='2026');
+  const cur26Rev = cur26.reduce((s,u)=>s+(+u.매출_억||0),0);
+  const cur26Op  = cur26.reduce((s,u)=>s+(+u.영업이익_억||0),0);
+  const cur26Rate = cur26Rev>0?(cur26Op/cur26Rev*100).toFixed(1):'—';
   if(memoEl) memoEl.innerHTML = `
     <div>✅ <strong>매출 성장:</strong> 2022년 437억 → 2025년 589억, 3년간 <strong>+34.7%</strong> 성장. 코로나 이후 회복 완료 및 신규 점포 출점 효과.</div>
     <div>✅ <strong>수익성 개선:</strong> 영업이익률 2022년 <strong style="color:#c0392b">-0.8%</strong> → 2025년 <strong style="color:#1a7f4a">+5.5%</strong>. 임차료 구조 개선(85억→79억) + 매출 성장 레버리지.</div>
     <div>✅ <strong>2025년 성수기 집중:</strong> 7월(6.6억)·8월(5.4억) 영업이익 집중. 비수기(1~2월) 적자 구조는 백화점 식당가 특성상 구조적.</div>
-    <div>⚠️ <strong>컨세션 vs 영업본부:</strong> 컨세션(위탁운영) 재료비율 50.8%로 영업본부(27.7%) 대비 높음 — 단체급식 특성. 영업이익률은 양 부문 유사(4.7% vs 5.5%).</div>
-    <div>🎯 <strong>2026 목표:</strong> YTD(2월) 매출 97.9억, 영업이익 6.2억(이익률 6.3%) — 전년 동기 대비 양호. 신규점(용산·광주) 정상화 시 600억 돌파 가능.</div>`;
+    ${cur26.length ? `<div>📊 <strong>2026년 현재 (${cur26.length}개월):</strong> 누계 매출 <strong style="color:#1a56c4">${cur26Rev.toFixed(1)}억</strong>, 영업이익률 <strong style="color:${cur26Rate>='5.0'?'#1a7f4a':'#e6a817'}">${cur26Rate}%</strong></div>` : ''}
+    <div>🎯 <strong>2026 목표:</strong> 신규점(용산·광주) 정상화 + 도원점 입점 시 600억 돌파 목표. 월별 데이터 입력으로 실시간 추적하세요.</div>`;
+
+  renderPlHistory();
 }
 
 function renderDashErexPL() {
