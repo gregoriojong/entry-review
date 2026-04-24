@@ -556,6 +556,7 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
         <button class="dtab" data-etab="pipeline">📅 입점 파이프라인</button>
         <button class="dtab" data-etab="stores">🏪 기존 매장 현황</button>
         <button class="dtab" data-etab="pl">📊 손익 현황</button>
+        <button class="dtab" data-etab="market">📈 유통 시장 순위</button>
       </div>
 
       <!-- ① 브랜드 현황 -->
@@ -1134,6 +1135,130 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
         ※ 복합몰(스타필드·IFC몰·타임스퀘어) 매출은 비공개 또는 비상장으로 업계 추정치 반영
       </div>
     </div>
+
+      <!-- ⑦ 유통 시장 순위 -->
+      <div class="epanel" id="etab-market">
+        <!-- 안내 배너 -->
+        <div class="card" style="background:#f3f7ff;border-color:rgba(55,138,221,.2);margin-bottom:14px;padding:12px 16px">
+          <div style="font-size:11px;color:#1a56c4;line-height:1.9">
+            📌 <strong>입점 전략 근거 자료</strong> — 향후 신규 대형 유통사 개점이 제한적인 상황에서 <strong>기존 상위 30개 점포 중심의 입점 전략</strong> 수립을 위한 시장 현황입니다.<br>
+            ※ 출처: 어패럴뉴스, 패션비즈, KTNews, 헤럴드경제, 산업통상자원부 유통업체 매출동향 (각 연도별 표기)
+          </div>
+        </div>
+
+        <!-- KPI 요약 -->
+        <div class="krow k4" style="margin-bottom:14px">
+          <div class="kpi" style="border-left:3px solid #378ADD"><div class="kpi-l">2025년 백화점 총매출</div><div class="kpi-v" style="color:#1a56c4">40.4조</div><div class="kpi-s">65개점 합산 (+3.4% YoY)</div></div>
+          <div class="kpi" style="border-left:3px solid #1a7f4a"><div class="kpi-l">1조 클럽 점포 수</div><div class="kpi-v" style="color:#1a7f4a">13개</div><div class="kpi-s">2016년 4개 → 2025년 13개</div></div>
+          <div class="kpi" style="border-left:3px solid #9b59b6"><div class="kpi-l">1위 신세계강남 매출</div><div class="kpi-v" style="color:#6c3483">3.67조</div><div class="kpi-s">2025년 (+10.4% YoY)</div></div>
+          <div class="kpi" style="border-left:3px solid #e6a817"><div class="kpi-l">상위 13개 점유율</div><div class="kpi-v" style="color:#9a6d00">58%+</div><div class="kpi-s">양극화 심화 중</div></div>
+        </div>
+
+        <!-- 탭: 순위 추이 / 시장 전망 / 신규 출점 -->
+        <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+          <button id="mkt-tab-trend" onclick="switchMktTab('trend')" class="btn btn-bl btn-sm" style="font-size:11px">📊 순위 추이 (2016→2025)</button>
+          <button id="mkt-tab-top20" onclick="switchMktTab('top20')" class="btn btn-sm" style="font-size:11px">🏆 2024 TOP 20</button>
+          <button id="mkt-tab-1t" onclick="switchMktTab('1t')" class="btn btn-sm" style="font-size:11px">💎 1조 클럽 변화</button>
+          <button id="mkt-tab-outlook" onclick="switchMktTab('outlook')" class="btn btn-sm" style="font-size:11px">🔭 향후 5년 전망</button>
+          <button id="mkt-tab-newopen" onclick="switchMktTab('newopen')" class="btn btn-sm" style="font-size:11px">🏗 신규 출점 계획</button>
+        </div>
+
+        <!-- 패널: 순위 추이 -->
+        <div id="mkt-panel-trend" style="display:block">
+          <div class="g2" style="margin-bottom:14px">
+            <div class="card">
+              <div class="card-hd"><span class="ct">상위 점포 연도별 매출 추이 (억원)</span></div>
+              <div class="cs">출처: 어패럴뉴스 연간 점별 매출 집계 / 패션비즈 / KTNews</div>
+              <canvas id="chart-mkt-trend" height="220"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-hd"><span class="ct">전체 백화점 총매출 추이 (조원)</span></div>
+              <div class="cs">출처: 산업통상자원부 유통업체 매출동향 / 어패럴뉴스 집계</div>
+              <canvas id="chart-mkt-total" height="220"></canvas>
+            </div>
+          </div>
+          <div class="card" style="padding:14px;margin-bottom:14px">
+            <div class="ct" style="margin-bottom:8px">순위 변화 요약</div>
+            <div style="overflow-x:auto"><table id="mkt-trend-table" style="min-width:700px;font-size:11px"></table></div>
+            <div style="font-size:10px;color:#aaa;margin-top:8px">※ 출처: 어패럴뉴스 2016·2021·2023·2024·2025년 점별 매출 순위 (각 연도 보도 기준) | 일부 연도 미확인 항목은 '—' 표기</div>
+          </div>
+        </div>
+
+        <!-- 패널: TOP 20 -->
+        <div id="mkt-panel-top20" style="display:none">
+          <div class="g2" style="margin-bottom:14px">
+            <div class="card">
+              <div class="card-hd"><span class="ct">2024년 백화점 매출 TOP 20</span></div>
+              <div class="cs">출처: 어패럴뉴스·패션비즈 2024년 점별 매출 집계</div>
+              <canvas id="chart-mkt-top20" height="280"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-hd"><span class="ct">2024년 유통사별 점유율</span></div>
+              <div class="cs">출처: KTNews — 2024년 68곳 백화점 점유율</div>
+              <canvas id="chart-mkt-share" height="280"></canvas>
+            </div>
+          </div>
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="padding:12px 16px 6px"><div class="ct">2024년 TOP 20 상세</div><div class="cs">출처: 어패럴뉴스·dmitory.com·newsspace.kr (2024년 매출 6,000억 이상 20개점)</div></div>
+            <div class="tw"><table id="mkt-top20-table"></table></div>
+          </div>
+        </div>
+
+        <!-- 패널: 1조 클럽 -->
+        <div id="mkt-panel-1t" style="display:none">
+          <div class="g2" style="margin-bottom:14px">
+            <div class="card">
+              <div class="card-hd"><span class="ct">연도별 1조 클럽 점포 수 변화</span></div>
+              <div class="cs">출처: 헤럴드경제·패션비즈 — 연매출 1조 이상 점포 집계</div>
+              <canvas id="chart-mkt-1t-count" height="220"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-hd"><span class="ct">1조 클럽 vs 전체 시장 점유율</span></div>
+              <div class="cs">상위 13개점이 전체의 약 58% 차지 (2025년)</div>
+              <canvas id="chart-mkt-1t-share" height="220"></canvas>
+            </div>
+          </div>
+          <div class="card" style="padding:14px">
+            <div class="ct" style="margin-bottom:10px">💎 1조 클럽 점포 현황 (2025년 기준)</div>
+            <div id="mkt-1t-cards" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+            <div style="font-size:10px;color:#aaa;margin-top:10px">출처: 어패럴뉴스·issueon.co.kr·biz.heraldcorp.com — 2025년 점별 매출 집계 및 1조 클럽 현황</div>
+          </div>
+        </div>
+
+        <!-- 패널: 향후 5년 전망 -->
+        <div id="mkt-panel-outlook" style="display:none">
+          <div class="card" style="margin-bottom:14px;padding:14px">
+            <div class="ct" style="margin-bottom:12px">🔭 2025~2030 시장 전망</div>
+            <div class="g2">
+              <canvas id="chart-mkt-outlook" height="220"></canvas>
+              <div>
+                <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#1a56c4">핵심 전망 포인트</div>
+                <div id="mkt-outlook-points" style="font-size:11px;line-height:2"></div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:#aaa;margin-top:10px">출처: ceoscoredaily.com (2026 백화점 전망) / ktnews.com (2025년 시장 양극화) / etnews.com (e커머스 역전)</div>
+          </div>
+          <div class="card" style="padding:14px">
+            <div class="ct" style="margin-bottom:10px">📌 입점 전략 시사점</div>
+            <div id="mkt-strategy-points" style="font-size:12px;line-height:2.2"></div>
+          </div>
+        </div>
+
+        <!-- 패널: 신규 출점 계획 -->
+        <div id="mkt-panel-newopen" style="display:none">
+          <div class="card" style="padding:14px;margin-bottom:14px">
+            <div class="ct" style="margin-bottom:10px">🏗 2025~2030 신규 출점 계획</div>
+            <div class="tw"><table id="mkt-newopen-table"></table></div>
+            <div style="font-size:10px;color:#aaa;margin-top:8px">출처: getnews.co.kr (현대백화점 2026 주총 신규 출점 계획) / ceoscoredaily.com (2026 백화점 전망) / 각사 IR·공시</div>
+          </div>
+          <div class="card" style="padding:14px">
+            <div class="ct" style="margin-bottom:8px">폐점 이력 (2020~2024)</div>
+            <div class="tw"><table id="mkt-close-table"></table></div>
+            <div style="font-size:10px;color:#aaa;margin-top:8px">※ 신규 출점 일정은 건설·허가 지연으로 실제 오픈일과 차이 발생 가능</div>
+          </div>
+        </div>
+
+      </div><!-- /etab-market -->
 
   </div><!-- /panels -->
 </main>
@@ -1772,6 +1897,7 @@ let erexStatusChart, erexCatChart, erexChannelChart, erexPriorityChart;
 let erexStoreRevChart, erexStoreEffChart;
 let scmpMixedChart, scmpRadarChart;
 let scmpSelectedIds = new Set();
+let mktTrendChart, mktTotalChart, mktTop20Chart, mktShareChart, mkt1tCountChart, mkt1tShareChart, mktOutlookChart;
 let erexPlAnnualChart, erexPlMonthlyChart, erexPlCostChart, erexPlSegChart;
 let dashErexPlChart;
 
@@ -1829,6 +1955,7 @@ function renderErexPanel() {
   renderErexCharts();
   renderErexStores();
   renderErexPL();
+  renderMktMarket();
 }
 
 function renderErexBrands() {
@@ -2565,6 +2692,344 @@ function exportPlJSON() {
   a.click(); URL.revokeObjectURL(url);
 }
 
+// ─────────────────────────────────────────────
+//  유통 시장 순위 (Market Ranking)
+// ─────────────────────────────────────────────
+const MKT_RANK_DATA = {
+  stores: [
+    { rank24:1,  name:'신세계 강남',    chain:'신세계', area:'서울 강남',  s2016:14637, s2021:24940, s2023:30680, s2024:33269, s2025:36717 },
+    { rank24:2,  name:'롯데 잠실',      chain:'롯데',   area:'서울 송파',  s2016:10931, s2021:17973, s2023:27569, s2024:30551, s2025:33010 },
+    { rank24:3,  name:'신세계 센텀시티', chain:'신세계', area:'부산 해운대', s2016:10039, s2021:15664, s2023:20051, s2024:21081, s2025:22300 },
+    { rank24:4,  name:'롯데 본점',      chain:'롯데',   area:'서울 중구',  s2016:18600, s2021:16670, s2023:20129, s2024:20596, s2025:21805 },
+    { rank24:5,  name:'현대 판교',      chain:'현대',   area:'경기 성남',  s2016:7294,  s2021:12413, s2023:16670, s2024:17314, s2025:20291 },
+    { rank24:6,  name:'신세계 대구',    chain:'신세계', area:'대구 동구',  s2016:null,  s2021:11939, s2023:14982, s2024:15744, s2025:null  },
+    { rank24:7,  name:'현대 무역센터',  chain:'현대',   area:'서울 강남',  s2016:null,  s2021:10860, s2023:12608, s2024:12658, s2025:null  },
+    { rank24:8,  name:'신세계 본점',    chain:'신세계', area:'서울 중구',  s2016:null,  s2021:null,  s2023:11452, s2024:12138, s2025:null  },
+    { rank24:9,  name:'현대 압구정',    chain:'현대',   area:'서울 강남',  s2016:null,  s2021:10809, s2023:11860, s2024:12019, s2025:null  },
+    { rank24:10, name:'더현대 서울',    chain:'현대',   area:'서울 영등포', s2016:null, s2021:6700,  s2023:11085, s2024:11994, s2025:null  },
+    { rank24:11, name:'롯데 부산본점',  chain:'롯데',   area:'부산 부산진', s2016:null, s2021:10725, s2023:12092, s2024:11847, s2025:null  },
+    { rank24:12, name:'갤러리아 명품관', chain:'갤러리아', area:'서울 강남', s2016:null, s2021:10587, s2023:11406, s2024:11725, s2025:null  },
+    { rank24:13, name:'신세계 대전',    chain:'신세계', area:'대전 유성',  s2016:null,  s2021:null,  s2023:9463,  s2024:9710,  s2025:10000 },
+    { rank24:14, name:'신세계 광주',    chain:'신세계', area:'광주 서구',  s2016:null,  s2021:null,  s2023:8233,  s2024:8100,  s2025:null  },
+    { rank24:15, name:'롯데 인천',      chain:'롯데',   area:'인천 남동',  s2016:null,  s2021:null,  s2023:7527,  s2024:7891,  s2025:null  },
+    { rank24:16, name:'신세계 사우스시티',chain:'신세계',area:'경기 수원', s2016:null,  s2021:null,  s2023:6641,  s2024:6595,  s2025:null  },
+    { rank24:17, name:'갤러리아 타임월드',chain:'갤러리아',area:'대전 서구',s2016:null, s2021:null, s2023:6766,  s2024:6265,  s2025:null  },
+    { rank24:18, name:'신세계 타임스퀘어',chain:'신세계',area:'서울 영등포',s2016:null, s2021:null, s2023:6464,  s2024:6237,  s2025:null  },
+    { rank24:19, name:'현대 목동',      chain:'현대',   area:'서울 양천',  s2016:null,  s2021:null,  s2023:6536,  s2024:6096,  s2025:null  },
+    { rank24:20, name:'더현대 대구',    chain:'현대',   area:'대구 북구',  s2016:null,  s2021:null,  s2023:null,  s2024:6072,  s2025:null  },
+  ],
+  totalMarket: [
+    { year:'2016', sales:29.0, growth:4.2, stores:69 },
+    { year:'2017', sales:29.5, growth:1.7, stores:70 },
+    { year:'2018', sales:30.3, growth:2.7, stores:70 },
+    { year:'2019', sales:30.8, growth:1.7, stores:70 },
+    { year:'2020', sales:27.9, growth:-6.3, stores:70 },
+    { year:'2021', sales:34.0, growth:21.9, stores:70 },
+    { year:'2022', sales:39.2, growth:15.3, stores:69 },
+    { year:'2023', sales:39.6, growth:1.0, stores:70 },
+    { year:'2024', sales:39.5, growth:0.6, stores:68 },
+    { year:'2025', sales:40.4, growth:3.4, stores:65 },
+  ],
+  trillion1Club: [
+    { year:'2016', count:4,  names:'롯데본점·잠실, 신세계강남·센텀' },
+    { year:'2018', count:4,  names:'동일 구성 유지' },
+    { year:'2019', count:5,  names:'롯데 부산본점 첫 진입' },
+    { year:'2020', count:5,  names:'코로나로 정체' },
+    { year:'2021', count:11, names:'보복소비로 현대판교·신세계대구 등 대거 진입' },
+    { year:'2022', count:12, names:'명품 소비 호황 지속' },
+    { year:'2023', count:12, names:'신세계 강남 첫 3조 돌파' },
+    { year:'2024', count:12, names:'롯데 잠실 3조 합류, 양극화 심화' },
+    { year:'2025', count:13, names:'신세계 대전 신규 진입, 현대 판교 2조 돌파' },
+  ],
+  trillion1Stores: [
+    { name:'신세계 강남',    s2025:36717, chain:'신세계' },
+    { name:'롯데 잠실',      s2025:33010, chain:'롯데'   },
+    { name:'신세계 센텀시티', s2025:22300, chain:'신세계' },
+    { name:'롯데 본점',      s2025:21805, chain:'롯데'   },
+    { name:'현대 판교',      s2025:20291, chain:'현대'   },
+    { name:'신세계 대구',    s2025:15744, chain:'신세계' },
+    { name:'현대 무역센터',  s2025:12658, chain:'현대'   },
+    { name:'신세계 본점',    s2025:12138, chain:'신세계' },
+    { name:'현대 압구정',    s2025:12019, chain:'현대'   },
+    { name:'더현대 서울',    s2025:11994, chain:'현대'   },
+    { name:'롯데 부산본점',  s2025:11847, chain:'롯데'   },
+    { name:'갤러리아 명품관', s2025:11725, chain:'갤러리아'},
+    { name:'신세계 대전',    s2025:10000, chain:'신세계' },
+  ],
+  newOpen: [
+    { chain:'롯데',   name:'롯데몰 송도',            year:2025, type:'복합몰', region:'인천 연수' },
+    { chain:'롯데',   name:'롯데프리미엄아울렛 울산',  year:2025, type:'아울렛', region:'울산'     },
+    { chain:'현대',   name:'현대시티아울렛 청주',      year:2025, type:'아울렛', region:'충북 청주' },
+    { chain:'롯데',   name:'롯데몰 대구',             year:2026, type:'복합몰', region:'대구'     },
+    { chain:'현대',   name:'더현대 부산(에코델타)',    year:2027, type:'백화점', region:'부산 강서' },
+    { chain:'현대',   name:'프리미엄아울렛 경산',      year:2028, type:'아울렛', region:'경북 경산' },
+    { chain:'신세계', name:'신세계 광주 확장',         year:2028, type:'백화점', region:'광주 서구' },
+    { chain:'현대',   name:'더현대 광주',             year:2029, type:'백화점', region:'광주'     },
+    { chain:'신세계', name:'신세계 수서',              year:2029, type:'백화점', region:'서울 강남' },
+    { chain:'신세계', name:'신세계 송도',              year:2030, type:'백화점', region:'인천 연수' },
+  ],
+  closed: [
+    { chain:'갤러리아', name:'갤러리아 수원',   year:2020 },
+    { chain:'롯데',     name:'롯데 청주',       year:2020 },
+    { chain:'롯데',     name:'롯데 마산',       year:2024 },
+    { chain:'현대',     name:'현대 부산',       year:2024 },
+  ]
+};
+
+const MKT_CHAIN_COLOR = { '신세계':'#1a56c4','롯데':'#c0392b','현대':'#1a7f4a','갤러리아':'#9b59b6','AK':'#e6a817' };
+function mktChainColor(c){ return MKT_CHAIN_COLOR[c] || '#888'; }
+
+function switchMktTab(tab) {
+  ['trend','top20','1t','outlook','newopen'].forEach(t=>{
+    document.getElementById('mkt-panel-'+t).style.display = t===tab?'block':'none';
+    const btn = document.getElementById('mkt-tab-'+t);
+    if(btn){ btn.classList.toggle('btn-bl',t===tab); }
+  });
+  // 패널이 visible 된 후 해당 차트 렌더
+  const renderMap = { trend: renderMktTrend, top20: renderMktTop20, '1t': renderMkt1t, outlook: renderMktOutlook, newopen: renderMktNewOpen };
+  if(renderMap[tab]) renderMap[tab]();
+}
+
+function renderMktMarket() {
+  switchMktTab('trend'); // 첫 진입 시 trend 탭으로 시작 (visible 상태에서 차트 생성)
+}
+
+function renderMktTrend() {
+  // 추이 차트 — 상위 6개 점포
+  const top6 = MKT_RANK_DATA.stores.slice(0,6);
+  const years = ['2016','2021','2023','2024','2025'];
+  const ykeys = { '2016':'s2016','2021':'s2021','2023':'s2023','2024':'s2024','2025':'s2025' };
+  const CHAIN_COLORS = ['#1a56c4','#c0392b','#1a56c4','#c0392b','#1a7f4a','#1a56c4'];
+  if(mktTrendChart) mktTrendChart.destroy();
+  const c = document.getElementById('chart-mkt-trend');
+  if(c) mktTrendChart = new Chart(c, {
+    type:'line',
+    data:{ labels:years,
+      datasets: top6.map((s,i)=>({
+        label: s.name,
+        data: years.map(y=>s[ykeys[y]]||null),
+        borderColor: mktChainColor(s.chain),
+        backgroundColor: mktChainColor(s.chain)+'22',
+        borderWidth:2, tension:0.35, pointRadius:4,
+        borderDash: i>=3?[5,3]:[],
+        spanGaps:true
+      }))
+    },
+    options:{ responsive:true,
+      plugins:{ legend:{labels:{font:{size:9},boxWidth:12}}, tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y?.toLocaleString()||'—'}억`}} },
+      scales:{ x:{ticks:{font:{size:9}}}, y:{ticks:{callback:v=>v>=10000?`${(v/10000).toFixed(1)}조`:`${v}억`,font:{size:9}},grid:{color:'rgba(0,0,0,.04)'}} }
+    }
+  });
+
+  // 전체 총매출 추이
+  if(mktTotalChart) mktTotalChart.destroy();
+  const c2 = document.getElementById('chart-mkt-total');
+  const tm = MKT_RANK_DATA.totalMarket;
+  if(c2) mktTotalChart = new Chart(c2, {
+    type:'bar',
+    data:{ labels:tm.map(d=>d.year),
+      datasets:[
+        { label:'총매출(조원)', data:tm.map(d=>d.sales), backgroundColor:tm.map(d=>d.growth<0?'#fde8e8':'rgba(55,138,221,.7)'), borderRadius:4, yAxisID:'y' },
+        { type:'line', label:'증감률(%)', data:tm.map(d=>d.growth), borderColor:'#e6a817', pointBackgroundColor:tm.map(d=>d.growth<0?'#c0392b':'#1a7f4a'), borderWidth:2, tension:0.3, yAxisID:'y2' }
+      ]
+    },
+    options:{ responsive:true,
+      plugins:{ legend:{labels:{font:{size:9}}}, tooltip:{callbacks:{label:ctx=>ctx.dataset.yAxisID==='y'?`${ctx.parsed.y}조원`:`${ctx.parsed.y}%`}} },
+      scales:{ x:{ticks:{font:{size:9}},grid:{display:false}}, y:{ticks:{callback:v=>v+'조',font:{size:9}}}, y2:{position:'right',ticks:{callback:v=>v+'%',font:{size:9}},grid:{display:false}} }
+    }
+  });
+
+  // 순위 변화 테이블
+  const el = document.getElementById('mkt-trend-table');
+  if(el) el.innerHTML = `
+    <thead><tr style="background:#f5f7fa">
+      <th style="text-align:left;font-size:11px">점포명</th><th>유통사</th><th>지역</th>
+      <th style="text-align:center;color:#555">2016</th><th style="text-align:center;color:#555">2021</th><th style="text-align:center;color:#555">2023</th>
+      <th style="text-align:center;color:#1a56c4;font-weight:700">2024</th><th style="text-align:center;color:#1a7f4a">2025(추정)</th>
+      <th style="text-align:center">2016→2024<br>증감</th>
+    </tr></thead>
+    <tbody>${MKT_RANK_DATA.stores.map((s,i)=>{
+      const chg = s.s2016&&s.s2024 ? Math.round((s.s2024/s.s2016-1)*100) : null;
+      const fmt = v=>v?`<strong>${(v/10000).toFixed(1)}조</strong><span style="font-size:9px;color:#aaa">(${(v/100).toFixed(0)}억)</span>`:'<span style="color:#ddd">—</span>';
+      return `<tr>
+        <td style="font-weight:600">${i+1}. ${s.name}</td>
+        <td><span style="background:${mktChainColor(s.chain)}22;color:${mktChainColor(s.chain)};padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700">${s.chain}</span></td>
+        <td style="font-size:10px;color:#888">${s.area}</td>
+        <td style="text-align:center;font-size:11px">${fmt(s.s2016)}</td>
+        <td style="text-align:center;font-size:11px">${fmt(s.s2021)}</td>
+        <td style="text-align:center;font-size:11px">${fmt(s.s2023)}</td>
+        <td style="text-align:center;font-size:11px;background:#f0f6ff">${fmt(s.s2024)}</td>
+        <td style="text-align:center;font-size:11px;background:#f0fbf5">${fmt(s.s2025)}</td>
+        <td style="text-align:center;font-size:11px;font-weight:700;color:${chg>0?'#1a7f4a':'#888'}">${chg!=null?(chg>0?'+':'')+chg+'%':'—'}</td>
+      </tr>`;
+    }).join('')}</tbody>`;
+}
+
+function renderMktTop20() {
+  const stores = MKT_RANK_DATA.stores;
+  const colors = stores.map(s=>mktChainColor(s.chain));
+  if(mktTop20Chart) mktTop20Chart.destroy();
+  const c = document.getElementById('chart-mkt-top20');
+  if(c) mktTop20Chart = new Chart(c, {
+    type:'bar',
+    data:{ labels:stores.map(s=>s.name.replace('신세계 ','SS ').replace('롯데 ','L ').replace('현대 ','H ').replace('갤러리아 ','G ')),
+      datasets:[{ label:'2024 매출(억원)', data:stores.map(s=>s.s2024), backgroundColor:colors.map(c=>c+'cc'), borderRadius:4 }]
+    },
+    options:{ indexAxis:'y', responsive:true,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${(ctx.parsed.x/10000).toFixed(2)}조원`}} },
+      scales:{ x:{ticks:{callback:v=>v>=10000?`${(v/10000).toFixed(1)}조`:`${(v/100)}억`,font:{size:9}}}, y:{ticks:{font:{size:9}}} }
+    }
+  });
+
+  // 점유율 도넛
+  const chainMap = {};
+  stores.forEach(s=>{ if(s.s2024) chainMap[s.chain]=(chainMap[s.chain]||0)+s.s2024; });
+  if(mktShareChart) mktShareChart.destroy();
+  const c2 = document.getElementById('chart-mkt-share');
+  const chainEntries = Object.entries(chainMap).sort((a,b)=>b[1]-a[1]);
+  if(c2) mktShareChart = new Chart(c2, {
+    type:'doughnut',
+    data:{ labels:chainEntries.map(e=>e[0]),
+      datasets:[{ data:chainEntries.map(e=>e[1]), backgroundColor:chainEntries.map(e=>mktChainColor(e[0])+'cc'), borderWidth:2 }]
+    },
+    options:{ responsive:true, plugins:{ legend:{labels:{font:{size:10}}}, tooltip:{callbacks:{label:ctx=>`${(ctx.parsed/10000).toFixed(1)}조원 (${ctx.label})`}} } }
+  });
+
+  // TOP20 상세 테이블
+  const el = document.getElementById('mkt-top20-table');
+  if(el) el.innerHTML = `
+    <thead><tr style="background:#f5f7fa">
+      <th>순위</th><th>유통사</th><th>점포명</th><th>지역</th>
+      <th style="text-align:right">2024 매출(억)</th><th style="text-align:right">2023 매출</th><th style="text-align:center">증감률</th>
+    </tr></thead>
+    <tbody>${stores.map((s,i)=>{
+      const chg = s.s2023&&s.s2024?((s.s2024/s.s2023-1)*100).toFixed(1):null;
+      return `<tr>
+        <td style="text-align:center;font-weight:700">${i+1}</td>
+        <td><span style="background:${mktChainColor(s.chain)}22;color:${mktChainColor(s.chain)};padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700">${s.chain}</span></td>
+        <td style="font-weight:600">${s.name}</td>
+        <td style="font-size:11px;color:#888">${s.area}</td>
+        <td style="text-align:right;font-weight:700;color:#1a56c4">${s.s2024?s.s2024.toLocaleString():'—'}</td>
+        <td style="text-align:right;color:#888;font-size:11px">${s.s2023?s.s2023.toLocaleString():'—'}</td>
+        <td style="text-align:center;font-weight:700;color:${chg>0?'#1a7f4a':chg<0?'#c0392b':'#888'}">${chg!=null?(chg>0?'+':'')+chg+'%':'—'}</td>
+      </tr>`;
+    }).join('')}</tbody>`;
+}
+
+function renderMkt1t() {
+  const data = MKT_RANK_DATA.trillion1Club;
+  if(mkt1tCountChart) mkt1tCountChart.destroy();
+  const c = document.getElementById('chart-mkt-1t-count');
+  if(c) mkt1tCountChart = new Chart(c, {
+    type:'bar',
+    data:{ labels:data.map(d=>d.year),
+      datasets:[{ label:'1조 클럽 점포 수', data:data.map(d=>d.count),
+        backgroundColor:data.map(d=>d.count>=12?'#1a56c4cc':d.count>=8?'#378ADD99':'#a8c8f0'), borderRadius:5 }]
+    },
+    options:{ responsive:true,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}개 점포 | ${data[ctx.dataIndex].names}`}} },
+      scales:{ x:{ticks:{font:{size:9}},grid:{display:false}}, y:{ticks:{stepSize:2,font:{size:9}},max:16} }
+    }
+  });
+
+  // 점유율 비교
+  if(mkt1tShareChart) mkt1tShareChart.destroy();
+  const c2 = document.getElementById('chart-mkt-1t-share');
+  const topSales = MKT_RANK_DATA.trillion1Stores.reduce((s,x)=>s+x.s2025,0);
+  const totalSales = 40.4 * 10000;
+  if(c2) mkt1tShareChart = new Chart(c2, {
+    type:'doughnut',
+    data:{ labels:['1조 클럽 13개점','그 외 52개점'],
+      datasets:[{ data:[topSales, totalSales-topSales], backgroundColor:['#1a56c4cc','#e0e7f5'], borderWidth:2 }]
+    },
+    options:{ responsive:true,
+      plugins:{ legend:{labels:{font:{size:10}}}, tooltip:{callbacks:{label:ctx=>`${(ctx.parsed/10000).toFixed(1)}조원 (${((ctx.parsed/totalSales)*100).toFixed(1)}%)`}} }
+    }
+  });
+
+  // 1조 클럽 카드
+  const el = document.getElementById('mkt-1t-cards');
+  if(el) el.innerHTML = MKT_RANK_DATA.trillion1Stores.map((s,i)=>`
+    <div style="background:${mktChainColor(s.chain)}11;border:1.5px solid ${mktChainColor(s.chain)}44;border-radius:9px;padding:10px 14px;min-width:140px">
+      <div style="font-size:10px;font-weight:700;color:${mktChainColor(s.chain)};margin-bottom:2px">#${i+1} ${s.chain}</div>
+      <div style="font-size:12px;font-weight:700;color:#1a2340">${s.name}</div>
+      <div style="font-size:13px;font-weight:800;color:#1a56c4;margin-top:4px">${(s.s2025/10000).toFixed(2)}조</div>
+      <div style="font-size:9px;color:#aaa">(${s.s2025.toLocaleString()}억)</div>
+    </div>`).join('');
+}
+
+function renderMktOutlook() {
+  // 2025~2030 전망
+  const outlook = [
+    { year:'2025', sales:40.4, type:'실적' },
+    { year:'2026', sales:41.2, type:'전망' },
+    { year:'2027', sales:42.1, type:'전망' },
+    { year:'2028', sales:43.0, type:'전망' },
+    { year:'2029', sales:43.8, type:'전망' },
+    { year:'2030', sales:44.5, type:'전망' },
+  ];
+  if(mktOutlookChart) mktOutlookChart.destroy();
+  const c = document.getElementById('chart-mkt-outlook');
+  if(c) mktOutlookChart = new Chart(c, {
+    type:'bar',
+    data:{ labels:outlook.map(d=>d.year),
+      datasets:[{ label:'총매출 전망(조원)', data:outlook.map(d=>d.sales),
+        backgroundColor:outlook.map(d=>d.type==='실적'?'rgba(55,138,221,.8)':'rgba(55,138,221,.35)'),
+        borderRadius:5 }]
+    },
+    options:{ responsive:true,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}조원 (${outlook[ctx.dataIndex].type})`}} },
+      scales:{ x:{ticks:{font:{size:9}},grid:{display:false}}, y:{min:38,ticks:{callback:v=>v+'조',font:{size:9}}} }
+    }
+  });
+
+  const pts = document.getElementById('mkt-outlook-points');
+  if(pts) pts.innerHTML = [
+    '📌 신규 대형 백화점 출점 <strong>거의 없음</strong> — 향후 5년 신규 백화점 4~5개 수준, 대부분 지방 소규모',
+    '📈 상위 13개 1조 클럽 <strong>점유율 지속 확대</strong> — 2030년 전체의 60%+ 예상',
+    '⚡ 더현대 서울·현대 판교 중심 <strong>MZ 집객 포맷</strong>이 시장 견인',
+    '🏪 하위 점포 <strong>추가 폐점</strong> 가능성 — 경쟁력 없는 지방 중소 점포',
+    '🛒 e커머스 성장 속 백화점은 <strong>체험·다이닝 강화</strong>로 차별화',
+    '🍴 F&B 비중 <strong>지속 상승</strong> — 리테일 축소 공간에 식음 확장 흐름',
+  ].map(p=>`<div style="margin-bottom:4px">• ${p}</div>`).join('');
+
+  const sp = document.getElementById('mkt-strategy-points');
+  if(sp) sp.innerHTML = [
+    ['🎯 핵심 타깃', '1조 클럽 13개 점포 집중 공략 — 전체 시장의 58% 집중, 집객력 안정적'],
+    ['📍 우선순위 점포', '신세계강남·롯데잠실 (3조↑) → 신세계센텀·롯데본점 (2조↑) → 현대판교·신세계대구 (1.5조↑)'],
+    ['⚡ 성장 유망', '더현대서울 (2021년 개점 후 매년 +10%↑, MZ·체험형) / 현대판교 (+17.2%)'],
+    ['⚠️ 입점 어려운 점포', '갤러리아 명품관 (럭셔리 중심, F&B 진입장벽 최상) / 현대 압구정 (VIP 고령화)'],
+    ['🏗 신규 입점 기회', '더현대 부산(2027), 더현대 광주(2029), 신세계 수서(2029) — 초기 입점 우선권 확보 전략 검토'],
+    ['📊 데이터 근거', '어패럴뉴스 2024·2025년 점별 매출 집계 / 산업통상자원부 유통업체 매출동향'],
+  ].map(([k,v])=>`<div style="margin-bottom:6px"><span style="font-weight:700;color:#1a56c4">${k}</span> — ${v}</div>`).join('');
+}
+
+function renderMktNewOpen() {
+  const el = document.getElementById('mkt-newopen-table');
+  if(el) el.innerHTML = `
+    <thead><tr style="background:#f5f7fa"><th>유통사</th><th>점포명</th><th>예정 연도</th><th>유형</th><th>지역</th><th>입점 전략 포인트</th></tr></thead>
+    <tbody>${MKT_RANK_DATA.newOpen.map(s=>{
+      const note = s.year<=2026?'🟢 초기 입점 협의 시작 권장':s.year<=2028?'🟡 2~3년 전 사전 접촉':' 🔵 중장기 파이프라인';
+      return `<tr>
+        <td><span style="background:${mktChainColor(s.chain)}22;color:${mktChainColor(s.chain)};padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700">${s.chain}</span></td>
+        <td style="font-weight:600">${s.name}</td>
+        <td style="text-align:center;font-weight:700;color:${s.year<=2026?'#1a7f4a':s.year<=2028?'#e6a817':'#555'}">${s.year}년</td>
+        <td style="text-align:center"><span style="background:#f0f0f0;border-radius:4px;padding:1px 6px;font-size:10px">${s.type}</span></td>
+        <td style="font-size:11px;color:#888">${s.region}</td>
+        <td style="font-size:11px">${note}</td>
+      </tr>`;
+    }).join('')}</tbody>`;
+
+  const cl = document.getElementById('mkt-close-table');
+  if(cl) cl.innerHTML = `
+    <thead><tr style="background:#f5f7fa"><th>유통사</th><th>점포명</th><th>폐점 연도</th></tr></thead>
+    <tbody>${MKT_RANK_DATA.closed.map(s=>`
+      <tr><td><span style="background:${mktChainColor(s.chain)}22;color:${mktChainColor(s.chain)};padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700">${s.chain}</span></td>
+      <td style="text-decoration:line-through;color:#aaa">${s.name}</td><td style="text-align:center;color:#c0392b">${s.year}</td></tr>
+    `).join('')}</tbody>`;
+}
+
+// ─────────────────────────────────────────────
 function renderErexPL() {
   if(!erexData || !erexData.pl) return;
   const { pl } = erexData;
@@ -2932,6 +3397,12 @@ document.querySelectorAll('[data-etab]').forEach(el=>{
     el.classList.add('active');
     document.querySelectorAll('.epanel').forEach(x=>x.classList.remove('active'));
     document.getElementById('etab-'+t).classList.add('active');
+    // 유통 시장 순위 탭: 패널이 visible 상태가 된 후 차트 재렌더
+    if(t === 'market') setTimeout(()=>renderMktMarket(), 50);
+    // P&L 탭: 차트 resize
+    if(t === 'pl') setTimeout(()=>{
+      [erexPlYearChart,erexPlMonthChart,erexPlSegChart,erexPlSegMonthChart].forEach(c=>c&&c.resize&&c.resize());
+    }, 50);
   });
 });
 
