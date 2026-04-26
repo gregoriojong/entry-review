@@ -1180,6 +1180,7 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
           <button id="mkt-tab-outlook" onclick="switchMktTab('outlook')" class="btn btn-sm" style="font-size:11px">🔭 향후 5년 전망</button>
           <button id="mkt-tab-newopen" onclick="switchMktTab('newopen')" class="btn btn-sm" style="font-size:11px">🏗 신규 출점 계획</button>
           <button id="mkt-tab-lotte" onclick="switchMktTab('lotte')" class="btn btn-sm" style="font-size:11px;border:1.5px solid #c0392b;color:#c0392b;font-weight:700">🏬 롯데 강남·본점 분석</button>
+          <button id="mkt-tab-compare" onclick="switchMktTab('compare')" class="btn btn-sm" style="font-size:11px;border:1.5px solid #1a56c4;color:#1a56c4;font-weight:700">🔍 강남점 vs 사우스시티 비교</button>
         </div>
 
         <!-- 패널: 순위 추이 -->
@@ -1419,6 +1420,207 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
           </div>
 
         </div><!-- /mkt-panel-lotte -->
+
+        <!-- ════ 비교분석: 롯데 강남점 vs 신세계 사우스시티 ════ -->
+        <div id="mkt-panel-compare" style="display:none">
+
+          <!-- 안내 배너 -->
+          <div class="card" style="background:#eff4fd;border-color:rgba(26,86,196,.25);padding:11px 16px;margin-bottom:12px">
+            <div style="font-size:11px;color:#1a3c8a;line-height:1.9">
+              🔍 <strong>입점검토 비교분석</strong> — 롯데백화점 강남점(대치동) vs 신세계 사우스시티(용인 죽전동) 입지·매출·F&B·상권 종합 비교<br>
+              실적 출처: 어패럴뉴스 연간 점별 매출 집계·패션비즈·산업통상자원부 유통업체 매출동향 | 전망: 업계 CAGR + 리뉴얼 효과 반영 추정값<br>
+              ⚠ 2026년 이후 수치는 <strong>참고용 전망값</strong> — 리뉴얼 확정·시장 변동 시 재검토 필요
+            </div>
+          </div>
+
+          <!-- KPI 4개 -->
+          <div class="krow k4" style="margin-bottom:12px">
+            <div class="kpi" style="border-left:3px solid #1a56c4">
+              <div class="kpi-l">2024 매출 격차</div>
+              <div class="kpi-v blu">3.4배</div>
+              <div class="kpi-s">사우스시티 6,406억 vs 강남점 1,885억</div>
+            </div>
+            <div class="kpi" style="border-left:3px solid #1a7f4a">
+              <div class="kpi-l">영업면적 비교</div>
+              <div class="kpi-v up">2.4배</div>
+              <div class="kpi-s">사우스시티 16,000평 vs 강남점 6,800평</div>
+            </div>
+            <div class="kpi" style="border-left:3px solid #e6a817">
+              <div class="kpi-l">F&B 매출 비중 (2024)</div>
+              <div class="kpi-v" style="color:#9a6d00">31% vs 23%</div>
+              <div class="kpi-s">강남점 식품 의존형 vs 사우스시티 균형형</div>
+            </div>
+            <div class="kpi" style="border-left:3px solid #888">
+              <div class="kpi-l">전국 순위 (2024)</div>
+              <div class="kpi-v" style="color:#888">16위 vs 50위</div>
+              <div class="kpi-s">사우스시티 16위 vs 강남점 50위</div>
+            </div>
+          </div>
+
+          <!-- 입지 조건 비교 -->
+          <div class="g2" style="margin-bottom:14px">
+            <!-- 롯데 강남점 -->
+            <div class="card" style="border-top:3px solid #c0392b;padding:14px">
+              <div class="ct" style="color:#c0392b;margin-bottom:10px">🏬 롯데백화점 강남점 (대치동)</div>
+              <table style="width:100%;font-size:11px">
+                <tr><td style="color:#aaa;padding:4px 0;width:38%">위치</td><td style="padding:4px 0">서울 강남구 대치동 944-31</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">개점</td><td style="padding:4px 0">2000년 9월 (구 그랜드백화점 인수)</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">영업면적</td><td style="padding:4px 0">약 6,800평 (B1~8F)</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">교통</td><td style="padding:4px 0">3호선 대치역 5분 / 9호선 언주역 10분</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">호재</td><td style="padding:4px 0">GTX-A 삼성역 접근 / 영동대로 복합개발</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">배후상권</td><td style="padding:4px 0">대치동 학원가(국내 최대) / 도곡·개포 아파트</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">주고객</td><td style="padding:4px 0">40~60대 고소득 지역 주민</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">일 방문객</td><td style="padding:4px 0">약 12,000명 (추정)</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">경쟁점</td><td style="padding:4px 0">신세계 강남(반포) / 현대 무역센터·압구정 / 갤러리아 명품관</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">리뉴얼</td><td style="padding:4px 0"><span style="color:#c0392b;font-weight:700">무기한 연기</span> (예산·우선순위 문제)</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">F&B 특성</td><td style="padding:4px 0">식품관·식당가 의존형 / 학원가 수요 흡수</td></tr>
+              </table>
+            </div>
+            <!-- 신세계 사우스시티 -->
+            <div class="card" style="border-top:3px solid #1a56c4;padding:14px">
+              <div class="ct" style="color:#1a56c4;margin-bottom:10px">🏙 신세계 사우스시티 (용인 죽전동)</div>
+              <table style="width:100%;font-size:11px">
+                <tr><td style="color:#aaa;padding:4px 0;width:38%">위치</td><td style="padding:4px 0">경기도 용인시 수지구 죽전동</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">개점</td><td style="padding:4px 0">2007년 3월 (2024.08 사우스시티 브랜드 변경)</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">영업면적</td><td style="padding:4px 0">약 16,000평 (복합몰 형태)</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">교통</td><td style="padding:4px 0">분당선 죽전역 직접 연결 / 용인-서울 고속도로</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">호재</td><td style="padding:4px 0">수지·죽전 신규 아파트 공급 지속 / 스타필드마켓 죽전 시너지</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">배후상권</td><td style="padding:4px 0">수지구+분당구+기흥구 약 100만 세대</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">주고객</td><td style="padding:4px 0">30~40대 가족, 젊은 부부, 단국대 대학생</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">일 방문객</td><td style="padding:4px 0">약 35,000명 (추정)</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">경쟁점</td><td style="padding:4px 0">갤러리아 광교 / 현대 판교 / AK플라자 분당 / 스타필드 수원</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">리뉴얼</td><td style="padding:4px 0"><span style="color:#1a7f4a;font-weight:700">브랜드 리뉴얼 완료</span> (2024.08 사우스시티 전환)</td></tr>
+                <tr><td style="color:#aaa;padding:4px 0">F&B 특성</td><td style="padding:4px 0">가족형 외식 강세 / 스타 셰프 협업 팝업 확대</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- ① 매출 추이 비교 차트 -->
+          <div class="card" style="padding:14px;margin-bottom:14px;border-top:3px solid #1a56c4">
+            <div class="card-hd"><span class="ct" style="color:#1a56c4">① 연도별 매출 추이 비교 (억원, 2021~2030)</span></div>
+            <div class="cs" style="margin-bottom:10px">실적(2021~2024) + 전망(2025~2030) | 강남점 2026~은 리뉴얼 기본 시나리오 적용 | 출처: 어패럴뉴스·패션비즈·산업부</div>
+            <canvas id="chart-cmp-sales" height="200"></canvas>
+            <div style="font-size:10px;color:#888;margin-top:6px;display:flex;gap:16px;flex-wrap:wrap">
+              <span>■ <span style="color:#c0392b">롯데 강남점 실적</span> / <span style="color:#f1948a">강남점 전망</span></span>
+              <span>■ <span style="color:#1a56c4">사우스시티 실적</span> / <span style="color:#85c1e9">사우스시티 전망</span></span>
+              <span style="color:#aaa">점선: 실적→전망 전환 경계 (2025)</span>
+            </div>
+          </div>
+
+          <!-- ② 순위 추이 비교 차트 -->
+          <div class="card" style="padding:14px;margin-bottom:14px;border-top:3px solid #9b59b6">
+            <div class="card-hd"><span class="ct" style="color:#6c3483">② 전국 백화점 순위 추이 (낮을수록 상위, 2021~2030)</span></div>
+            <div class="cs" style="margin-bottom:10px">전국 약 65~68개 점포 기준 | 강남점 리뉴얼 완료 시 순위 상승 가정 | 역축: 1위가 최상단</div>
+            <canvas id="chart-cmp-rank" height="180"></canvas>
+          </div>
+
+          <!-- ③ F&B 매출 비중·성장률 비교 -->
+          <div class="card" style="padding:14px;margin-bottom:14px;border-top:3px solid #e6a817">
+            <div class="card-hd"><span class="ct" style="color:#9a6d00">③ F&B 매출 비중 추이 (%, 2021~2030)</span></div>
+            <div class="cs" style="margin-bottom:10px">F&B = 식품관+식당가+카페 합산 기준 | 업계 전체 비중(회색): 산업부 유통업체 매출동향 | 강남점: 식품 의존형으로 비중 높음</div>
+            <canvas id="chart-cmp-fnb" height="180"></canvas>
+          </div>
+
+          <!-- ④ 레이더 비교 -->
+          <div class="g2" style="margin-bottom:14px">
+            <div class="card" style="padding:14px">
+              <div class="ct" style="margin-bottom:10px">④ 입지 경쟁력 레이더 비교</div>
+              <div class="cs">6개 항목 100점 기준 — 강남점(빨) vs 사우스시티(파)</div>
+              <canvas id="chart-cmp-radar" height="240"></canvas>
+            </div>
+            <div class="card" style="padding:14px">
+              <div class="ct" style="margin-bottom:10px">⑤ F&B 입점 종합 평가표</div>
+              <table style="width:100%;font-size:11px;margin-top:6px">
+                <thead><tr>
+                  <th style="text-align:left;padding:6px 8px;color:#aaa;font-size:10px;border-bottom:.5px solid rgba(0,0,0,.08)">평가항목</th>
+                  <th style="text-align:center;padding:6px 8px;color:#c0392b;font-size:10px;border-bottom:.5px solid rgba(0,0,0,.08)">롯데 강남점</th>
+                  <th style="text-align:center;padding:6px 8px;color:#1a56c4;font-size:10px;border-bottom:.5px solid rgba(0,0,0,.08)">신세계 사우스시티</th>
+                </tr></thead>
+                <tbody>
+                  <tr><td style="padding:5px 8px;color:#555">F&B 집객력</td><td style="text-align:center;padding:5px 8px"><span class="tag trd">★★☆☆☆</span></td><td style="text-align:center;padding:5px 8px"><span class="tag tgn">★★★★☆</span></td></tr>
+                  <tr><td style="padding:5px 8px;color:#555">상권 배후 규모</td><td style="text-align:center;padding:5px 8px"><span class="tag tam">★★★☆☆</span></td><td style="text-align:center;padding:5px 8px"><span class="tag tgn">★★★★★</span></td></tr>
+                  <tr><td style="padding:5px 8px;color:#555">교통 접근성</td><td style="text-align:center;padding:5px 8px"><span class="tag tam">★★★☆☆</span></td><td style="text-align:center;padding:5px 8px"><span class="tag tgn">★★★★☆</span></td></tr>
+                  <tr><td style="padding:5px 8px;color:#555">성장 잠재력</td><td style="text-align:center;padding:5px 8px"><span class="tag tbl">★★★★☆</span></td><td style="text-align:center;padding:5px 8px"><span class="tag tam">★★★☆☆</span></td></tr>
+                  <tr><td style="padding:5px 8px;color:#555">임대조건 협상력</td><td style="text-align:center;padding:5px 8px"><span class="tag tgn">★★★★☆</span></td><td style="text-align:center;padding:5px 8px"><span class="tag tam">★★★☆☆</span></td></tr>
+                  <tr><td style="padding:5px 8px;color:#555">브랜드 포지셔닝</td><td style="text-align:center;padding:5px 8px"><span class="tag tam">★★★☆☆</span></td><td style="text-align:center;padding:5px 8px"><span class="tag tbl">★★★★☆</span></td></tr>
+                  <tr><td style="padding:5px 8px;color:#555">입점 시기 명확성</td><td style="text-align:center;padding:5px 8px"><span class="tag trd">★☆☆☆☆</span></td><td style="text-align:center;padding:5px 8px"><span class="tag tgn">★★★★★</span></td></tr>
+                  <tr style="background:#f8f8f5"><td style="padding:7px 8px;font-weight:700">종합 추천도</td><td style="text-align:center;padding:7px 8px"><span class="tag tam" style="font-size:11px">조건부 검토 (63점)</span></td><td style="text-align:center;padding:7px 8px"><span class="tag tgn" style="font-size:11px">입점 권장 (78점)</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 주변 상권 비교 표 -->
+          <div class="card" style="padding:14px;margin-bottom:14px">
+            <div class="ct" style="margin-bottom:10px">📍 주변 상권 비교 — 경쟁 구도·고객 특성</div>
+            <div class="tw">
+              <table style="font-size:11px;width:100%">
+                <thead><tr>
+                  <th>구분</th>
+                  <th style="color:#c0392b">롯데 강남점 (대치동)</th>
+                  <th style="color:#1a56c4">신세계 사우스시티 (죽전)</th>
+                </tr></thead>
+                <tbody>
+                  <tr><td style="color:#aaa">배후 세대</td><td>약 30만 세대 (강남3구)</td><td>약 100만 세대 (수지+분당+기흥)</td></tr>
+                  <tr><td style="color:#aaa">일 방문객 추정</td><td>12,000명</td><td>35,000명</td></tr>
+                  <tr><td style="color:#aaa">주요 고객층</td><td>40~60대 고소득 지역 주민</td><td>30~40대 가족, 젊은 신혼 부부</td></tr>
+                  <tr><td style="color:#aaa">평균 체류시간</td><td>약 1.5시간</td><td>약 2.5시간</td></tr>
+                  <tr><td style="color:#aaa">외식·카페 수요</td><td>학원가 연계 높음 (간식·식사)</td><td>가족 외식, 주말 나들이 수요 높음</td></tr>
+                  <tr><td style="color:#aaa">주요 경쟁 백화점</td><td>신세계 강남(반포) / 현대 무역센터</td><td>갤러리아 광교 / 현대 판교</td></tr>
+                  <tr><td style="color:#aaa">명품 MD 수준</td><td>약함 (3급 → 리뉴얼 미정)</td><td>중간 (명품 확장 추진 중)</td></tr>
+                  <tr><td style="color:#aaa">F&B 선호 업종</td><td>캐주얼·패스트푸드·베이커리</td><td>가족 다이닝·디저트 카페·브런치</td></tr>
+                  <tr><td style="color:#aaa">인근 대형시설</td><td>영동대로 MICE 복합개발(예정)</td><td>스타필드마켓 죽전 / CGV 동일 부지</td></tr>
+                  <tr><td style="color:#aaa">상권 성장성</td><td>리뉴얼 시 급등 기대 / 현재 정체</td><td>안정적 성장 / 경쟁 다각화 리스크</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- F&B 전략 시사점 -->
+          <div class="card" style="padding:14px;background:#fef9f0;border-color:rgba(230,168,23,.3);margin-bottom:14px">
+            <div class="ct" style="margin-bottom:10px">🎯 F&B 입점 전략 시사점 — 비교 기반 의사결정</div>
+            <div class="g2">
+              <div>
+                <div style="font-size:11px;font-weight:700;color:#c0392b;margin-bottom:6px">🏬 롯데백화점 강남점</div>
+                <div style="font-size:11px;line-height:2;color:#555">
+                  ● <strong>단기전략 (리뉴얼 전)</strong>: 학원가·고소득 주민 겨냥 프리미엄 디저트·베이커리 카페 우선 검토<br>
+                  ● <strong>중기전략 (리뉴얼 완료 시)</strong>: VIP 전용 다이닝 라운지·명품 연계 F&B로 포지셔닝 재정립<br>
+                  ● <strong>협상 포인트</strong>: 리뉴얼 연기 → 당사 협상 레버리지 높음 / 인테리어 지원 50% 이상·수수료율 26% 이하 목표<br>
+                  ● <strong>리스크 관리</strong>: 리뉴얼 시점 불확실 → 단기 계약(1+1년) 후 조건 재협의 구조 확보<br>
+                  ● <strong>업종 적합도</strong>: 캐주얼 다이닝·베이커리 카페 ★★★★ / 파인다이닝 ★★☆ (집객력 부족)
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:#1a56c4;margin-bottom:6px">🏙 신세계 사우스시티</div>
+                <div style="font-size:11px;line-height:2;color:#555">
+                  ● <strong>단기전략</strong>: 30~40대 가족·젊은 부부 겨냥 트렌디 캐주얼 다이닝·디저트 카페 우선 공략<br>
+                  ● <strong>중기전략</strong>: 스타 셰프 협업 팝업 연계·시즌 메뉴 F&B 이벤트로 체류시간 연장 전략 활용<br>
+                  ● <strong>협상 포인트</strong>: 브랜드 리뉴얼 직후 → 신규 MD 유치 적극적 / 인테리어 지원·수수료 인하 협상 기회<br>
+                  ● <strong>리스크 관리</strong>: 갤러리아 광교·현대 판교 경쟁 심화 → 차별화된 콘텐츠 F&B 필수<br>
+                  ● <strong>업종 적합도</strong>: 가족 다이닝 ★★★★★ / 디저트 카페 ★★★★★ / 파인다이닝 ★★★
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:12px;padding:10px 12px;background:#fff8e6;border-radius:8px;font-size:11px;color:#7a5200;line-height:1.9">
+              📌 <strong>우선순위 권고</strong>: 현 시점에서는 <strong>신세계 사우스시티가 입점 적기</strong> — 브랜드 리뉴얼 직후 MD 재편 시기로 조건 협상 유리<br>
+              롯데 강남점은 <strong>리뉴얼 착공 일정 확정 후 재검토</strong> 권장 — 리뉴얼 완료 시 강남 상권 내 급격한 집객력 향상 기대
+            </div>
+          </div>
+
+          <!-- 출처 -->
+          <div class="card" style="padding:14px;background:#f8f8f8">
+            <div class="ct" style="margin-bottom:8px">📌 데이터 출처 및 산출 기준</div>
+            <div style="font-size:11px;line-height:2;color:#555">
+              • 매출 실적: 어패럴뉴스 연간 점별 매출 집계(2021~2024), 패션비즈, 한국섬유신문<br>
+              • 2025e 추정: 상반기 실적(테넌트뉴스·패션비즈) 기반 연환산<br>
+              • 2026f~2030f 전망: 사우스시티 CAGR 3.1% / 강남점 리뉴얼 기본 시나리오(착공 2026, 완공 2028) 적용<br>
+              • F&B 비중: 산업통상자원부 주요 유통업체 매출 동향(2021~2024) / 전망: 연 0.5%p 상승 가정<br>
+              • 순위: 전국 65~68개 점포 기준 (연도별 집계 점포 수 차이 있음)<br>
+              • 입지·상권: 나무위키·신세계 공식사이트·인사이트코리아·서울경제 기사 종합
+            </div>
+          </div>
+
+        </div><!-- /mkt-panel-compare -->
 
       </div><!-- /etab-market -->
 
@@ -3701,15 +3903,179 @@ const MKT_5YR = {
 let mkt5yrTotalChart, mkt5yrStoreChart;
 
 function switchMktTab(tab) {
-  ['trend','top20','1t','5yr','outlook','newopen','lotte'].forEach(t=>{
+  ['trend','top20','1t','5yr','outlook','newopen','lotte','compare'].forEach(t=>{
     const panel = document.getElementById('mkt-panel-'+t);
     if(panel) panel.style.display = t===tab?'block':'none';
     const btn = document.getElementById('mkt-tab-'+t);
     if(btn){ btn.classList.toggle('btn-bl',t===tab); }
   });
   // 패널이 visible 된 후 해당 차트 렌더
-  const renderMap = { trend: renderMktTrend, top20: renderMktTop20, '1t': renderMkt1t, '5yr': renderMkt5yr, outlook: renderMktOutlook, newopen: renderMktNewOpen, lotte: renderMktLotte };
+  const renderMap = { trend: renderMktTrend, top20: renderMktTop20, '1t': renderMkt1t, '5yr': renderMkt5yr, outlook: renderMktOutlook, newopen: renderMktNewOpen, lotte: renderMktLotte, compare: renderMktCompare };
   if(renderMap[tab]) renderMap[tab]();
+}
+
+// ═══════════════════════════════════════════════════════
+//  비교분석: 롯데 강남점 vs 신세계 사우스시티
+// ═══════════════════════════════════════════════════════
+const MKT_COMPARE = {
+  years: ['2021','2022','2023','2024','2025e','2026f','2027f','2028f','2029f','2030f'],
+  lotte: {
+    // 롯데백화점 강남점(대치동) 연도별 매출(억원) — 2026f부터 리뉴얼 기본 시나리오
+    sales:      [2400, 2613, 2050, 1885, 1900, 2200, 2800, 3200, 3500, 3800],
+    isForecast: [false,false,false,false,true, true, true, true, true, true],
+    ranks:      [44,   46,   48,   50,   50,   44,   37,   30,   27,   25],
+    fnbRatio:   [28,   29,   30,   31,   32,   30,   28,   27,   26,   26],  // F&B 비중(%)
+    fnbGrowth:  [null,  8,    5,   -2,    1,   16,   27,   14,    9,    9],  // 전년 대비 성장률
+  },
+  ssc: {
+    // 신세계 사우스시티(죽전) 연도별 매출(억원)
+    sales:      [5450, 6245, 6641, 6406, 6550, 6750, 6950, 7200, 7450, 7700],
+    isForecast: [false,false,false,false,true, true, true, true, true, true],
+    ranks:      [19,   17,   17,   16,   16,   15,   15,   14,   14,   14],
+    fnbRatio:   [20,   21,   22,   23,   23,   24,   24,   25,   25,   26],
+    fnbGrowth:  [null, 14,   17,    5,    4,    6,    4,    6,    6,    6],
+  },
+  industry: {
+    fnbShare: [11.8, 12.7, 13.2, 13.5, 14.0, 14.5, 15.0, 15.4, 15.8, 16.2],
+  }
+};
+let cmpSalesChart, cmpRankChart, cmpFnbChart, cmpRadarChart;
+
+function renderMktCompare() {
+  _renderCmpSales();
+  _renderCmpRank();
+  _renderCmpFnb();
+  _renderCmpRadar();
+}
+
+function _renderCmpSales() {
+  const c = document.getElementById('chart-cmp-sales');
+  if(!c) return;
+  if(cmpSalesChart) { cmpSalesChart.destroy(); cmpSalesChart = null; }
+  const yr = MKT_COMPARE.years;
+  const lt = MKT_COMPARE.lotte;
+  const sc = MKT_COMPARE.ssc;
+  const lotteColors = lt.sales.map((v,i)=>lt.isForecast[i]?'rgba(192,57,43,0.35)':'rgba(192,57,43,0.85)');
+  const sscColors   = sc.sales.map((v,i)=>sc.isForecast[i]?'rgba(26,86,196,0.3)':'rgba(26,86,196,0.8)');
+  cmpSalesChart = new Chart(c, {
+    type:'bar',
+    data:{
+      labels: yr,
+      datasets:[
+        { label:'롯데 강남점 (억원)', data: lt.sales, backgroundColor: lotteColors, borderRadius:4, order:2 },
+        { label:'신세계 사우스시티 (억원)', data: sc.sales, backgroundColor: sscColors, borderRadius:4, order:1 }
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{labels:{font:{size:10}}},
+        annotation:{annotations:{line1:{type:'line',xMin:4.5,xMax:4.5,borderColor:'#aaa',borderWidth:1,borderDash:[4,4],label:{content:'전망→',display:true,font:{size:9},color:'#aaa'}}}}
+      },
+      scales:{
+        x:{ticks:{font:{size:10}}},
+        y:{min:0,max:8000,ticks:{callback:v=>v.toLocaleString()+'억',font:{size:10}},grid:{color:'rgba(0,0,0,.04)'}}
+      }
+    }
+  });
+}
+
+function _renderCmpRank() {
+  const c = document.getElementById('chart-cmp-rank');
+  if(!c) return;
+  if(cmpRankChart) { cmpRankChart.destroy(); cmpRankChart = null; }
+  const yr = MKT_COMPARE.years;
+  cmpRankChart = new Chart(c, {
+    type:'line',
+    data:{
+      labels: yr,
+      datasets:[
+        { label:'롯데 강남점 순위', data: MKT_COMPARE.lotte.ranks,
+          borderColor:'#c0392b', backgroundColor:'rgba(192,57,43,.08)',
+          pointBackgroundColor: MKT_COMPARE.lotte.isForecast.map(f=>f?'#f1948a':'#c0392b'),
+          borderDash: [0], borderWidth:2, tension:0.3, fill:false,
+          segment:{borderDash: ctx=>MKT_COMPARE.lotte.isForecast[ctx.p1DataIndex]?[5,4]:[]}
+        },
+        { label:'신세계 사우스시티 순위', data: MKT_COMPARE.ssc.ranks,
+          borderColor:'#1a56c4', backgroundColor:'rgba(26,86,196,.08)',
+          pointBackgroundColor: MKT_COMPARE.ssc.isForecast.map(f=>f?'#85c1e9':'#1a56c4'),
+          borderWidth:2, tension:0.3, fill:false,
+          segment:{borderDash: ctx=>MKT_COMPARE.ssc.isForecast[ctx.p1DataIndex]?[5,4]:[]}
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{font:{size:10}}}},
+      scales:{
+        x:{ticks:{font:{size:10}}},
+        y:{reverse:true, min:1, max:60, ticks:{callback:v=>Number.isInteger(v)?v+'위':'',font:{size:10}},
+           grid:{color:'rgba(0,0,0,.04)'}}
+      }
+    }
+  });
+}
+
+function _renderCmpFnb() {
+  const c = document.getElementById('chart-cmp-fnb');
+  if(!c) return;
+  if(cmpFnbChart) { cmpFnbChart.destroy(); cmpFnbChart = null; }
+  const yr = MKT_COMPARE.years;
+  cmpFnbChart = new Chart(c, {
+    type:'line',
+    data:{
+      labels: yr,
+      datasets:[
+        { label:'롯데 강남점 F&B 비중(%)', data: MKT_COMPARE.lotte.fnbRatio,
+          borderColor:'#c0392b', backgroundColor:'rgba(192,57,43,.1)',
+          fill:true, tension:0.3, borderWidth:2,
+          segment:{borderDash: ctx=>MKT_COMPARE.lotte.isForecast[ctx.p1DataIndex]?[5,4]:[]}
+        },
+        { label:'사우스시티 F&B 비중(%)', data: MKT_COMPARE.ssc.fnbRatio,
+          borderColor:'#1a56c4', backgroundColor:'rgba(26,86,196,.1)',
+          fill:true, tension:0.3, borderWidth:2,
+          segment:{borderDash: ctx=>MKT_COMPARE.ssc.isForecast[ctx.p1DataIndex]?[5,4]:[]}
+        },
+        { label:'업계 전체 식품 비중(%)', data: MKT_COMPARE.industry.fnbShare,
+          borderColor:'#aaa', backgroundColor:'transparent',
+          borderDash:[4,4], tension:0.3, borderWidth:1.5, pointRadius:2
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{font:{size:10}}}},
+      scales:{
+        x:{ticks:{font:{size:10}}},
+        y:{min:8,max:36,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'rgba(0,0,0,.04)'}}
+      }
+    }
+  });
+}
+
+function _renderCmpRadar() {
+  const c = document.getElementById('chart-cmp-radar');
+  if(!c) return;
+  if(cmpRadarChart) { cmpRadarChart.destroy(); cmpRadarChart = null; }
+  cmpRadarChart = new Chart(c, {
+    type:'radar',
+    data:{
+      labels:['입지 접근성','상권 배후 규모','F&B 집객력','브랜드 포지셔닝','성장 잠재력','임대조건 협상력'],
+      datasets:[
+        { label:'롯데 강남점', data:[62, 55, 58, 45, 80, 78],
+          borderColor:'#c0392b', backgroundColor:'rgba(192,57,43,.15)',
+          pointBackgroundColor:'#c0392b', borderWidth:2 },
+        { label:'신세계 사우스시티', data:[78, 88, 82, 72, 65, 62],
+          borderColor:'#1a56c4', backgroundColor:'rgba(26,86,196,.12)',
+          pointBackgroundColor:'#1a56c4', borderWidth:2 }
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{font:{size:10}}}},
+      scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:9}},pointLabels:{font:{size:10}}}}
+    }
+  });
 }
 
 function renderMktMarket() {
