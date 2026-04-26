@@ -245,6 +245,23 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
         <div class="kpi"><div class="kpi-l">평균 종합 점수</div><div class="kpi-v" id="kpi-avg">—</div><div class="kpi-s">전체 평균 / 100점</div></div>
         <div class="kpi"><div class="kpi-l">입점 권장 비율</div><div class="kpi-v" id="kpi-rec">—</div><div class="kpi-s">60점 이상 비율</div></div>
       </div>
+      <div class="krow" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:16px">
+        <div class="kpi" style="border-left:3px solid #378ADD">
+          <div class="kpi-l">🆕 신규입점 검토</div>
+          <div class="kpi-v blu" id="kpi-new">—</div>
+          <div class="kpi-s" id="kpi-new-names" style="color:#aaa;font-size:10px">—</div>
+        </div>
+        <div class="kpi" style="border-left:3px solid #1a7f4a">
+          <div class="kpi-l">🔄 연장계약 협의</div>
+          <div class="kpi-v up" id="kpi-renew">—</div>
+          <div class="kpi-s" id="kpi-renew-names" style="color:#aaa;font-size:10px">—</div>
+        </div>
+        <div class="kpi" style="border-left:3px solid #e6a817">
+          <div class="kpi-l">⏳ 협의중 / 검토중</div>
+          <div class="kpi-v" style="color:#e6a817" id="kpi-inprog">—</div>
+          <div class="kpi-s" id="kpi-inprog-names" style="color:#aaa;font-size:10px">—</div>
+        </div>
+      </div>
 
       <div class="g2">
         <div class="card">
@@ -296,7 +313,7 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
             <thead>
               <tr>
                 <th><input type="checkbox" id="chk-all" onclick="toggleAllChk(this)"></th>
-                <th>건물명</th><th>주소</th><th>종합점수</th><th>권고등급</th><th>분석일</th><th>액션</th>
+                <th>건물명</th><th>유형</th><th>상태</th><th>주소</th><th>종합점수</th><th>권고등급</th><th>분석일</th><th>액션</th>
               </tr>
             </thead>
             <tbody id="sites-tbody"></tbody>
@@ -1421,12 +1438,67 @@ const FALLBACK = {
     포획시장:{단지전체상주:20458,현재입주율:68,출근율:85,외식율:70,건물이용율:40,점유율:6.7,일일수요:260,주변좌석수:2500,공급부족지수:8.2,공급부족등급:'★★★★★'},
     재무:{보수적:{월매출:51750000,월순익:-900000,BEP:53250000,투자회수:null,ROI2년:null},기본:{월매출:69000000,월순익:12900000,BEP:53250000,투자회수:40,ROI2년:40},낙관적:{월매출:86250000,월순익:19800000,BEP:53250000,투자회수:26,ROI2년:91}},
     종합:{점수:67,등급:'★★★☆☆',권고:'조건부 입점 권장',핵심조건:'렌트프리 3개월 이상 협상 필수, 카페/캐주얼 F&B 업종 고수',리스크:'보수적 시나리오에서 적자 가능, 투자회수 40개월 장기'}
-  }],
+  },
+  // ── 롯데백화점 강남점 ── 신규입점 검토
+  {
+    id:'lotte-gangnam',
+    meta:{건물명:'롯데백화점 강남점', 주소:'서울 강남구 대치동 944-31', 대상공간:'B1 식품관 / 4F F&B MD 구역', 전용면적PY:40, 준공일:'2000-09', 분석일:'2026-04-26',
+          검토유형:'신규입점', 검토상태:'검토중', 카테고리:'백화점', 유통사:'롯데백화점',
+          비고:'강남점 대규모 리뉴얼 무기한 연기 중 — 리뉴얼 완료 시점 재협상 예정'},
+    임대조건:{보증금:50000000, 월MG:9000000, 관리비:1800000},
+    포획시장:{단지전체상주:20000, 현재입주율:90, 출근율:60, 외식율:55, 건물이용율:30, 점유율:5.5, 일일수요:330, 주변좌석수:4200, 공급부족지수:5.2, 공급부족등급:'★★★★☆'},
+    재무:{
+      보수적:{월매출:35000000, 월순익:-1500000, BEP:45000000, 투자회수:null, ROI2년:null},
+      기본:{월매출:50000000, 월순익:4500000, BEP:45000000, 투자회수:44, ROI2년:33},
+      낙관적:{월매출:70000000, 월순익:11000000, BEP:45000000, 투자회수:28, ROI2년:73}
+    },
+    종합:{점수:63, 등급:'★★★☆☆', 권고:'조건부 입점 검토 (리뉴얼 완료 후 재평가)',
+          핵심조건:'리뉴얼 완료 후 우량 MD구역 선점 협상 / 인테리어 지원비 PY당 600만 이상 확보 필수 / 수수료율 28% 이하 협의',
+          리스크:'강남점 대규모 리뉴얼 무기한 연기 중 → 입점 시점 불투명, 강남 F&B 경쟁 심화, 보수적 시나리오에서 적자'}
+  },
+  // ── 롯데백화점 소공동 본점 ── 연장계약 검토
+  {
+    id:'lotte-sogong',
+    meta:{건물명:'롯데백화점 소공동 본점', 주소:'서울 중구 남대문로 81', 대상공간:'B1 식품관 / 8F 레스토랑 MD 구역', 전용면적PY:45, 준공일:'1979-12', 분석일:'2026-04-26',
+          검토유형:'연장계약', 검토상태:'협의중', 카테고리:'백화점', 유통사:'롯데백화점',
+          비고:'국내 최고 매출 백화점 1~2위권, 관광객·명품 수요 안정적'},
+    임대조건:{보증금:80000000, 월MG:13500000, 관리비:2200000},
+    포획시장:{단지전체상주:50000, 현재입주율:95, 출근율:55, 외식율:50, 건물이용율:25, 점유율:4.8, 일일수요:660, 주변좌석수:8500, 공급부족지수:7.2, 공급부족등급:'★★★★★'},
+    재무:{
+      보수적:{월매출:70000000, 월순익:3000000, BEP:80000000, 투자회수:null, ROI2년:null},
+      기본:{월매출:100000000, 월순익:15000000, BEP:80000000, 투자회수:33, ROI2년:55},
+      낙관적:{월매출:130000000, 월순익:26000000, BEP:80000000, 투자회수:23, ROI2년:92}
+    },
+    종합:{점수:82, 등급:'★★★★☆', 권고:'입점 권장 — 계약 조건 협의 진행',
+          핵심조건:'수수료율 25% 이하 협상 / 렌트프리 2개월 요청 / 리뉴얼 인테리어 지원 50% 이상 요청 / 계약기간 3년 확보',
+          리스크:'높은 임대 부담(보증금·MG), 관광객 의존도 높아 경기 침체 시 변동성, 리뉴얼 공사 중 영업 손실 가능'}
+  },
+  // ── 롯데백화점 경기점 ── 연장계약 검토
+  {
+    id:'lotte-gyeonggi',
+    meta:{건물명:'롯데백화점 경기점', 주소:'경기도 수원시 팔달구 인계로 178', 대상공간:'지하 식품관 / 6F F&B MD 구역', 전용면적PY:38, 준공일:'1990-09', 분석일:'2026-04-26',
+          검토유형:'연장계약', 검토상태:'협의중', 카테고리:'백화점', 유통사:'롯데백화점',
+          비고:'경기 남부 거점 점포, 수원 상권 안정적 — 계약 만료 전 조건 재협상 필요'},
+    임대조건:{보증금:40000000, 월MG:7500000, 관리비:1500000},
+    포획시장:{단지전체상주:25000, 현재입주율:88, 출근율:55, 외식율:52, 건물이용율:28, 점유율:5.0, 일일수요:380, 주변좌석수:4800, 공급부족지수:5.8, 공급부족등급:'★★★★☆'},
+    재무:{
+      보수적:{월매출:35000000, 월순익:-500000, BEP:42000000, 투자회수:null, ROI2년:null},
+      기본:{월매출:50000000, 월순익:5500000, BEP:42000000, 투자회수:38, ROI2년:42},
+      낙관적:{월매출:65000000, 월순익:10500000, BEP:42000000, 투자회수:26, ROI2년:75}
+    },
+    종합:{점수:68, 등급:'★★★☆☆', 권고:'조건부 연장 권장',
+          핵심조건:'수수료율 재협상(현행 대비 2%p 인하 목표) / 인테리어 지원비 확보 / 계약기간 3년 이상',
+          리스크:'경기 침체에 따른 방문객 감소, 오프라인 유통 위축, 경쟁 F&B 브랜드 증가'}
+  }
+  ],
   changelog:[
     {date:'2026-04-14',type:'skill',title:'entry-review 스킬 v1.0 생성',detail:'dev-simulation + fnb-market + field-management 통합'},
     {date:'2026-04-14',type:'site',title:'트라이타워 분석 완료',detail:'종합 67점, 조건부 입점 권장'},
     {date:'2026-04-16',type:'skill',title:'스킬 v1.2 업데이트',detail:'HTML 대시보드(Step 9), 트리거 최적화, 복수 후보지 비교 추가'},
-    {date:'2026-04-16',type:'report',title:'용어 학습 가이드 생성',detail:'바이브코딩 & 웹개발 38개 용어 HTML 가이드'}
+    {date:'2026-04-16',type:'report',title:'용어 학습 가이드 생성',detail:'바이브코딩 & 웹개발 38개 용어 HTML 가이드'},
+    {date:'2026-04-26',type:'site',title:'롯데백화점 강남점 후보지 등록',detail:'신규입점 검토 — 종합 63점, 리뉴얼 완료 후 재평가 예정'},
+    {date:'2026-04-26',type:'site',title:'롯데백화점 소공동 본점 후보지 등록',detail:'연장계약 협의중 — 종합 82점, 입점 권장'},
+    {date:'2026-04-26',type:'site',title:'롯데백화점 경기점 후보지 등록',detail:'연장계약 협의중 — 종합 68점, 조건부 연장 권장'}
   ],
   skillConfig:{version:'1.2',포획시장:{출근율:85,외식율:70,건물이용율:40,점유율:6.7},재무:{식재료비율:35,인건비율:25,기타경비율:5,영업일수:22},평가배점:{입지등급:15,포획시장규모:20,경쟁강도:15,교통호재:10,재무건전성:25,임대조건:15},출력:{엑셀시트수:10,PPT슬라이드수:11,HTML차트수:12}}
 };
@@ -1540,6 +1612,18 @@ function renderDashboard(){
   const rec = sites.length ? Math.round(sites.filter(s=>s.종합.점수>=60).length/sites.length*100) : 0;
   document.getElementById('kpi-rec').textContent = rec+'%';
 
+  // 유형별 KPI
+  const newSites    = sites.filter(s=>s.meta.검토유형==='신규입점');
+  const renewSites  = sites.filter(s=>s.meta.검토유형==='연장계약');
+  const inProgSites = sites.filter(s=>s.meta.검토상태==='협의중'||s.meta.검토상태==='검토중'||!s.meta.검토상태);
+  const shortName = s => s.meta.건물명.replace('롯데백화점 ','롯데 ').replace('제2판교 ','');
+  document.getElementById('kpi-new').textContent = newSites.length+'건';
+  document.getElementById('kpi-new-names').textContent = newSites.map(shortName).join(' · ')||'—';
+  document.getElementById('kpi-renew').textContent = renewSites.length+'건';
+  document.getElementById('kpi-renew-names').textContent = renewSites.map(shortName).join(' · ')||'—';
+  document.getElementById('kpi-inprog').textContent = inProgSites.length+'건';
+  document.getElementById('kpi-inprog-names').textContent = inProgSites.map(shortName).join(' · ')||'—';
+
   // Score bar chart
   const labels = sites.map(s=>s.meta.건물명.replace('제2판교 ',''));
   const scores = sites.map(s=>s.종합.점수);
@@ -1590,10 +1674,16 @@ function renderSitesTable(){
     const score = s.종합.점수;
     const tagCls = score>=90?'tbl':score>=75?'tgn':score>=60?'tam':'trd';
     const tagTxt = score>=90?'강력권장':score>=75?'입점권장':score>=60?'조건부권장':'입점비권장';
+    const typeCls = s.meta.검토유형==='신규입점'?'tbl':s.meta.검토유형==='연장계약'?'tgn':s.meta.검토유형==='리뉴얼검토'?'tam':'tgy';
+    const typeHtml = s.meta.검토유형 ? `<span class="tag ${typeCls}">${s.meta.검토유형}</span>` : '<span class="tag tgy">일반</span>';
+    const stsCls = s.meta.검토상태==='완료'?'tgn':s.meta.검토상태==='협의중'?'tam':s.meta.검토상태==='보류'?'trd':'tgy';
+    const stsHtml = `<span class="tag ${stsCls}">${s.meta.검토상태||'검토중'}</span>`;
     return `<tr>
       <td><input type="checkbox" class="site-chk" value="${i}"></td>
       <td style="font-weight:600">${s.meta.건물명}</td>
-      <td style="color:#888;max-width:180px;overflow:hidden;text-overflow:ellipsis">${s.meta.주소}</td>
+      <td>${typeHtml}</td>
+      <td>${stsHtml}</td>
+      <td style="color:#888;max-width:160px;overflow:hidden;text-overflow:ellipsis">${s.meta.주소}</td>
       <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-bar-fill" style="width:${score}%;background:${score>=90?'#378ADD':score>=75?'#1a7f4a':score>=60?'#e6a817':'#c0392b'}"></div></div><strong style="min-width:28px;text-align:right;font-size:12px">${score}</strong></div></td>
       <td><span class="tag ${tagCls}">${tagTxt}</span></td>
       <td style="color:#aaa">${s.meta.분석일}</td>
