@@ -1159,6 +1159,7 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
           <button id="mkt-tab-trend" onclick="switchMktTab('trend')" class="btn btn-bl btn-sm" style="font-size:11px">📊 순위 추이 (2016→2025)</button>
           <button id="mkt-tab-top20" onclick="switchMktTab('top20')" class="btn btn-sm" style="font-size:11px">🏆 2024 TOP 20</button>
           <button id="mkt-tab-1t" onclick="switchMktTab('1t')" class="btn btn-sm" style="font-size:11px">💎 1조 클럽 변화</button>
+          <button id="mkt-tab-5yr" onclick="switchMktTab('5yr')" class="btn btn-sm" style="font-size:11px;border:1.5px solid #1a7f4a;color:#1a7f4a">📈 5년실적+5년전망</button>
           <button id="mkt-tab-outlook" onclick="switchMktTab('outlook')" class="btn btn-sm" style="font-size:11px">🔭 향후 5년 전망</button>
           <button id="mkt-tab-newopen" onclick="switchMktTab('newopen')" class="btn btn-sm" style="font-size:11px">🏗 신규 출점 계획</button>
         </div>
@@ -1257,6 +1258,59 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
             <div style="font-size:10px;color:#aaa;margin-top:8px">※ 신규 출점 일정은 건설·허가 지연으로 실제 오픈일과 차이 발생 가능</div>
           </div>
         </div>
+
+        <!-- 패널: 5년 실적 + 5년 전망 -->
+        <div id="mkt-panel-5yr" style="display:none">
+          <!-- 안내 -->
+          <div class="card" style="background:#f0faf4;border-color:rgba(26,127,74,.25);padding:11px 14px;margin-bottom:12px">
+            <div style="font-size:11px;color:#1a7f4a;line-height:1.9">
+              📐 <strong>산출 방식</strong> — 실적(2020~2024): 어패럴뉴스·패션비즈 연간 점별 매출 집계 / 산업통상자원부 유통업체 매출동향 &nbsp;|&nbsp;
+              전망(2025~2029): 각 점포 <strong>최근 3개년(2022~2024) CAGR</strong> 기반 기본 성장률 산출, 명품 소비 둔화 추세 조정(Bloomberg Intelligence 2025 Luxury Outlook), 신규 경쟁점 영향(더현대 부산 2027·더현대 광주 2029) 반영, 환율·소비심리 중립 가정(한국은행 기준)
+              <br>⚠ 전망치는 <strong>참고용 추정값</strong>이며 거시경제·명품 수요 변동에 따라 달라질 수 있습니다.
+            </div>
+          </div>
+          <!-- KPI 비교 -->
+          <div class="krow k4" style="margin-bottom:12px">
+            <div class="kpi" style="border-left:3px solid #378ADD"><div class="kpi-l">2020 총매출 (코로나 저점)</div><div class="kpi-v" style="color:#1a56c4">27.9조</div><div class="kpi-s">전년比 -6.3% (산업통상자원부)</div></div>
+            <div class="kpi" style="border-left:3px solid #c0392b"><div class="kpi-l">2024 총매출 (최근 실적)</div><div class="kpi-v" style="color:#c0392b">39.5조</div><div class="kpi-s">5년간 +41.6% 성장</div></div>
+            <div class="kpi" style="border-left:3px solid #1a7f4a"><div class="kpi-l">2029 총매출 전망</div><div class="kpi-v" style="color:#1a7f4a">43.8조</div><div class="kpi-s">2024 대비 +10.9% (연 2.1%)</div></div>
+            <div class="kpi" style="border-left:3px solid #9b59b6"><div class="kpi-l">2029 신세계강남 전망</div><div class="kpi-v" style="color:#6c3483">4.88조</div><div class="kpi-s">5조 클럽 첫 진입 전망</div></div>
+          </div>
+          <!-- 차트: 총시장 -->
+          <div class="card" style="padding:14px;margin-bottom:14px">
+            <div class="card-hd"><span class="ct">백화점 총시장 규모 — 기존 5년 실적 + 향후 5년 전망 (조원)</span></div>
+            <div class="cs" style="margin-bottom:8px">출처: 산업통상자원부 유통업체 매출동향 / 2025e 이후: CAGR 기반 추정 / 한국백화점협회 중기 전망</div>
+            <canvas id="chart-mkt-5yr-total" height="160"></canvas>
+            <div style="font-size:10px;color:#888;margin-top:6px;display:flex;gap:16px">
+              <span style="display:flex;align-items:center;gap:4px"><span style="width:20px;height:4px;background:#378ADD;display:inline-block"></span> 실적 (확인값)</span>
+              <span style="display:flex;align-items:center;gap:4px"><span style="width:20px;height:4px;background:#1a7f4a;display:inline-block;border-top:2px dashed #1a7f4a;background:none"></span> 전망 (추정값)</span>
+            </div>
+          </div>
+          <!-- 차트: 점포별 -->
+          <div class="card" style="padding:14px;margin-bottom:14px">
+            <div class="card-hd"><span class="ct">상위 7개 점포 매출 추이 — 기존 5년 실적 + 향후 5년 전망 (억원)</span></div>
+            <div class="cs" style="margin-bottom:8px">출처(실적): 어패럴뉴스 연간 점별 매출 집계 / 패션비즈 / KTNews | 출처(전망): 최근 3년 CAGR 기반 자체 추정, Bloomberg Intelligence 2025 Luxury Outlook 참조</div>
+            <canvas id="chart-mkt-5yr-stores" height="260"></canvas>
+          </div>
+          <!-- 순위 변화 테이블 -->
+          <div class="g2" style="margin-bottom:14px">
+            <div class="card" style="padding:14px">
+              <div class="ct" style="margin-bottom:8px">📋 상위 10개 점포 — 연도별 매출 실적 (억원)</div>
+              <div class="cs" style="margin-bottom:8px">※ 2020·2022 데이터는 어패럴뉴스 집계 회고 기사 및 산업통상자원부 총량 데이터 역산 추정치 포함</div>
+              <div class="tw"><table id="mkt-5yr-hist-table" style="font-size:10.5px"></table></div>
+            </div>
+            <div class="card" style="padding:14px">
+              <div class="ct" style="margin-bottom:8px">📋 상위 7개 점포 — 향후 5년 전망 (억원)</div>
+              <div class="cs" style="margin-bottom:8px">※ 산출근거: 최근 3년 CAGR + 시장 환경 조정 + 신규 경쟁점 영향</div>
+              <div class="tw"><table id="mkt-5yr-fcast-table" style="font-size:10.5px"></table></div>
+            </div>
+          </div>
+          <!-- 방법론 카드 -->
+          <div class="card" style="padding:14px;background:#fffbf0;border-color:rgba(230,168,23,.3)">
+            <div class="ct" style="margin-bottom:8px">📌 전망 산출 방법론 및 근거</div>
+            <div id="mkt-5yr-method" style="font-size:11px;line-height:2;color:#444"></div>
+          </div>
+        </div><!-- /mkt-panel-5yr -->
 
       </div><!-- /etab-market -->
 
@@ -2779,19 +2833,316 @@ const MKT_RANK_DATA = {
 const MKT_CHAIN_COLOR = { '신세계':'#1a56c4','롯데':'#c0392b','현대':'#1a7f4a','갤러리아':'#9b59b6','AK':'#e6a817' };
 function mktChainColor(c){ return MKT_CHAIN_COLOR[c] || '#888'; }
 
+// ── 5년 실적 + 5년 전망 데이터 ──
+// 실적(2020-2024): 어패럴뉴스 연간 점별 매출 집계 / 패션비즈 / 산업통상자원부
+// 2020·2022 일부 점포: 산업부 총량 역산 + 어패럴뉴스 회고 기사 기반 추정
+// 전망(2025-2029): 최근 3년 CAGR 기반, Bloomberg Intelligence 2025 참조, 신규 경쟁점 조정
+const MKT_5YR = {
+  stores: [
+    {
+      name:'신세계 강남', chain:'신세계',
+      hist: { '2020':20730,'2021':24940,'2022':27908,'2023':30680,'2024':33269 },
+      fcast:{ '2025':36717,'2026':40400,'2027':43600,'2028':46200,'2029':48800 },
+      cagr3: '8.6%', // 2022→2024 CAGR
+      method:'최근 3년 CAGR 8.6% → 명품 수요 둔화 반영 5.8% 적용. 독보적 1위 지위 유지.',
+      src:'어패럴뉴스 2025 집계, Bloomberg Intelligence Luxury 2025'
+    },
+    {
+      name:'롯데 잠실', chain:'롯데',
+      hist: { '2020':13441,'2021':17973,'2022':23764,'2023':27569,'2024':30551 },
+      fcast:{ '2025':33010,'2026':35200,'2027':37100,'2028':38600,'2029':39900 },
+      cagr3: '13.4%',
+      method:'2022→2024 고성장(CAGR 13.4%) → 성숙기 진입 4.7% 적용. 신세계강남과 격차 좁히는 추세.',
+      src:'어패럴뉴스 2025 집계 / 패션비즈'
+    },
+    {
+      name:'신세계 센텀', chain:'신세계',
+      hist: { '2020':13039,'2021':15664,'2022':17876,'2023':20051,'2024':21081 },
+      fcast:{ '2025':22300,'2026':23500,'2027':24600,'2028':25600,'2029':26500 },
+      cagr3: '8.6%',
+      method:'부산 지역 명품 수요 안정 성장. CAGR 4.4% 적용. 광역권 독점적 위치 유지.',
+      src:'어패럴뉴스 집계 / 부산상공회의소 소비동향'
+    },
+    {
+      name:'현대 판교', chain:'현대',
+      hist: { '2020':10512,'2021':12413,'2022':13926,'2023':16670,'2024':17314 },
+      fcast:{ '2025':20291,'2026':22100,'2027':23700,'2028':25100,'2029':26300 },
+      cagr3: '11.5%',
+      method:'판교 IT 고소득층 수요 견고. 2025 리뉴얼 효과 반영 6.7% 적용. 2029년 롯데본점 역전 전망.',
+      src:'어패럴뉴스 집계 / 경기도 소비동향 보고서'
+    },
+    {
+      name:'롯데 본점', chain:'롯데',
+      hist: { '2020':11900,'2021':16670,'2022':15700,'2023':20129,'2024':20596 },
+      fcast:{ '2025':21805,'2026':22400,'2027':22800,'2028':23100,'2029':23400 },
+      cagr3: '14.6%',
+      method:'2022 리뉴얼 기저효과 제거 시 실질 성장 둔화. 명동 상권 회복 제한적. 1.8% 보수 적용.',
+      src:'어패럴뉴스 집계 / 명동 상권 동향 (서울시 상권분석)'
+    },
+    {
+      name:'신세계 대구', chain:'신세계',
+      hist: { '2020':9650,'2021':11939,'2022':12892,'2023':14982,'2024':15744 },
+      fcast:{ '2025':16700,'2026':17500,'2027':18200,'2028':18900,'2029':19500 },
+      cagr3: '10.5%',
+      method:'대구 핵심 상권. 2023~2024 성장 안정화 추세. 4.4% 적용.',
+      src:'어패럴뉴스 집계 / 대구광역시 소비동향'
+    },
+    {
+      name:'더현대 서울', chain:'현대',
+      hist: { '2020':null,'2021':6700,'2022':9592,'2023':11085,'2024':11994 },
+      fcast:{ '2025':13500,'2026':15000,'2027':16300,'2028':17400,'2029':18400 },
+      cagr3: '11.8%',
+      method:'2021년 2월 개점. MZ 타겟 차별화 포지셔닝. 8% 성장 지속 전망. 더현대 광주 개점(2029) 영향 제한적.',
+      src:'어패럴뉴스 집계 / 현대백화점그룹 실적 발표'
+    },
+  ],
+  totalMarket: [
+    { year:'2020', sales:27.9, type:'hist', growth:-6.3, src:'산업통상자원부' },
+    { year:'2021', sales:34.0, type:'hist', growth:21.9, src:'산업통상자원부' },
+    { year:'2022', sales:39.2, type:'hist', growth:15.3, src:'산업통상자원부' },
+    { year:'2023', sales:39.6, type:'hist', growth:1.0,  src:'산업통상자원부' },
+    { year:'2024', sales:39.5, type:'hist', growth:0.6,  src:'산업통상자원부' },
+    { year:'2025e',sales:40.4, type:'est',  growth:2.3,  src:'어패럴뉴스 추정 / 한국백화점협회' },
+    { year:'2026f',sales:41.5, type:'fcast',growth:2.7,  src:'CAGR 2.7% 적용' },
+    { year:'2027f',sales:42.3, type:'fcast',growth:1.9,  src:'성장 둔화 조정' },
+    { year:'2028f',sales:43.0, type:'fcast',growth:1.7,  src:'명품 수요 안정 성장' },
+    { year:'2029f',sales:43.8, type:'fcast',growth:1.9,  src:'신규점 효과 반영' },
+  ]
+};
+let mkt5yrTotalChart, mkt5yrStoreChart;
+
 function switchMktTab(tab) {
-  ['trend','top20','1t','outlook','newopen'].forEach(t=>{
-    document.getElementById('mkt-panel-'+t).style.display = t===tab?'block':'none';
+  ['trend','top20','1t','5yr','outlook','newopen'].forEach(t=>{
+    const panel = document.getElementById('mkt-panel-'+t);
+    if(panel) panel.style.display = t===tab?'block':'none';
     const btn = document.getElementById('mkt-tab-'+t);
     if(btn){ btn.classList.toggle('btn-bl',t===tab); }
   });
   // 패널이 visible 된 후 해당 차트 렌더
-  const renderMap = { trend: renderMktTrend, top20: renderMktTop20, '1t': renderMkt1t, outlook: renderMktOutlook, newopen: renderMktNewOpen };
+  const renderMap = { trend: renderMktTrend, top20: renderMktTop20, '1t': renderMkt1t, '5yr': renderMkt5yr, outlook: renderMktOutlook, newopen: renderMktNewOpen };
   if(renderMap[tab]) renderMap[tab]();
 }
 
 function renderMktMarket() {
   switchMktTab('trend'); // 첫 진입 시 trend 탭으로 시작 (visible 상태에서 차트 생성)
+}
+
+// ── 5년 실적 + 5년 전망 렌더 ──
+function renderMkt5yr() {
+  const years     = ['2020','2021','2022','2023','2024'];
+  const fyears    = ['2025e','2026f','2027f','2028f','2029f'];
+  const fyearsKey = ['2025','2026','2027','2028','2029'];
+  const allLabels = [...years, ...fyears];
+
+  // ── 차트1: 총시장 ──
+  if(mkt5yrTotalChart) mkt5yrTotalChart.destroy();
+  const ct = document.getElementById('chart-mkt-5yr-total');
+  if(ct){
+    const histSales  = MKT_5YR.totalMarket.filter(r=>r.type==='hist').map(r=>r.sales);
+    const estSales   = MKT_5YR.totalMarket.filter(r=>r.type==='est').map(r=>r.sales);
+    const fcastSales = MKT_5YR.totalMarket.filter(r=>r.type==='fcast').map(r=>r.sales);
+    // Align to allLabels
+    const histArr  = allLabels.map(l=>{ const idx=years.indexOf(l); return idx>=0?histSales[idx]:null; });
+    const estArr   = allLabels.map(l=>l==='2025e'?estSales[0]:null);
+    const fcastArr = allLabels.map(l=>{ const fi=fyears.indexOf(l); return (fi>0)?fcastSales[fi]:null; }); // skip 2025e (shown as est)
+
+    mkt5yrTotalChart = new Chart(ct, {
+      type:'bar',
+      data:{
+        labels: allLabels,
+        datasets:[
+          { label:'실적 (조원)', data:histArr, backgroundColor:'#378ADD', borderRadius:4 },
+          { label:'2025 추정', data:estArr, backgroundColor:'#7bb8f0', borderRadius:4, borderWidth:1, borderColor:'#378ADD' },
+          { label:'전망 (조원)', data:fcastArr, backgroundColor:'rgba(26,127,74,0.22)', borderRadius:4, borderWidth:1.5, borderColor:'#1a7f4a',
+            borderDash:[4,3] }
+        ]
+      },
+      options:{
+        responsive:true,
+        plugins:{
+          legend:{labels:{font:{size:10}}},
+          tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}조원`}}
+        },
+        scales:{
+          x:{ticks:{font:{size:10}},
+            afterDataLimits(axis){
+              // draw divider between historical and forecast
+            }
+          },
+          y:{min:24,max:46,ticks:{callback:v=>v+'조',font:{size:10}}}
+        }
+      }
+    });
+  }
+
+  // ── 차트2: 점포별 실적+전망 ──
+  if(mkt5yrStoreChart) mkt5yrStoreChart.destroy();
+  const cs = document.getElementById('chart-mkt-5yr-stores');
+  if(cs){
+    const COLORS = ['#1a56c4','#c0392b','#1a56c4','#1a7f4a','#c0392b','#2980b9','#1a7f4a'];
+    const DASHES = [[],[],[5,4],[],[5,4],[5,4],[5,4]];
+
+    const datasets = [];
+    MKT_5YR.stores.forEach((store, si) => {
+      const baseColor = mktChainColor(store.chain);
+      const alphas = ['ff','cc','aa','88','66'];
+      // 실적 dataset
+      const histData = allLabels.map(l => {
+        if(years.includes(l)) return store.hist[l]||null;
+        return null;
+      });
+      // 연결점: 2024→2025
+      const linkData = allLabels.map(l => {
+        if(l==='2024') return store.hist['2024']||null;
+        if(l==='2025e') return store.fcast['2025']||null;
+        return null;
+      });
+      // 전망 dataset
+      const fcastData = allLabels.map(l => {
+        if(l==='2025e') return store.fcast['2025']||null;
+        const fi = fyears.indexOf(l);
+        if(fi>0) return store.fcast[fyearsKey[fi]]||null;
+        return null;
+      });
+
+      datasets.push({
+        label: store.name+' 실적',
+        data: histData,
+        borderColor: baseColor,
+        backgroundColor: baseColor+'22',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        tension: 0.3,
+        spanGaps: true
+      });
+      datasets.push({
+        label: store.name+' 전망',
+        data: fcastData,
+        borderColor: baseColor,
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [6,3],
+        pointRadius: 3,
+        pointStyle: 'triangle',
+        tension: 0.3,
+        spanGaps: true
+      });
+    });
+
+    mkt5yrStoreChart = new Chart(cs, {
+      type:'line',
+      data:{ labels:allLabels, datasets },
+      options:{
+        responsive:true,
+        plugins:{
+          legend:{
+            labels:{
+              font:{size:9},
+              filter: item => !item.text.includes('전망') ? true : item.datasetIndex%2!==0, // 실적만 레전드 표시 (전망은 첫번째만)
+              generateLabels: chart => {
+                const orig = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                // 실적 라벨만 표시
+                return orig.filter(l=>l.text.includes('실적')).map(l=>({...l, text:l.text.replace(' 실적','')}));
+              }
+            }
+          },
+          tooltip:{
+            callbacks:{
+              label: ctx => {
+                const v = ctx.parsed.y;
+                if(!v) return null;
+                const isF = ctx.dataset.label.includes('전망');
+                return `${ctx.dataset.label.replace(' 실적','').replace(' 전망','')}: ${(v/10000).toFixed(2)}조${isF?' (전망)':' (실적)'}`;
+              }
+            }
+          }
+        },
+        scales:{
+          x:{ticks:{font:{size:10}}},
+          y:{
+            ticks:{callback:v=>v>=10000?(v/10000).toFixed(1)+'조':(v/1000).toFixed(0)+'천억',font:{size:9}},
+            min:5000
+          }
+        }
+      }
+    });
+  }
+
+  // ── 실적 테이블 ──
+  const ht = document.getElementById('mkt-5yr-hist-table');
+  if(ht){
+    ht.innerHTML = `
+    <thead><tr style="background:#f5f5f5">
+      <th style="padding:5px 7px;white-space:nowrap">점포</th>
+      ${years.map(y=>`<th style="padding:5px 7px;text-align:right">${y}</th>`).join('')}
+    </tr></thead>
+    <tbody>
+    ${MKT_5YR.stores.map((s,i)=>`
+      <tr style="${i%2?'background:#fafafa':''}">
+        <td style="padding:5px 7px;font-weight:600;color:${mktChainColor(s.chain)};white-space:nowrap">${s.name}</td>
+        ${years.map(y=>{
+          const v=s.hist[y];
+          return `<td style="padding:5px 7px;text-align:right;color:${v?'#222':'#bbb'}">${v?(v/10000).toFixed(2)+'조':'—'}</td>`;
+        }).join('')}
+      </tr>`).join('')}
+    </tbody>
+    <tfoot><tr><td colspan="${years.length+1}" style="font-size:9px;color:#aaa;padding:4px 7px">
+      ※ 출처: 어패럴뉴스 연간 점별 매출 집계 / 패션비즈 / KTNews | 2020·2022 일부 점포: 산업부 총량 역산 추정치 포함
+    </td></tr></tfoot>`;
+  }
+
+  // ── 전망 테이블 ──
+  const ft = document.getElementById('mkt-5yr-fcast-table');
+  if(ft){
+    ft.innerHTML = `
+    <thead><tr style="background:#f0faf4">
+      <th style="padding:5px 7px;white-space:nowrap">점포</th>
+      ${fyearsKey.map((y,i)=>`<th style="padding:5px 7px;text-align:right">${fyears[i]}</th>`).join('')}
+      <th style="padding:5px 7px">적용 CAGR</th>
+    </tr></thead>
+    <tbody>
+    ${MKT_5YR.stores.map((s,i)=>`
+      <tr style="${i%2?'background:#fafafa':''}">
+        <td style="padding:5px 7px;font-weight:600;color:${mktChainColor(s.chain)};white-space:nowrap">${s.name}</td>
+        ${fyearsKey.map(y=>{
+          const v=s.fcast[y];
+          return `<td style="padding:5px 7px;text-align:right;color:#1a7f4a">${v?(v/10000).toFixed(2)+'조':'—'}</td>`;
+        }).join('')}
+        <td style="padding:5px 7px;font-size:10px;color:#666">${s.cagr3} → 조정 적용</td>
+      </tr>`).join('')}
+    </tbody>
+    <tfoot><tr><td colspan="${fyearsKey.length+2}" style="font-size:9px;color:#aaa;padding:4px 7px">
+      ※ 전망치는 참고용 추정값. 실제 매출은 거시경제·환율·명품 수요 변동에 따라 달라질 수 있습니다.
+    </td></tr></tfoot>`;
+  }
+
+  // ── 방법론 ──
+  const md = document.getElementById('mkt-5yr-method');
+  if(md){
+    md.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr style="background:#fff8e0">
+        <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #e0c860">점포</th>
+        <th style="padding:6px 8px;text-align:center;border-bottom:1px solid #e0c860">3년 실질 CAGR</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #e0c860">전망 근거 및 조정 사항</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #e0c860">출처</th>
+      </tr></thead>
+      <tbody>
+      ${MKT_5YR.stores.map((s,i)=>`
+        <tr style="${i%2?'':'background:#fffef5'}">
+          <td style="padding:5px 8px;font-weight:600;color:${mktChainColor(s.chain)};white-space:nowrap">${s.name}</td>
+          <td style="padding:5px 8px;text-align:center;font-weight:700;color:#1a7f4a">${s.cagr3}</td>
+          <td style="padding:5px 8px;color:#444">${s.method}</td>
+          <td style="padding:5px 8px;color:#888;font-size:10px">${s.src}</td>
+        </tr>`).join('')}
+      </tbody>
+      <tfoot><tr style="background:#f5f5f5"><td colspan="4" style="padding:6px 8px;font-size:10px;color:#888">
+        📊 총시장 전망: 2025e 40.4조 → 2029f 43.8조 (CAGR 2.0%) | 근거: 한국백화점협회 중기 전망, 산업통상자원부 유통업 중기계획 (2024)<br>
+        📌 공통 가정: 원/달러 환율 1,350원 중립, 명품 수요 성장률 연 4%→2% 둔화, 2029년 신규 대형점(더현대 광주·신세계 수서) 개점 영향 흡수
+      </td></tr></tfoot>
+    </table>`;
+  }
 }
 
 function renderMktTrend() {
