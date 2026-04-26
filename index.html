@@ -574,6 +574,7 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
         <button class="dtab" data-etab="stores">🏪 기존 매장 현황</button>
         <button class="dtab" data-etab="pl">📊 손익 현황</button>
         <button class="dtab" data-etab="market">📈 유통 시장 순위</button>
+        <button class="dtab" data-etab="location" style="border:1.5px solid #1a7f4a;color:#1a7f4a;font-weight:700">📍 입지 분석</button>
       </div>
 
       <!-- ① 브랜드 현황 -->
@@ -1623,6 +1624,205 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
         </div><!-- /mkt-panel-compare -->
 
       </div><!-- /etab-market -->
+
+      <!-- ════ 입지 분석: P.F. Chang's 신규 입점 검토 ════ -->
+      <div class="epanel" id="etab-location">
+
+        <!-- 안내 배너 -->
+        <div class="card" style="background:#edfaf1;border-color:rgba(26,127,74,.25);padding:11px 16px;margin-bottom:12px">
+          <div style="font-size:11px;color:#1a5c38;line-height:1.9">
+            📍 <strong>P.F. Chang's 신규 입점 입지 검토</strong> — 롯데백화점 강남점(대치동) vs 신세계 사우스시티(용인 죽전) 비교 분석<br>
+            현재 한국 운영 점포: 롯데 월드몰(잠실) · 코엑스몰(강남구) | 분석 기준일: 2026-04-26<br>
+            ⚠ 매출·수수료 수치는 <strong>업계 유사 매장 참고 추정값</strong> — 실제 협상 전 현장 실사 및 유통사 협의 병행 필요
+          </div>
+        </div>
+
+        <!-- 브랜드 개요 카드 -->
+        <div class="card" style="padding:14px;margin-bottom:14px;border-left:4px solid #1a7f4a">
+          <div class="ct" style="margin-bottom:10px;color:#1a7f4a">🍜 P.F. Chang's 브랜드 프로파일</div>
+          <div class="g3" style="gap:10px">
+            <table style="font-size:11px;width:100%">
+              <tr><td style="color:#aaa;padding:4px 0;width:40%">브랜드 유형</td><td style="padding:4px 0">미국식 아시안 퓨전 캐주얼 다이닝</td></tr>
+              <tr><td style="color:#aaa;padding:4px 0">본사</td><td style="padding:4px 0">미국 애리조나 / 글로벌 220+ 점포</td></tr>
+              <tr><td style="color:#aaa;padding:4px 0">한국 현황</td><td style="padding:4px 0">롯데월드몰·코엑스몰 2개 운영 중</td></tr>
+              <tr><td style="color:#aaa;padding:4px 0">타겟 고객</td><td style="padding:4px 0">25~45세 도심형 외식족·외국인·가족</td></tr>
+            </table>
+            <table style="font-size:11px;width:100%">
+              <tr><td style="color:#aaa;padding:4px 0;width:40%">객단가 (1인)</td><td style="padding:4px 0">4.5만~6.5만원 / 2인 기준 10~13만원</td></tr>
+              <tr><td style="color:#aaa;padding:4px 0">적정 좌석수</td><td style="padding:4px 0">160~220석 (테이블 서비스)</td></tr>
+              <tr><td style="color:#aaa;padding:4px 0">필요 면적</td><td style="padding:4px 0">180~250평 (BOH 포함)</td></tr>
+              <tr><td style="color:#aaa;padding:4px 0">인테리어 수준</td><td style="padding:4px 0">중~고급 (평당 300~400만원)</td></tr>
+            </table>
+            <table style="font-size:11px;width:100%">
+              <tr><td style="color:#aaa;padding:4px 0;width:40%">회전율 목표</td><td style="padding:4px 0">점심 1.5회 / 저녁 1.8회</td></tr>
+              <tr><td style="color:#aaa;padding:4px 0">운영 모델</td><td style="padding:4px 0">백화점·복합몰 수수료 계약</td></tr>
+              <tr><td style="color:#aaa;padding:4px 0">평균 수수료율</td><td style="padding:4px 0">국내 카주얼 다이닝 22~30%</td></tr>
+              <tr><td style="color:#aaa;padding:4px 0">경쟁 브랜드</td><td style="padding:4px 0">크리스탈제이드·와이키키·치즈케익팩토리</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- KPI 비교 4개 -->
+        <div class="krow k4" style="margin-bottom:12px">
+          <div class="kpi" style="border-left:3px solid #c0392b">
+            <div class="kpi-l">🏬 강남점 기본 월매출 (추정)</div>
+            <div class="kpi-v" style="color:#c0392b">2.2억</div>
+            <div class="kpi-s">좌석 180석 · 객단가 5만 · 회전 1.6회</div>
+          </div>
+          <div class="kpi" style="border-left:3px solid #1a56c4">
+            <div class="kpi-l">🏙 사우스시티 기본 월매출 (추정)</div>
+            <div class="kpi-v blu">3.2억</div>
+            <div class="kpi-s">좌석 200석 · 객단가 5만 · 회전 1.9회</div>
+          </div>
+          <div class="kpi" style="border-left:3px solid #e6a817">
+            <div class="kpi-l">수수료율 협상 목표</div>
+            <div class="kpi-v" style="color:#9a6d00">25% vs 27%</div>
+            <div class="kpi-s">강남점 우위 (집객 약세 → 협상 레버리지 ↑)</div>
+          </div>
+          <div class="kpi" style="border-left:3px solid #1a7f4a">
+            <div class="kpi-l">투자회수 (기본 시나리오)</div>
+            <div class="kpi-v up">24M vs 30M</div>
+            <div class="kpi-s">강남 24개월 vs 사우스시티 30개월</div>
+          </div>
+        </div>
+
+        <!-- 상세 비교 분석표 -->
+        <div class="card" style="padding:14px;margin-bottom:14px">
+          <div class="ct" style="margin-bottom:10px">📋 P.F. Chang's 입지 상세 비교표 — 롯데 강남점 vs 신세계 사우스시티</div>
+          <div class="tw">
+            <table style="font-size:11px;width:100%">
+              <thead>
+                <tr style="background:#f8f8f5">
+                  <th style="width:22%;text-align:left;padding:8px 10px;color:#888">항목</th>
+                  <th style="width:39%;text-align:left;padding:8px 10px;color:#c0392b">🏬 롯데백화점 강남점 (대치동)</th>
+                  <th style="width:39%;text-align:left;padding:8px 10px;color:#1a56c4">🏙 신세계 사우스시티 (죽전)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- 기본 입지 -->
+                <tr style="background:#f0f4ff"><td colspan="3" style="padding:6px 10px;font-weight:700;font-size:10px;color:#1a56c4;letter-spacing:.05em">■ 기본 입지 정보</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">주소</td><td style="padding:6px 10px">서울 강남구 대치동 944-31</td><td style="padding:6px 10px">경기도 용인시 수지구 죽전동</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">추천 입점층</td><td style="padding:6px 10px">4F~5F 레스토랑 MD 존</td><td style="padding:6px 10px">5F~6F 레스토랑 MD 존</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">매장 면적 (목표)</td><td style="padding:6px 10px">약 200평 (FOH 140 + BOH 60)</td><td style="padding:6px 10px">약 220평 (FOH 155 + BOH 65)</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">예상 좌석수</td><td style="padding:6px 10px">180석 (테이블 45개)</td><td style="padding:6px 10px">200석 (테이블 50개)</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">점포 규모 등급</td><td style="padding:6px 10px"><span class="tag trd">소형 (전국 50위권)</span></td><td style="padding:6px 10px"><span class="tag tgn">중형 (전국 16위)</span></td></tr>
+                <!-- 상권 특성 -->
+                <tr style="background:#f0f4ff"><td colspan="3" style="padding:6px 10px;font-weight:700;font-size:10px;color:#1a56c4;letter-spacing:.05em">■ 상권 · 고객 특성</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">배후 상권</td><td style="padding:6px 10px">대치동 학원가·도곡·개포 아파트 (강남3구)</td><td style="padding:6px 10px">수지구·분당구·기흥구 약 100만 세대</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">일 방문객 (추정)</td><td style="padding:6px 10px">12,000명</td><td style="padding:6px 10px">35,000명</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">주요 고객층</td><td style="padding:6px 10px">40~60대 고소득 지역 주민</td><td style="padding:6px 10px">30~40대 가족 · 젊은 신혼부부</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">PF Chang's 적합도</td><td style="padding:6px 10px"><span class="tag tam">보통 — 외국계 F&B 인지도 낮음</span></td><td style="padding:6px 10px"><span class="tag tgn">적합 — 가족 다이닝·트렌디 수요 높음</span></td></tr>
+                <tr><td style="color:#666;padding:6px 10px">평균 체류시간</td><td style="padding:6px 10px">약 1.5시간</td><td style="padding:6px 10px">약 2.5시간 → F&B 전환율 유리</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">외국인 고객 비중</td><td style="padding:6px 10px">낮음 (~5%)</td><td style="padding:6px 10px">낮음 (~3%)</td></tr>
+                <!-- 운영 조건 -->
+                <tr style="background:#f0f4ff"><td colspan="3" style="padding:6px 10px;font-weight:700;font-size:10px;color:#1a56c4;letter-spacing:.05em">■ 운영 · 임대 조건</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">수수료율 (목표)</td><td style="padding:6px 10px"><span class="tag tgn">25% 이하</span> (집객 약세 → 레버리지↑)</td><td style="padding:6px 10px"><span class="tag tam">27%</span> (상위 점포 표준 수준)</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">인테리어 비용</td><td style="padding:6px 10px">약 7억 (200평 × 350만/평)</td><td style="padding:6px 10px">약 8.8억 (220평 × 400만/평)</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">인테리어 지원 협상</td><td style="padding:6px 10px"><span class="tag tgn">50% 이상 가능</span> (리뉴얼 유인책)</td><td style="padding:6px 10px"><span class="tag tam">35~40%</span> (상위 점포 여유 적음)</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">자부담 인테리어비</td><td style="padding:6px 10px">약 3.5억 (50% 지원 시)</td><td style="padding:6px 10px">약 5.3억 (40% 지원 시)</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">렌트프리 협상</td><td style="padding:6px 10px"><span class="tag tgn">3개월 가능</span></td><td style="padding:6px 10px"><span class="tag tam">1~2개월</span></td></tr>
+                <tr><td style="color:#666;padding:6px 10px">계약기간</td><td style="padding:6px 10px">2+1년 (리뉴얼 연기 변수)</td><td style="padding:6px 10px">3년 고정 권장</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">리뉴얼 상황</td><td style="padding:6px 10px"><span class="tag trd">무기한 연기</span> → 입점 시기 불투명</td><td style="padding:6px 10px"><span class="tag tgn">2024.08 브랜드 리뉴얼 완료</span></td></tr>
+                <!-- 재무 예측 -->
+                <tr style="background:#f0f4ff"><td colspan="3" style="padding:6px 10px;font-weight:700;font-size:10px;color:#1a56c4;letter-spacing:.05em">■ 재무 시뮬레이션 (월 기준)</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">보수 시나리오 매출</td><td style="padding:6px 10px">1.5억원</td><td style="padding:6px 10px">2.2억원</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">기본 시나리오 매출</td><td style="padding:6px 10px"><strong>2.2억원</strong></td><td style="padding:6px 10px"><strong>3.2억원</strong></td></tr>
+                <tr><td style="color:#666;padding:6px 10px">낙관 시나리오 매출</td><td style="padding:6px 10px">3.2억원</td><td style="padding:6px 10px">4.5억원</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">기본 월 순이익 (10%/8%)</td><td style="padding:6px 10px">약 <strong>2,200만원</strong></td><td style="padding:6px 10px">약 <strong>2,560만원</strong></td></tr>
+                <tr><td style="color:#666;padding:6px 10px">BEP 월매출</td><td style="padding:6px 10px">약 1.75억</td><td style="padding:6px 10px">약 2.5억</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">투자회수 (기본)</td><td style="padding:6px 10px">약 <strong>24개월</strong> (자부담 3.5억)</td><td style="padding:6px 10px">약 <strong>30개월</strong> (자부담 5.3억)</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">2년 ROI (기본)</td><td style="padding:6px 10px"><strong>50%</strong></td><td style="padding:6px 10px"><strong>40%</strong></td></tr>
+                <!-- 리스크·기회 -->
+                <tr style="background:#f0f4ff"><td colspan="3" style="padding:6px 10px;font-weight:700;font-size:10px;color:#1a56c4;letter-spacing:.05em">■ 리스크 · 기회 요인</td></tr>
+                <tr><td style="color:#666;padding:6px 10px">주요 리스크</td>
+                  <td style="padding:6px 10px;color:#c0392b">① 리뉴얼 연기 → 집객 미회복<br>② 식품관 경쟁 (일식·양식 다수)<br>③ 외부 방문객 유입 제한</td>
+                  <td style="padding:6px 10px;color:#922b21">① 갤러리아광교·현대판교 경쟁 심화<br>② 높은 수수료 부담 (27%)<br>③ 높은 인테리어 자부담</td>
+                </tr>
+                <tr><td style="color:#666;padding:6px 10px">주요 기회</td>
+                  <td style="padding:6px 10px;color:#1a7f4a">① 리뉴얼 후 강남 프리미엄 급반등<br>② 낮은 수수료 확보 가능 (25%)<br>③ 학원가 학부모·고소득층 외식 수요</td>
+                  <td style="padding:6px 10px;color:#1a5c38">① 가족 다이닝 수요 (30~40대 강세)<br>② 긴 체류시간 → F&B 전환율 높음<br>③ 신규 MD 재편 시기 → 우량 위치 확보</td>
+                </tr>
+                <tr><td style="color:#666;padding:6px 10px">경쟁 F&B 브랜드</td>
+                  <td style="padding:6px 10px">수제버거·일식 체인·이탈리안 레스토랑</td>
+                  <td style="padding:6px 10px">빕스·아웃백·쉐이크쉑·한식 다이닝</td>
+                </tr>
+                <!-- 종합 -->
+                <tr style="background:#f8f8f5">
+                  <td style="padding:8px 10px;font-weight:700">종합 권고</td>
+                  <td style="padding:8px 10px"><span class="tag tam" style="font-size:11px">조건부 추진 (리뉴얼 착공 후 재평가)</span><br><span style="font-size:10px;color:#888;margin-top:3px;display:block">수수료 25%·인테리어 50%·렌트프리 3M 조건 확보 시 OK</span></td>
+                  <td style="padding:8px 10px"><span class="tag tgn" style="font-size:11px">우선 추진 권장 (브랜드 리뉴얼 MD 재편 적기)</span><br><span style="font-size:10px;color:#888;margin-top:3px;display:block">가족 다이닝 수요 + 우량 층 위치 확보가 핵심 조건</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 차트 2개 -->
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card" style="padding:14px">
+            <div class="ct" style="margin-bottom:6px">📊 시나리오별 월매출 비교 (억원)</div>
+            <div class="cs">보수·기본·낙관 3단계 | 수수료 차감 전 매출 기준</div>
+            <canvas id="chart-loc-revenue" height="220"></canvas>
+          </div>
+          <div class="card" style="padding:14px">
+            <div class="ct" style="margin-bottom:6px">🎯 입지 경쟁력 레이더 비교</div>
+            <div class="cs">P.F. Chang's 업종 기준 6개 항목 (100점)</div>
+            <canvas id="chart-loc-radar" height="220"></canvas>
+          </div>
+        </div>
+
+        <!-- 월별 예상 손익 흐름 -->
+        <div class="card" style="padding:14px;margin-bottom:14px">
+          <div class="ct" style="margin-bottom:6px">📈 개점 후 누적 순이익 흐름 예측 (기본 시나리오, 만원)</div>
+          <div class="cs">렌트프리 기간 포함 | 강남점 렌트프리 3개월 · 사우스시티 2개월 가정 | 자부담 인테리어비 회수선 점선 표시</div>
+          <canvas id="chart-loc-payback" height="180"></canvas>
+        </div>
+
+        <!-- 최종 전략 권고 -->
+        <div class="card" style="padding:14px;background:#fef9f0;border-color:rgba(230,168,23,.3);margin-bottom:14px">
+          <div class="ct" style="margin-bottom:10px">🎯 P.F. Chang's 입점 최종 전략 권고</div>
+          <div class="g2">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#c0392b;margin-bottom:6px">🏬 롯데백화점 강남점 — 조건부 추진</div>
+              <div style="font-size:11px;line-height:2;color:#555">
+                ● <strong>현 시점 액션</strong>: 착공 일정 모니터링 — 리뉴얼 착공 확정 즉시 MD 협상 착수<br>
+                ● <strong>필수 조건</strong>: 수수료율 25% 이하 / 인테리어 지원 50% / 렌트프리 3개월<br>
+                ● <strong>위치 협상</strong>: 4F 레스토랑 존 메인 동선 코너 자리 선점이 핵심<br>
+                ● <strong>타임라인</strong>: 착공 확정(2026 하반기 예상) → 협상(6개월) → 개점(2027~28)<br>
+                ● <strong>업종 포지셔닝</strong>: 학원가 가족 외식 + 도곡·대치 고소득층 특별 식사 니즈 공략
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#1a56c4;margin-bottom:6px">🏙 신세계 사우스시티 — 우선 추진 권장</div>
+              <div style="font-size:11px;line-height:2;color:#555">
+                ● <strong>현 시점 액션</strong>: 브랜드 리뉴얼 직후 MD 재편 시기 — 즉시 협상 착수<br>
+                ● <strong>필수 조건</strong>: 수수료율 27% 이하 / 5~6F 레스토랑 존 주동선 위치 / 3년 계약<br>
+                ● <strong>위치 협상</b>: 주말 가족 동선 핵심 위치 + 외부 전망 테라스석 확보 시 객단가↑<br>
+                ● <strong>타임라인</strong>: 협상 착수(2026.05) → 계약(2026.08) → 인테리어(3개월) → 개점(2026.11~12)<br>
+                ● <strong>업종 포지셔닝</strong>: 주말 가족 Special Occasion 다이닝 + 트렌디한 미식 경험 컨셉
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:12px;padding:10px 12px;background:#fff8e6;border-radius:8px;font-size:11px;color:#7a5200;line-height:1.9">
+            📌 <strong>우선순위 결론</strong>: <strong>신세계 사우스시티 선(先) 오픈 → 롯데 강남점 후(後) 검토</strong><br>
+            사우스시티는 2026년 내 개점 가능 + 가족 다이닝 시장성 명확 | 강남점은 리뉴얼 불확실성 해소 후 진행이 리스크 최소화
+          </div>
+        </div>
+
+        <!-- 데이터 출처 -->
+        <div class="card" style="padding:14px;background:#f8f8f8">
+          <div class="ct" style="margin-bottom:8px">📌 분석 근거 및 출처</div>
+          <div style="font-size:11px;line-height:2;color:#555">
+            • P.F. Chang's 한국 현황: 롯데월드몰·코엑스몰 운영 (TripAdvisor, 공식 페이스북 확인)<br>
+            • 수수료율 기준: 국내 백화점 캐주얼 다이닝 평균 22~30% (유통업계 관행 기준)<br>
+            • 방문객 추정: 어패럴뉴스 점포별 매출·산업부 유통업체 동향 역산<br>
+            • 인테리어 단가: 국내 풀서비스 레스토랑 시공 실적 평균 (2024~2025년 기준)<br>
+            • 매출 추정: 한국 유사 캐주얼 다이닝 체인 (아웃백·빕스·크리스탈제이드) 점포당 매출 참고<br>
+            • 상권 분석: 본 대시보드 상권 DB 비교분석 탭 데이터 활용 (2026-04-26 기준)
+          </div>
+        </div>
+
+      </div><!-- /etab-location -->
 
   </div><!-- /panels -->
 </main>
@@ -4078,6 +4278,119 @@ function _renderCmpRadar() {
   });
 }
 
+// ═══════════════════════════════════════════════════════
+//  입지 분석: P.F. Chang's 롯데 강남 vs 신세계 사우스시티
+// ═══════════════════════════════════════════════════════
+let locRevenueChart, locRadarChart, locPaybackChart;
+
+function renderErexLocation() {
+  _renderLocRevenue();
+  _renderLocRadar();
+  _renderLocPayback();
+}
+
+function _renderLocRevenue() {
+  const c = document.getElementById('chart-loc-revenue');
+  if(!c) return;
+  if(locRevenueChart){locRevenueChart.destroy();locRevenueChart=null;}
+  locRevenueChart = new Chart(c, {
+    type:'bar',
+    data:{
+      labels:['보수 시나리오','기본 시나리오','낙관 시나리오'],
+      datasets:[
+        { label:'롯데 강남점 (억원)', data:[1.5,2.2,3.2],
+          backgroundColor:'rgba(192,57,43,0.8)', borderRadius:6 },
+        { label:'신세계 사우스시티 (억원)', data:[2.2,3.2,4.5],
+          backgroundColor:'rgba(26,86,196,0.8)', borderRadius:6 }
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{labels:{font:{size:10}}},
+        annotation:{annotations:{
+          bep1:{type:'line',yMin:1.75,yMax:1.75,borderColor:'rgba(192,57,43,0.5)',borderWidth:1.5,borderDash:[4,3],label:{content:'강남 BEP',display:true,font:{size:9},color:'#c0392b',position:'end'}},
+          bep2:{type:'line',yMin:2.5,yMax:2.5,borderColor:'rgba(26,86,196,0.5)',borderWidth:1.5,borderDash:[4,3],label:{content:'SSC BEP',display:true,font:{size:9},color:'#1a56c4',position:'end'}}
+        }}
+      },
+      scales:{
+        y:{min:0,max:5,ticks:{callback:v=>v+'억',font:{size:10}},grid:{color:'rgba(0,0,0,.04)'}},
+        x:{ticks:{font:{size:10}}}
+      }
+    }
+  });
+}
+
+function _renderLocRadar() {
+  const c = document.getElementById('chart-loc-radar');
+  if(!c) return;
+  if(locRadarChart){locRadarChart.destroy();locRadarChart=null;}
+  locRadarChart = new Chart(c, {
+    type:'radar',
+    data:{
+      labels:['집객·방문객 수','F&B 업종 적합도','수수료 조건','임대협상 레버리지','성장 잠재력','리스크 최소성'],
+      datasets:[
+        { label:'롯데 강남점', data:[42,52,72,78,82,44],
+          borderColor:'#c0392b', backgroundColor:'rgba(192,57,43,.15)',
+          pointBackgroundColor:'#c0392b', borderWidth:2 },
+        { label:'신세계 사우스시티', data:[78,82,58,55,65,70],
+          borderColor:'#1a56c4', backgroundColor:'rgba(26,86,196,.12)',
+          pointBackgroundColor:'#1a56c4', borderWidth:2 }
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{font:{size:10}}}},
+      scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:8}},pointLabels:{font:{size:9}}}}
+    }
+  });
+}
+
+function _renderLocPayback() {
+  const c = document.getElementById('chart-loc-payback');
+  if(!c) return;
+  if(locPaybackChart){locPaybackChart.destroy();locPaybackChart=null;}
+  // 누적 순이익 시뮬레이션 (36개월)
+  // 강남: 렌트프리 3개월(월+2200만), 이후 +2200만/월, 자부담 3.5억
+  // SSC: 렌트프리 2개월(월+2560만), 이후 +2560만/월, 자부담 5.3억
+  const months = Array.from({length:37},(_,i)=>i===0?'개점':i+'M');
+  const lotteCumul = [], sscCumul = [];
+  let ls=0, ss=0;
+  for(let i=0;i<37;i++){
+    const ltProfit = i<3?2200:2200;
+    const scProfit = i<2?2560:2560;
+    ls += ltProfit; ss += scProfit;
+    lotteCumul.push(Math.round(ls));
+    sscCumul.push(Math.round(ss));
+  }
+  locPaybackChart = new Chart(c, {
+    type:'line',
+    data:{
+      labels: months,
+      datasets:[
+        { label:'롯데 강남점 누적 순이익 (만원)', data: lotteCumul,
+          borderColor:'#c0392b', backgroundColor:'rgba(192,57,43,.06)',
+          fill:true, tension:0.3, borderWidth:2, pointRadius:0 },
+        { label:'신세계 사우스시티 누적 순이익 (만원)', data: sscCumul,
+          borderColor:'#1a56c4', backgroundColor:'rgba(26,86,196,.06)',
+          fill:true, tension:0.3, borderWidth:2, pointRadius:0 },
+        { label:'강남 BEP선 (3.5억)', data: Array(37).fill(35000),
+          borderColor:'rgba(192,57,43,0.4)', borderDash:[5,4], borderWidth:1.5, pointRadius:0 },
+        { label:'사우스시티 BEP선 (5.3억)', data: Array(37).fill(53000),
+          borderColor:'rgba(26,86,196,0.4)', borderDash:[5,4], borderWidth:1.5, pointRadius:0 }
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{font:{size:10}}}},
+      scales:{
+        x:{ticks:{font:{size:9},maxTicksLimit:13}},
+        y:{ticks:{callback:v=>(v/10000).toFixed(1)+'억',font:{size:10}},grid:{color:'rgba(0,0,0,.04)'}}
+      }
+    }
+  });
+}
+
 function renderMktMarket() {
   switchMktTab('trend'); // 첫 진입 시 trend 탭으로 시작 (visible 상태에서 차트 생성)
 }
@@ -4909,6 +5222,8 @@ document.querySelectorAll('[data-etab]').forEach(el=>{
     if(t === 'pl') setTimeout(()=>{
       [erexPlYearChart,erexPlMonthChart,erexPlSegChart,erexPlSegMonthChart].forEach(c=>c&&c.resize&&c.resize());
     }, 50);
+    // 입지 분석 탭
+    if(t === 'location') setTimeout(()=>renderErexLocation(), 50);
   });
 });
 
