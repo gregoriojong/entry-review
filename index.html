@@ -1162,6 +1162,7 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
           <button id="mkt-tab-5yr" onclick="switchMktTab('5yr')" class="btn btn-sm" style="font-size:11px;border:1.5px solid #1a7f4a;color:#1a7f4a">📈 5년실적+5년전망</button>
           <button id="mkt-tab-outlook" onclick="switchMktTab('outlook')" class="btn btn-sm" style="font-size:11px">🔭 향후 5년 전망</button>
           <button id="mkt-tab-newopen" onclick="switchMktTab('newopen')" class="btn btn-sm" style="font-size:11px">🏗 신규 출점 계획</button>
+          <button id="mkt-tab-lotte" onclick="switchMktTab('lotte')" class="btn btn-sm" style="font-size:11px;border:1.5px solid #c0392b;color:#c0392b;font-weight:700">🏬 롯데 강남·본점 분석</button>
         </div>
 
         <!-- 패널: 순위 추이 -->
@@ -1311,6 +1312,101 @@ td.cmp-low{background:#fde8e8!important;color:#c0392b!important;font-weight:700!
             <div id="mkt-5yr-method" style="font-size:11px;line-height:2;color:#444"></div>
           </div>
         </div><!-- /mkt-panel-5yr -->
+
+        <!-- 패널: 롯데 강남·본점 분석 -->
+        <div id="mkt-panel-lotte" style="display:none">
+
+          <!-- 개발 배경 배너 -->
+          <div class="card" style="background:#fff5f5;border-color:rgba(192,57,43,.25);padding:12px 16px;margin-bottom:12px">
+            <div style="font-size:11px;color:#922b21;line-height:1.9">
+              🏗 <strong>신규점 검토 분석</strong> — 롯데백화점 강남점(계획)·소공동 본점(기존) 입점 전략 수립용 비교 자료입니다.<br>
+              강남점: 롯데쇼핑 중장기 개발 로드맵 기반 시나리오 (착공·위치 미확정 기준) | 출처: 유통경제신문·한국경제·롯데쇼핑 IR 자료 (2024~2025)<br>
+              ⚠ 전망치는 <strong>참고용 추정값</strong>이며, 착공·개점 일정 확정 후 재검토 필요합니다.
+            </div>
+          </div>
+
+          <!-- KPI 비교 -->
+          <div class="krow k4" style="margin-bottom:12px">
+            <div class="kpi" style="border-left:3px solid #c0392b">
+              <div class="kpi-l">강남점 2030 기본 전망</div>
+              <div class="kpi-v" style="color:#c0392b">1.9조</div>
+              <div class="kpi-s">오픈 5년차 기준 (기본 시나리오)</div>
+            </div>
+            <div class="kpi" style="border-left:3px solid #e74c3c">
+              <div class="kpi-l">강남점 2030 낙관 전망</div>
+              <div class="kpi-v" style="color:#e74c3c">2.35조</div>
+              <div class="kpi-s">A급 입지·프리미엄 포지셔닝</div>
+            </div>
+            <div class="kpi" style="border-left:3px solid #922b21">
+              <div class="kpi-l">소공동 본점 2030 전망</div>
+              <div class="kpi-v" style="color:#922b21">2.37조</div>
+              <div class="kpi-s">현재 4위 → 2030 5위권</div>
+            </div>
+            <div class="kpi" style="border-left:3px solid #9b59b6">
+              <div class="kpi-l">강남점 예상 순위 (2030)</div>
+              <div class="kpi-v" style="color:#6c3483">7~9위</div>
+              <div class="kpi-s">기본 시나리오 기준</div>
+            </div>
+          </div>
+
+          <!-- 강남점 개요 카드 -->
+          <div class="g2" style="margin-bottom:12px">
+            <div class="card" style="padding:14px;border-left:3px solid #c0392b">
+              <div class="ct" style="margin-bottom:8px;color:#c0392b">🏗 롯데백화점 강남점 (신규 계획)</div>
+              <table style="width:100%;font-size:11px;border-collapse:collapse" id="lotte-gangnam-info"></table>
+            </div>
+            <div class="card" style="padding:14px;border-left:3px solid #922b21">
+              <div class="ct" style="margin-bottom:8px;color:#922b21">🏛 롯데백화점 본점 (소공동 기존)</div>
+              <table style="width:100%;font-size:11px;border-collapse:collapse" id="lotte-sogong-info"></table>
+            </div>
+          </div>
+
+          <!-- 차트1: 강남점 시나리오별 연도별 매출 -->
+          <div class="card" style="padding:14px;margin-bottom:14px">
+            <div class="card-hd"><span class="ct">롯데 강남점 — 시나리오별 예상 매출 추이 2026~2030 (억원)</span></div>
+            <div class="cs" style="margin-bottom:8px">근거: 더현대 서울 오픈 궤적(2021~2024) 준용 + 강남 상권 프리미엄 + 경쟁 환경 3단계 조정 | 시나리오 가정은 하단 방법론 참조</div>
+            <canvas id="chart-lotte-scenario" height="200"></canvas>
+          </div>
+
+          <!-- 차트2: 강남 vs 소공동 비교 (2020-2030) -->
+          <div class="card" style="padding:14px;margin-bottom:14px">
+            <div class="card-hd"><span class="ct">롯데 강남점(기본) vs 소공동 본점 — 매출 비교 2020~2030 (억원)</span></div>
+            <div class="cs" style="margin-bottom:8px">소공동 실적: 어패럴뉴스 집계 | 강남점: 2026 오픈 기준 (기본 시나리오) | 2025~ 소공동 전망 포함</div>
+            <canvas id="chart-lotte-compare" height="200"></canvas>
+          </div>
+
+          <!-- 차트3: 2030 업계 순위 전망 (강남점 포함) -->
+          <div class="card" style="padding:14px;margin-bottom:14px">
+            <div class="card-hd"><span class="ct">2030년 백화점 매출 순위 전망 — 롯데 강남점 진입 시 (억원)</span></div>
+            <div class="cs" style="margin-bottom:8px">기본 시나리오 기준 | 강남점 진입으로 소공동 본점 5위권 하락 전망</div>
+            <canvas id="chart-lotte-rank2030" height="240"></canvas>
+          </div>
+
+          <!-- 테이블: 시나리오 상세 -->
+          <div class="g2" style="margin-bottom:14px">
+            <div class="card" style="padding:14px">
+              <div class="ct" style="margin-bottom:8px">📋 강남점 시나리오별 연도별 예상 매출 (억원)</div>
+              <div class="tw"><table id="lotte-scenario-table" style="font-size:10.5px"></table></div>
+            </div>
+            <div class="card" style="padding:14px">
+              <div class="ct" style="margin-bottom:8px">📋 소공동 본점 실적+전망 (2020~2030)</div>
+              <div class="tw"><table id="lotte-sogong-table" style="font-size:10.5px"></table></div>
+            </div>
+          </div>
+
+          <!-- 입점 전략 시사점 -->
+          <div class="card" style="padding:14px;background:#fef9f0;border-color:rgba(230,168,23,.3);margin-bottom:14px">
+            <div class="ct" style="margin-bottom:10px">🎯 입점 전략 시사점 — 신규점 검토</div>
+            <div id="lotte-strategy" style="font-size:11px;line-height:2"></div>
+          </div>
+
+          <!-- 방법론 -->
+          <div class="card" style="padding:14px;background:#f8f8f8">
+            <div class="ct" style="margin-bottom:8px">📌 전망 산출 방법론</div>
+            <div id="lotte-method" style="font-size:11px;line-height:2;color:#555"></div>
+          </div>
+
+        </div><!-- /mkt-panel-lotte -->
 
       </div><!-- /etab-market -->
 
@@ -2833,6 +2929,327 @@ const MKT_RANK_DATA = {
 const MKT_CHAIN_COLOR = { '신세계':'#1a56c4','롯데':'#c0392b','현대':'#1a7f4a','갤러리아':'#9b59b6','AK':'#e6a817' };
 function mktChainColor(c){ return MKT_CHAIN_COLOR[c] || '#888'; }
 
+// ── 롯데 강남·본점 심층 분석 데이터 ──
+// 강남점: 롯데쇼핑 중장기 개발 로드맵·유통경제신문·한국경제 보도 기반 시나리오 (2025.04 기준)
+// 소공동: 어패럴뉴스 연간 점별 매출 집계 / 패션비즈 / 산업통상자원부
+const MKT_LOTTE = {
+  gangnam: {
+    info: [
+      { label:'상태',    val:'계획·검토 단계 (2025.04 기준)' },
+      { label:'예정 위치', val:'서울 강남구 (세부 위치 미확정)' },
+      { label:'계획 형태', val:'프리미엄 백화점 (복합몰 검토 병행)' },
+      { label:'예정 연면적',val:'약 6~9만평 (확정 전)' },
+      { label:'오픈 목표', val:'2026~2027년 (착공 일정 미확정)' },
+      { label:'비교 기준점',val:'더현대 서울 오픈 궤적 (2021 개점, 6,700억→1.4조 성장)' },
+      { label:'경쟁 점포', val:'신세계 강남·갤러리아 명품관·현대 압구정 (반경 2~4km)' },
+      { label:'출처',    val:'유통경제신문·한국경제·롯데쇼핑 IR (2024~2025)' },
+    ],
+    // 시나리오별 예상 매출 (억원)
+    // 기준: 더현대서울 궤적 + 강남 프리미엄 + 경쟁 강도 조정
+    scenarios: {
+      opt:  { label:'낙관 (A급·프리미엄)',  color:'#e74c3c', alpha:'33',
+              data:{'2026':8500,'2027':13500,'2028':18000,'2029':21500,'2030':23500},
+              cagr:'29.0%', basis:'강남역 직결 A급 입지, 명품관 직접 경쟁 포지셔닝, 신세계 강남 수요 일부 흡수' },
+      base: { label:'기본 (상위 입지)',      color:'#c0392b', alpha:'33',
+              data:{'2026':6500,'2027':10000,'2028':13500,'2029':16500,'2030':19000},
+              cagr:'30.7%', basis:'더현대서울 1년차 6,700억 준용, 강남 상권 1.2배 가산, 개점 3년차 성장 안정화' },
+      con:  { label:'보수 (경쟁 심화)',      color:'#922b21', alpha:'22',
+              data:{'2026':4000,'2027':6500,'2028':9000,'2029':11500,'2030':14000},
+              cagr:'36.8%', basis:'초기 시행착오, 신세계·갤러리아·현대와 수요 중복 40% 가정, 성장 둔화' },
+    }
+  },
+  sogong: {
+    info: [
+      { label:'위치',   val:'서울 중구 소공로 30 (소공동)' },
+      { label:'오픈',   val:'1979년 (국내 최초 현대식 백화점)' },
+      { label:'연면적', val:'약 8.9만평 (영업면적 약 4만평)' },
+      { label:'상권',   val:'명동·시청·광화문 중심 업무·관광 상권' },
+      { label:'2024 실적', val:'20,596억원 (업계 4위)' },
+      { label:'2024 순위', val:'4위 (신세계강남·잠실·센텀 다음)' },
+      { label:'리뉴얼',  val:'2022년 부분 리뉴얼 (영향으로 당해 하락 후 반등)' },
+      { label:'출처',   val:'어패럴뉴스 연간 집계 / 패션비즈 / 롯데쇼핑 분기보고서' },
+    ],
+    hist:  {'2020':11900,'2021':16670,'2022':15700,'2023':20129,'2024':20596},
+    fcast: {'2025e':21805,'2026f':22400,'2027f':22800,'2028f':23100,'2029f':23400,'2030f':23700},
+    rankChange: '현재 4위 → 롯데 강남점 진입 및 현대 판교 성장 시 2028~2030년 5위권 하락 전망',
+    basis: '명동 외국인 관광 회복(+)·신규 경쟁점 제한적 영향(±)·성장 정체 구간 진입(-). CAGR 2.4% 적용.'
+  },
+  // 2030 순위 전망 (기본 시나리오, 강남점 2026 오픈 가정)
+  rank2030: [
+    { name:'신세계 강남',     val:48800, chain:'신세계', note:'실적 기반 전망' },
+    { name:'롯데 잠실',       val:39900, chain:'롯데',   note:'실적 기반 전망' },
+    { name:'신세계 센텀시티', val:26500, chain:'신세계', note:'실적 기반 전망' },
+    { name:'현대 판교',       val:26300, chain:'현대',   note:'실적 기반 전망' },
+    { name:'롯데 본점(소공동)',val:23700, chain:'롯데',   note:'전망치', highlight:'sogong' },
+    { name:'신세계 대구',     val:19500, chain:'신세계', note:'실적 기반 전망' },
+    { name:'더현대 서울',     val:18400, chain:'현대',   note:'실적 기반 전망' },
+    { name:'롯데 강남점(신규)',val:19000, chain:'롯데',   note:'기본 시나리오', highlight:'gangnam' },
+    { name:'현대 무역센터',   val:14000, chain:'현대',   note:'실적 기반 전망' },
+    { name:'갤러리아 명품관', val:13500, chain:'갤러리아',note:'실적 기반 전망' },
+  ],
+  strategy: [
+    { store:'강남점 (신규)', timing:'오픈 6~12개월 전',   priority:'★★★★★',
+      action:'사전 입점 협상 착수 (개점 초기 MD 구성 선점)',
+      detail:'신규 대형점 초기 MD는 2~3년 이상 선점이 결정. 오픈 일정 확정 즉시 롯데 MD팀 접촉 권장. 오픈 1~2년차 집객 급성장 구간에 브랜드 인지도 제고 효과 극대화.' },
+    { store:'강남점 (신규)', timing:'오픈 후 1~2년차',     priority:'★★★★★',
+      action:'강남 프리미엄 포지셔닝 맞춘 MD 전략 협의',
+      detail:'기본 시나리오 기준 1년차 6,500억 → 방문객 연 600~800만명 추정. 신세계 강남·갤러리아와의 차별화 포인트 집중 공략.' },
+    { store:'소공동 본점',   timing:'2025~2026 (현재)',   priority:'★★★☆☆',
+      action:'리뉴얼 협상 시 조건 재검토 기회 활용',
+      detail:'현재 4위권 규모(2.06조). 명동 외국인 관광 의존도 높아 외환 환경 민감. 2030년 5위권으로 하락 전망이나 절대 매출은 2.37조로 유지. 입점 중이면 안정적 기존 거점으로 유지 권장.' },
+    { store:'소공동 본점',   timing:'2027~2028',          priority:'★★★☆☆',
+      action:'롯데 강남점 오픈 후 그룹 內 입점 조건 패키지 협상 검토',
+      detail:'롯데 강남점 입점 협상 시 소공동 본점 조건 연계 패키지 협상 가능성. 그룹 전체 파트너십 구도에서 레버리지 활용.' },
+  ]
+};
+let mktLotteScenChart, mktLotteCmpChart, mktLotteRankChart;
+
+function renderMktLotte() {
+  const years = ['2026','2027','2028','2029','2030'];
+  const yearLabels = ['2026e','2027f','2028f','2029f','2030f'];
+  const sogongAllYears = ['2020','2021','2022','2023','2024','2025e','2026f','2027f','2028f','2029f','2030f'];
+  const sogongAllVals  = [11900,16670,15700,20129,20596,21805,22400,22800,23100,23400,23700];
+  // gangnam base aligned to sogong timeline (null before 2026)
+  const gangnamBase = [null,null,null,null,null,null,6500,10000,13500,16500,19000];
+
+  // ── 개요 테이블 ──
+  const gi = document.getElementById('lotte-gangnam-info');
+  if(gi) gi.innerHTML = MKT_LOTTE.gangnam.info.map((r,i)=>`
+    <tr style="${i%2?'background:#fff':'background:#fff5f5'}">
+      <td style="padding:4px 7px;color:#888;white-space:nowrap;font-size:10.5px">${r.label}</td>
+      <td style="padding:4px 7px;font-weight:500;font-size:10.5px">${r.val}</td>
+    </tr>`).join('');
+  const si = document.getElementById('lotte-sogong-info');
+  if(si) si.innerHTML = MKT_LOTTE.sogong.info.map((r,i)=>`
+    <tr style="${i%2?'background:#fff':'background:#fff8f8'}">
+      <td style="padding:4px 7px;color:#888;white-space:nowrap;font-size:10.5px">${r.label}</td>
+      <td style="padding:4px 7px;font-weight:500;font-size:10.5px">${r.val}</td>
+    </tr>`).join('');
+
+  // ── 차트1: 시나리오별 ──
+  if(mktLotteScenChart) mktLotteScenChart.destroy();
+  const c1 = document.getElementById('chart-lotte-scenario');
+  if(c1){
+    const sc = MKT_LOTTE.gangnam.scenarios;
+    mktLotteScenChart = new Chart(c1, {
+      type:'bar',
+      data:{
+        labels: yearLabels,
+        datasets:[
+          { label:sc.opt.label,  data:years.map(y=>sc.opt.data[y]),  backgroundColor:sc.opt.color+'88',  borderColor:sc.opt.color,  borderWidth:1.5, borderRadius:4 },
+          { label:sc.base.label, data:years.map(y=>sc.base.data[y]), backgroundColor:sc.base.color+'66', borderColor:sc.base.color, borderWidth:1.5, borderRadius:4 },
+          { label:sc.con.label,  data:years.map(y=>sc.con.data[y]),  backgroundColor:sc.con.color+'44',  borderColor:sc.con.color,  borderWidth:1.5, borderRadius:4 },
+        ]
+      },
+      options:{
+        responsive:true,
+        plugins:{
+          legend:{labels:{font:{size:10}}},
+          tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${(ctx.parsed.y/10000).toFixed(2)}조원`}}
+        },
+        scales:{
+          x:{ticks:{font:{size:10}}},
+          y:{
+            min:0,
+            ticks:{callback:v=>v>=10000?(v/10000).toFixed(1)+'조':(v/1000).toFixed(0)+'천억',font:{size:9}},
+            title:{display:true,text:'억원',font:{size:9}}
+          }
+        }
+      }
+    });
+  }
+
+  // ── 차트2: 강남 vs 소공동 비교 ──
+  if(mktLotteCmpChart) mktLotteCmpChart.destroy();
+  const c2 = document.getElementById('chart-lotte-compare');
+  if(c2){
+    mktLotteCmpChart = new Chart(c2, {
+      type:'line',
+      data:{
+        labels: sogongAllYears,
+        datasets:[
+          { label:'소공동 본점 실적',
+            data: sogongAllYears.map((y,i)=>i<5?sogongAllVals[i]:null),
+            borderColor:'#922b21', backgroundColor:'#c0392b22', borderWidth:2.5, pointRadius:4, tension:0.3 },
+          { label:'소공동 본점 전망',
+            data: sogongAllYears.map((y,i)=>i>=4?sogongAllVals[i]:null),
+            borderColor:'#922b21', backgroundColor:'transparent', borderWidth:2, borderDash:[5,3], pointRadius:3, pointStyle:'triangle', tension:0.3 },
+          { label:'롯데 강남점 (기본 시나리오)',
+            data: gangnamBase,
+            borderColor:'#e74c3c', backgroundColor:'#e74c3c22', borderWidth:2.5, pointRadius:4, pointStyle:'rectRot', tension:0.3, spanGaps:false },
+          { label:'롯데 강남점 (낙관)',
+            data: sogongAllYears.map((y,i)=>{
+              const k=y.replace(/[ef]/g,'');
+              return MKT_LOTTE.gangnam.scenarios.opt.data[k]||null;
+            }),
+            borderColor:'#ff8a80', backgroundColor:'transparent', borderWidth:1.5, borderDash:[3,2], pointRadius:2, tension:0.3, spanGaps:false },
+          { label:'롯데 강남점 (보수)',
+            data: sogongAllYears.map((y,i)=>{
+              const k=y.replace(/[ef]/g,'');
+              return MKT_LOTTE.gangnam.scenarios.con.data[k]||null;
+            }),
+            borderColor:'#ffcdd2', backgroundColor:'transparent', borderWidth:1.5, borderDash:[3,2], pointRadius:2, tension:0.3, spanGaps:false },
+        ]
+      },
+      options:{
+        responsive:true,
+        plugins:{
+          legend:{labels:{font:{size:10}}},
+          tooltip:{callbacks:{label:ctx=>{const v=ctx.parsed.y;return v?`${ctx.dataset.label}: ${(v/10000).toFixed(2)}조`:null;}}}
+        },
+        scales:{
+          x:{ticks:{font:{size:10}}},
+          y:{min:8000,ticks:{callback:v=>(v/10000).toFixed(1)+'조',font:{size:9}}}
+        }
+      }
+    });
+  }
+
+  // ── 차트3: 2030 순위 전망 ──
+  if(mktLotteRankChart) mktLotteRankChart.destroy();
+  const c3 = document.getElementById('chart-lotte-rank2030');
+  if(c3){
+    // Sort by val desc
+    const sorted = [...MKT_LOTTE.rank2030].sort((a,b)=>b.val-a.val);
+    const labels = sorted.map(s=>s.name);
+    const vals   = sorted.map(s=>s.val);
+    const colors = sorted.map(s=>{
+      if(s.highlight==='gangnam') return '#e74c3c';
+      if(s.highlight==='sogong') return '#922b21';
+      return mktChainColor(s.chain)+'99';
+    });
+    const borders = sorted.map(s=>s.highlight?mktChainColor(s.chain):mktChainColor(s.chain)+'88');
+
+    mktLotteRankChart = new Chart(c3, {
+      type:'bar',
+      data:{
+        labels,
+        datasets:[{
+          label:'2030 예상 매출 (억원)',
+          data: vals,
+          backgroundColor: colors,
+          borderColor: borders,
+          borderWidth: sorted.map(s=>s.highlight?2:0),
+          borderRadius: 4
+        }]
+      },
+      options:{
+        indexAxis:'y',
+        responsive:true,
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:ctx=>`${(ctx.parsed.x/10000).toFixed(2)}조원`}}
+        },
+        scales:{
+          x:{ticks:{callback:v=>v>=10000?(v/10000).toFixed(1)+'조':(v/1000).toFixed(0)+'천억',font:{size:9}}},
+          y:{ticks:{font:{size:10},color: ctx=>{
+            const nm=labels[ctx.index];
+            if(nm.includes('강남점')) return '#e74c3c';
+            if(nm.includes('소공동')) return '#922b21';
+            return '#333';
+          }}}
+        }
+      }
+    });
+  }
+
+  // ── 시나리오 테이블 ──
+  const st = document.getElementById('lotte-scenario-table');
+  if(st){
+    const sc = MKT_LOTTE.gangnam.scenarios;
+    st.innerHTML = `
+    <thead><tr style="background:#fff5f5">
+      <th style="padding:5px 7px">구분</th>
+      ${yearLabels.map(y=>`<th style="padding:5px 7px;text-align:right">${y}</th>`).join('')}
+      <th style="padding:5px 7px">성장률</th>
+    </tr></thead>
+    <tbody>
+    ${Object.entries(sc).map(([k,s],i)=>`
+      <tr style="${i%2?'background:#fff8f8':''}">
+        <td style="padding:5px 7px;font-weight:700;color:${s.color};white-space:nowrap;font-size:10px">${s.label}</td>
+        ${years.map(y=>`<td style="padding:5px 7px;text-align:right;color:${s.color}">${(s.data[y]/10000).toFixed(2)}조</td>`).join('')}
+        <td style="padding:5px 7px;font-size:10px;color:#666">${s.cagr}</td>
+      </tr>
+      <tr style="background:#fffbfb"><td colspan="${years.length+2}" style="padding:3px 7px 6px;font-size:10px;color:#888;line-height:1.7">${s.basis}</td></tr>
+    `).join('')}
+    </tbody>
+    <tfoot><tr><td colspan="${years.length+2}" style="font-size:9px;color:#aaa;padding:4px 7px">
+      ※ 오픈 기준: 2026년 가정 | 전망치는 참고용 추정값
+    </td></tr></tfoot>`;
+  }
+
+  // ── 소공동 테이블 ──
+  const sgt = document.getElementById('lotte-sogong-table');
+  if(sgt){
+    const allY = Object.keys(MKT_LOTTE.sogong.hist).concat(Object.keys(MKT_LOTTE.sogong.fcast));
+    const allV = Object.values(MKT_LOTTE.sogong.hist).concat(Object.values(MKT_LOTTE.sogong.fcast));
+    sgt.innerHTML = `
+    <thead><tr style="background:#fff8f8">
+      <th style="padding:5px 7px">연도</th>
+      <th style="padding:5px 7px;text-align:right">매출 (억원)</th>
+      <th style="padding:5px 7px;text-align:right">환산 (조원)</th>
+      <th style="padding:5px 7px">구분</th>
+    </tr></thead>
+    <tbody>
+    ${allY.map((y,i)=>{
+      const v=allV[i];
+      const isF=y.includes('e')||y.includes('f');
+      const growth = i>0?((v-allV[i-1])/allV[i-1]*100).toFixed(1):'—';
+      return `<tr style="${i%2?'background:#fff8f8':''}">
+        <td style="padding:5px 7px;font-weight:600">${y}</td>
+        <td style="padding:5px 7px;text-align:right">${v.toLocaleString()}</td>
+        <td style="padding:5px 7px;text-align:right;color:${isF?'#1a7f4a':'#222'}">${(v/10000).toFixed(2)}조</td>
+        <td style="padding:5px 7px;font-size:10px;color:${isF?'#1a7f4a':'#888'}">${isF?'전망':'실적'}</td>
+      </tr>`;}).join('')}
+    </tbody>
+    <tfoot><tr><td colspan="4" style="font-size:9px;color:#aaa;padding:4px 7px">
+      실적: 어패럴뉴스 집계·패션비즈 | 전망: CAGR 2.4% 적용 | ${MKT_LOTTE.sogong.basis}
+    </td></tr></tfoot>`;
+  }
+
+  // ── 입점 전략 ──
+  const stratEl = document.getElementById('lotte-strategy');
+  if(stratEl){
+    stratEl.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr style="background:#fff8e0">
+        <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #e0c860">대상 점포</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #e0c860">추천 시기</th>
+        <th style="padding:6px 8px;text-align:center;border-bottom:1px solid #e0c860">우선순위</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #e0c860">권고 액션</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #e0c860">세부 내용</th>
+      </tr></thead>
+      <tbody>
+      ${MKT_LOTTE.strategy.map((s,i)=>`
+        <tr style="${i%2?'':'background:#fffef5'}; vertical-align:top">
+          <td style="padding:6px 8px;font-weight:700;color:#c0392b;white-space:nowrap">${s.store}</td>
+          <td style="padding:6px 8px;white-space:nowrap;color:#555">${s.timing}</td>
+          <td style="padding:6px 8px;text-align:center;color:#e6a817;font-size:13px">${s.priority}</td>
+          <td style="padding:6px 8px;font-weight:600">${s.action}</td>
+          <td style="padding:6px 8px;color:#555;line-height:1.7">${s.detail}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  }
+
+  // ── 방법론 ──
+  const mEl = document.getElementById('lotte-method');
+  if(mEl){
+    mEl.innerHTML = `
+    <strong>▸ 강남점 시나리오 산출 기준</strong><br>
+    · <strong>기준점</strong>: 더현대 서울 (2021.02 개점) — 1년차 6,700억, 2년차 9,592억, 3년차 11,085억, 4년차 11,994억 (출처: 어패럴뉴스)<br>
+    · <strong>강남 프리미엄 계수</strong>: 기본 시나리오 ×1.0 (더현대서울 동일 가정), 낙관 ×1.3 (강남 역세권 A급), 보수 ×0.65 (경쟁 수요 중복 40% 차감)<br>
+    · <strong>성장률</strong>: 더현대서울 실제 연도별 성장률(+43%→+15%→+8%) 패턴 준용, 3년차 이후 성장 둔화 반영<br>
+    · <strong>경쟁 조정</strong>: 신세계 강남(반경 2km, -3%), 갤러리아 명품관(반경 1.5km, -5%), 현대 압구정(반경 3km, -2%) 수요 중복 차감 (보수 시나리오 집중 반영)<br><br>
+    <strong>▸ 소공동 전망 산출 기준</strong><br>
+    · 2022~2024년 실질 CAGR 2.4% 적용 (리뉴얼 기저효과 제거 후)<br>
+    · 명동 외국인 관광 회복 부분 반영, 내국인 프리미엄 소비 성숙기 진입 조정<br>
+    · 롯데 강남점 오픈에 따른 직접 수요 잠식 낮음 (상권 분리: 소공동↔강남구) — 그룹 내 자원 배분 영향 소폭 반영<br><br>
+    <strong>▸ 공통 가정</strong>: 원/달러 환율 중립(1,350원), 국내 민간소비 연 2% 성장, 국내 명품 시장 성장률 2022 피크 후 4%→2% 둔화 (Bloomberg Intelligence 2025 Luxury Outlook)<br>
+    <span style="color:#aaa;font-size:10px">출처: 더현대서울 실적(현대백화점그룹 IR·어패럴뉴스), 롯데쇼핑 사업보고서, 유통경제신문, Bloomberg Intelligence</span>`;
+  }
+}
+
 // ── 5년 실적 + 5년 전망 데이터 ──
 // 실적(2020-2024): 어패럴뉴스 연간 점별 매출 집계 / 패션비즈 / 산업통상자원부
 // 2020·2022 일부 점포: 산업부 총량 역산 + 어패럴뉴스 회고 기사 기반 추정
@@ -2912,14 +3329,14 @@ const MKT_5YR = {
 let mkt5yrTotalChart, mkt5yrStoreChart;
 
 function switchMktTab(tab) {
-  ['trend','top20','1t','5yr','outlook','newopen'].forEach(t=>{
+  ['trend','top20','1t','5yr','outlook','newopen','lotte'].forEach(t=>{
     const panel = document.getElementById('mkt-panel-'+t);
     if(panel) panel.style.display = t===tab?'block':'none';
     const btn = document.getElementById('mkt-tab-'+t);
     if(btn){ btn.classList.toggle('btn-bl',t===tab); }
   });
   // 패널이 visible 된 후 해당 차트 렌더
-  const renderMap = { trend: renderMktTrend, top20: renderMktTop20, '1t': renderMkt1t, '5yr': renderMkt5yr, outlook: renderMktOutlook, newopen: renderMktNewOpen };
+  const renderMap = { trend: renderMktTrend, top20: renderMktTop20, '1t': renderMkt1t, '5yr': renderMkt5yr, outlook: renderMktOutlook, newopen: renderMktNewOpen, lotte: renderMktLotte };
   if(renderMap[tab]) renderMap[tab]();
 }
 
